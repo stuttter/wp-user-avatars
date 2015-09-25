@@ -1,0 +1,17 @@
+{
+  "name": "stuttter/wp-user-avatars",
+  "description": "Avatars for your users, without Gravatar",
+  "homepage": "https://github.com/stuttter/wp-user-avatars",
+  "type": "wordpress-plugin",
+  "require": {
+    "php": ">=5.2",
+    "composer/installers": "^1.0"
+  },
+  "license": "GPLv2 or later",
+  "authors": [
+    {
+      "name": "John James Jacoby",
+      "email": "johnjamesjacoby@me.com"
+    }
+  ]
+}
