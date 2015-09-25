@@ -14,7 +14,7 @@
 		position: relative;
 	}
 
-	#your-profile table {
+	#your-profile > table {
 		margin-right: 390px;
 		width: auto;
 	}
