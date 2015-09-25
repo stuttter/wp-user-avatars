@@ -1,11 +1,30 @@
 /* global i10n_WPUserAvatars, ajaxurl */
 jQuery( document ).ready( function ( $ ) {
 
+	/**
+	 * Check if submit should move
+	 */
+	function checkSubmitMove() {
+		var windowsize = $( window ).width();
+
+		if ( windowsize > 1110 ) {
+			$( '#your-profile p.submit' ).appendTo( $( '#wp-user-avatars-user-settings' ) );
+		} else {
+			$( '#wp-user-avatars-user-settings p.submit' ).appendTo( $( '#your-profile' ) );
+		}
+	}
+
+	// Bind event listener
+	$( window ).on( 'resize', function() {
+		checkSubmitMove();
+	} );
+
+	// Fire right away
+	checkSubmitMove();
+
 	/* Globals */
 	var wp_user_avatars_modal,
 		avatar_working;
-
-	$( '#your-profile p.submit' ).appendTo( $( '#wp-user-avatars-user-settings' ) );
 
 	/**
 	 * Invoke the media modal
