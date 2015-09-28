@@ -254,17 +254,19 @@ function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email, $size = 
 		$alt = get_the_author_meta( 'display_name', $user_id );
 	}
 
-	// generate a new size
+	// Generate a new size
 	if ( ! array_key_exists( $size, $user_avatars ) ) {
-		$user_avatars[ $size ] = $user_avatars['full']; // just in case of failure elsewhere
 
-		// allow automatic rescaling to be turned off
+		// Set full size
+		$user_avatars[ $size ] = $user_avatars['full'];
+
+		// Allow rescaling to be toggled, usually for performance reasons
 		if ( apply_filters( 'wp_user_avatars_dynamic_resize', true ) ) :
 
+			// Get the upload path (hard to trust this sometimes, though...)
 			$upload_path = wp_upload_dir();
 
-			// Get path for image by converting URL, unless its already been set,
-			// thanks to using media library approach
+			// Get path for image by converting URL
 			if ( ! isset( $avatar_full_path ) ) {
 				$avatar_full_path = str_replace( $upload_path['baseurl'], $upload_path['basedir'], $user_avatars['full'] );
 			}
