@@ -80,3 +80,64 @@
 		text-align: right;
 	}
 }
+
+/* WP User Profiles Support */
+#side-sortables #user-avatar br,
+#side-sortables #user-avatar .wp-user-avatar-rating-description,
+#side-sortables #user-avatar .fancy-hidden {
+	display: none;
+}
+
+#normal-sortables #wp-user-avatars-ratings fieldset,
+#side-sortables #wp-user-avatars-ratings fieldset {
+	padding-left: 0;
+}
+
+#side-sortables #user-avatar .wp-user-avatar-rating {
+	margin-right: 25px;
+}
+
+#side-sortables #user-avatar img {
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	height: 125px;
+	width: 125px;
+}
+
+#side-sortables #user-avatar h3 {
+	font-size: 14px;
+	padding: 8px 12px;
+	margin: 0;
+	line-height: 1.4;
+	border-bottom: 1px solid #eee;
+}
+
+#side-sortables #user-avatar table {
+	margin: 0;
+	padding: 0;
+}
+#side-sortables #user-avatar th {
+	display: none;
+}
+
+#side-sortables #user-avatar td {
+	padding: 15px 0 0 0;
+}
+
+#side-sortables #wp-user-avatars-photo,
+#side-sortables #wp-user-avatars-actions {
+	float: left;
+	width: 90%;
+}
+
+#side-sortables #wp-user-avatars-photo {
+	text-align: center;
+}
+
+#side-sortables #user-avatar p.submit {
+	margin: 0;
+	padding: 10px;
+	border-top: 1px solid #ddd;
+	background-color: #f5f5f5;
+	text-align: right;
+}

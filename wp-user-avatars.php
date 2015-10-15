@@ -33,6 +33,7 @@ function _wp_user_avatars() {
 	require $plugin_path . 'includes/capabilities.php';
 	require $plugin_path . 'includes/functions.php';
 	require $plugin_path . 'includes/errors.php';
+	require $plugin_path . 'includes/metabox.php';
 	require $plugin_path . 'includes/uninstall.php';
 	require $plugin_path . 'includes/hooks.php';
 }
@@ -57,7 +58,7 @@ function wp_user_avatars_get_plugin_url() {
  * @return int
  */
 function wp_user_avatars_get_asset_version() {
-	return 201509250001;
+	return 201510150001;
 }
 
 /**

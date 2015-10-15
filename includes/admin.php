@@ -111,7 +111,7 @@ function wp_user_avatars_sanitize_block_gravatar( $input ) {
 function wp_user_avatars_admin_enqueue_scripts( $hook_suffix = '' ) {
 
 	// Bail if not profile screen
-	if ( ! in_array( $hook_suffix, array( 'profile.php', 'user-edit.php' ) ) ) {
+	if ( ! in_array( $hook_suffix, wp_user_avatars_profile_sections() ) ) {
 		return;
 	}
 
@@ -121,9 +121,9 @@ function wp_user_avatars_admin_enqueue_scripts( $hook_suffix = '' ) {
 	}
 
 	// User ID
-	$user_id = ( 'profile.php' === $hook_suffix )
-		? get_current_user_id()
-		: (int) $_GET['user_id'];
+	$user_id = ! empty( $_GET['user_id'] )
+		? (int) $_GET['user_id']
+		: get_current_user_id();
 
 	// URL & Version
 	$url = wp_user_avatars_get_plugin_url();
@@ -160,102 +160,122 @@ function wp_user_avatars_edit_user_profile( $user = 0 ) {
 	<div id="wp-user-avatars-user-settings">
 		<h3><?php esc_html_e( 'Avatar','wp-user-avatars' ); ?></h3>
 
-		<table class="form-table">
+		<?php wp_user_avatars_section_content( $user ); ?>
 
-			<?php
-
-			// User needs caps to edit avatar
-			if ( current_user_can( 'edit_avatar', $user->ID ) ) : ?>
-
-				<tr>
-					<th scope="row"><label for="wp-user-avatars"><?php esc_html_e( 'Upload', 'wp-user-avatars' ); ?></label></th>
-					<td id="wp-user-avatars-photo">
-						<?php
-							add_filter( 'pre_option_avatar_rating', '__return_null' );
-							echo get_user_avatar( $user->ID, 90 );
-							remove_filter( 'pre_option_avatar_rating', '__return_null' );
-						?>
-					</td>
-					<td id="wp-user-avatars-actions">
-
-						<?php
-
-						// User needs additional caps to upload avatars
-						if ( current_user_can( 'upload_avatar', $user->ID ) ) : ?>
-
-							<div>
-								<input type="file" name="wp-user-avatars" id="wp-user-avatars" class="standard-text" />
-							</div>
-
-						<?php endif; ?>
-
-						<div>
-
-							<?php
-
-							// Prevent errors if not enqueued successfully
-							if ( did_action( 'wp_enqueue_media' ) ) : ?>
-
-								<a href="#" class="button hide-if-no-js" id="wp-user-avatars-media">
-									<?php esc_html_e( 'Choose from Media', 'wp-user-avatars' ); ?>
-								</a> &nbsp;
-
-							<?php endif; ?>
-
-							<?php
-
-							// User needs additional caps to remove existing avatar
-							if ( current_user_can( 'remove_avatar', $user->ID ) ) : ?>
-
-								<?php $remove_url = add_query_arg( array(
-									'action'   => 'remove-wp-user-avatars',
-									'user_id'  => $user->ID,
-									'_wpnonce' => false,
-								) ); ?>
-
-								<a href="<?php echo esc_url( $remove_url ); ?>" class="button item-delete submitdelete deletion" id="wp-user-avatars-remove"<?php if ( empty( $user->wp_user_avatars ) ) echo ' style="display:none;"'; ?>>
-									<?php esc_html_e( 'Remove', 'wp-user-avatars' ); ?>
-								</a>
-
-							<?php endif; ?>
-
-						</div>
-
-						<?php wp_nonce_field( 'wp_user_avatars_nonce', '_wp_user_avatars_nonce', false ); ?>
-
-					</td>
-				</tr>
-
-			<?php endif; ?>
-
-			<?php
-
-			// User needs additional caps to edit ratings
-			if ( current_user_can( 'edit_avatar_rating', $user->ID ) ) : ?>
-
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Rating', 'wp-user-avatars' ); ?></th>
-					<td id="wp-user-avatars-ratings" colspan="2" <?php if ( empty( $user->wp_user_avatars ) ) echo ' class="fancy-hidden"'; ?>>
-						<fieldset <?php disabled( empty( $user->wp_user_avatars ) ); ?>>
-							<legend class="screen-reader-text"><span><?php esc_html_e( 'Rating', 'wp-user-avatars' ); ?></span></legend>
-							<?php
-
-							// User rating
-							if ( empty( $user->wp_user_avatars_rating ) || ! array_key_exists( $user->wp_user_avatars_rating, wp_user_avatars_get_ratings() ) ) {
-								$user->wp_user_avatars_rating = 'G';
-							}
-
-							// Output the rating form field
-							wp_user_avatars_user_rating_form_field( $user ); ?>
-
-						</fieldset>
-					</td>
-				</tr>
-
-			<?php endif; ?>
-
-		</table>
 	</div>
 
 	<?php
+}
+
+/**
+ * Output the HTML used for the metabox and settings section
+ *
+ * @since 0.1.0
+ *
+ * @param  object $user
+ */
+function wp_user_avatars_section_content( $user = null ) {
+
+	// Bail if no user
+	if ( empty( $user->ID ) ) {
+		return;
+	} ?>
+
+	<table class="form-table">
+
+		<?php
+
+		// User needs caps to edit avatar
+		if ( current_user_can( 'edit_avatar', $user->ID ) ) : ?>
+
+			<tr>
+				<th scope="row"><label for="wp-user-avatars"><?php esc_html_e( 'Upload', 'wp-user-avatars' ); ?></label></th>
+				<td id="wp-user-avatars-photo">
+					<?php
+						add_filter( 'pre_option_avatar_rating', '__return_null' );
+						echo get_user_avatar( $user->ID, 90 );
+						remove_filter( 'pre_option_avatar_rating', '__return_null' );
+					?>
+				</td>
+				<td id="wp-user-avatars-actions">
+
+					<?php
+
+					// User needs additional caps to upload avatars
+					if ( current_user_can( 'upload_avatar', $user->ID ) ) : ?>
+
+						<div>
+							<input type="file" name="wp-user-avatars" id="wp-user-avatars" class="standard-text" />
+						</div>
+
+					<?php endif; ?>
+
+					<div>
+
+						<?php
+
+						// Prevent errors if not enqueued successfully
+						if ( did_action( 'wp_enqueue_media' ) ) : ?>
+
+							<a href="#" class="button hide-if-no-js" id="wp-user-avatars-media">
+								<?php esc_html_e( 'Choose from Media', 'wp-user-avatars' ); ?>
+							</a> &nbsp;
+
+						<?php endif; ?>
+
+						<?php
+
+						// User needs additional caps to remove existing avatar
+						if ( current_user_can( 'remove_avatar', $user->ID ) ) : ?>
+
+							<?php $remove_url = add_query_arg( array(
+								'action'   => 'remove-wp-user-avatars',
+								'user_id'  => $user->ID,
+								'_wpnonce' => false,
+							) ); ?>
+
+							<a href="<?php echo esc_url( $remove_url ); ?>" class="button item-delete submitdelete deletion" id="wp-user-avatars-remove"<?php if ( empty( $user->wp_user_avatars ) ) echo ' style="display:none;"'; ?>>
+								<?php esc_html_e( 'Remove', 'wp-user-avatars' ); ?>
+							</a>
+
+						<?php endif; ?>
+
+					</div>
+
+					<?php wp_nonce_field( 'wp_user_avatars_nonce', '_wp_user_avatars_nonce', false ); ?>
+
+				</td>
+			</tr>
+
+		<?php endif; ?>
+
+		<?php
+
+		// User needs additional caps to edit ratings
+		if ( current_user_can( 'edit_avatar_rating', $user->ID ) ) : ?>
+
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Rating', 'wp-user-avatars' ); ?></th>
+				<td id="wp-user-avatars-ratings" colspan="2" <?php if ( empty( $user->wp_user_avatars ) ) echo ' class="fancy-hidden"'; ?>>
+					<fieldset <?php disabled( empty( $user->wp_user_avatars ) ); ?>>
+						<legend class="screen-reader-text"><span><?php esc_html_e( 'Rating', 'wp-user-avatars' ); ?></span></legend>
+						<?php
+
+						// User rating
+						if ( empty( $user->wp_user_avatars_rating ) || ! array_key_exists( $user->wp_user_avatars_rating, wp_user_avatars_get_ratings() ) ) {
+							$user->wp_user_avatars_rating = 'G';
+						}
+
+						// Output the rating form field
+						wp_user_avatars_user_rating_form_field( $user ); ?>
+
+					</fieldset>
+				</td>
+			</tr>
+
+		<?php endif; ?>
+
+	</table>
+
+<?php
 }

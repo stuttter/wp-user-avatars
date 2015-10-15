@@ -40,3 +40,6 @@ add_filter( 'get_avatar', 'wp_user_avatars_filter_get_avatar', 10, 4 );
 add_action( 'wp_ajax_assign_wp_user_avatars_media', 'wp_user_avatars_ajax_assign_media'     );
 add_action( 'wp_ajax_remove_wp_user_avatars',       'wp_user_avatars_action_remove_avatars' );
 add_action( 'admin_action_remove-wp-user-avatars',  'wp_user_avatars_action_remove_avatars' );
+
+// Metabox
+add_action( 'add_meta_boxes', 'wp_user_profiles_add_avatar_meta_box', 10, 2 );

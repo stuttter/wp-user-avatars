@@ -420,3 +420,27 @@ function wp_user_avatars_user_rating_form_field( WP_User $user ) {
 	// Output the buffer
 	echo ob_get_clean();
 }
+
+/**
+ * Return array of profile sections
+ *
+ * @since 0.1.0
+ *
+ * @return string
+ */
+function wp_user_avatars_profile_sections() {
+
+	// Bail if no user profile sections
+	if ( ! function_exists( 'wp_user_profiles_sections' ) ) {
+		return array( 'profile.php', 'user-edit.php' );
+	}
+
+	// Get sections
+	$sections = wp_list_pluck( wp_user_profiles_sections(), 'slug' );
+	$in_array = array( 'toplevel_page_profile' );
+	foreach ( $sections as $section ) {
+		$in_array[] = 'users_page_' . $section;
+	}
+
+	return $in_array;
+}
