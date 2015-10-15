@@ -2,6 +2,13 @@
 	width: 90px;
 }
 
+#wp-user-avatars-user-settings img {
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	height: 90px;
+	width: 90px;
+}
+
 #wp-user-avatars-actions input[type=file]{
 	margin: 0 0 8px;
 }
@@ -45,13 +52,6 @@
 
 	#wp-user-avatars-user-settings .wp-user-avatar-rating {
 		margin-right: 25px;
-	}
-
-	#wp-user-avatars-user-settings img {
-		-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-		height: 90px;
-		width: 90px;
 	}
 
 	#wp-user-avatars-user-settings h3 {
