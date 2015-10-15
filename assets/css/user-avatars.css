@@ -124,6 +124,7 @@
 
 #side-sortables #user-avatar td {
 	padding: 15px 0 0 0;
+	margin-bottom: 0;
 }
 
 #side-sortables #wp-user-avatars-photo,
