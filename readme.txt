@@ -3,7 +3,7 @@ Contributors: johnjamesjacoby, stuttter
 Tags: avatar, user, profile
 Requires at least: 4.3
 Tested up to: 4.4
-Stable tag: 0.1.3
+Stable tag: 0.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,9 +39,6 @@ The WordPress support forums: https://wordpress.org/support/plugin/wp-user-avata
 http://github.com/stuttter/wp-user-avatars/
 
 == Changelog ==
-
-= 0.1.3 =
-* Improve avatar styling with user profiles plugin
 
 = 0.1.2 =
 * Improve avatar styling
