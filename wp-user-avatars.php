@@ -4,7 +4,7 @@
  * Plugin Name: WP User Avatars
  * Plugin URI:  https://wordpress.org/plugins/wp-user-avatars/
  * Description: Avatars for your users, without Gravatar
- * Version:     0.1.0
+ * Version:     0.1.1
  * Author:      John James Jacoby
  * Author URI:  http://jjj.me
  * License:     GPLv2 or later
@@ -58,7 +58,7 @@ function wp_user_avatars_get_plugin_url() {
  * @return int
  */
 function wp_user_avatars_get_asset_version() {
-	return 201510150001;
+	return 201510150002;
 }
 
 /**

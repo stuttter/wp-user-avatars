@@ -193,7 +193,7 @@ function wp_user_avatars_section_content( $user = null ) {
 				<td id="wp-user-avatars-photo">
 					<?php
 						add_filter( 'pre_option_avatar_rating', '__return_null' );
-						echo get_user_avatar( $user->ID, 90 );
+						echo get_user_avatar( $user->ID, 250 );
 						remove_filter( 'pre_option_avatar_rating', '__return_null' );
 					?>
 				</td>
