@@ -25,17 +25,17 @@ function _wp_user_avatars() {
 
 	// Admin-only common files
 	if ( is_admin() ) {
-		require $plugin_path . 'includes/admin.php';
-		require $plugin_path . 'includes/ajax.php';
+		require_once $plugin_path . 'includes/admin.php';
+		require_once $plugin_path . 'includes/ajax.php';
 	}
 
 	// Avatar files
-	require $plugin_path . 'includes/capabilities.php';
-	require $plugin_path . 'includes/functions.php';
-	require $plugin_path . 'includes/errors.php';
-	require $plugin_path . 'includes/metabox.php';
-	require $plugin_path . 'includes/uninstall.php';
-	require $plugin_path . 'includes/hooks.php';
+	require_once $plugin_path . 'includes/capabilities.php';
+	require_once $plugin_path . 'includes/functions.php';
+	require_once $plugin_path . 'includes/errors.php';
+	require_once $plugin_path . 'includes/metabox.php';
+	require_once $plugin_path . 'includes/uninstall.php';
+	require_once $plugin_path . 'includes/hooks.php';
 }
 add_action( 'plugins_loaded', '_wp_user_avatars' );
 
