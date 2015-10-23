@@ -34,7 +34,7 @@ add_action( 'user_profile_update_errors', 'wp_user_avatars_profile_update_errors
 add_filter( 'avatar_defaults', 'wp_user_avatars_avatar_defaults' );
 
 // Filter avatars
-add_filter( 'get_avatar', 'wp_user_avatars_filter_get_avatar', 10, 4 );
+add_filter( 'get_avatar', 'wp_user_avatars_filter_get_avatar', 10, 5 );
 
 // Ajax
 add_action( 'wp_ajax_assign_wp_user_avatars_media', 'wp_user_avatars_ajax_assign_media'     );

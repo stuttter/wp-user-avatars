@@ -193,7 +193,7 @@ function get_user_avatar( $id_or_email, $size = 250, $default = '', $alt = '' ) 
  *
  * @return string <img> tag for the user's avatar
  */
-function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email, $size = 250, $default = '', $alt = '' ) {
+function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email = 0, $size = 250, $default = '', $alt = '' ) {
 
 	// Do some work to figure out the user ID
 	if ( is_numeric( $id_or_email ) ) {
