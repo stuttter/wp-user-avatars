@@ -5,7 +5,7 @@
  *
  * @since 0.1.0
  *
- * @package User/Avatar/Ajax
+ * @package Plugins/Users/Avatar/Ajax
  */
 
 // Exit if accessed directly

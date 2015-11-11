@@ -5,7 +5,7 @@
  *
  * @since 0.1.0
  *
- * @package User/Avatar/Hooks
+ * @package Plugins/Users/Avatars/Hooks
  */
 
 // Exit if accessed directly

@@ -5,7 +5,7 @@
  *
  * @since 0.1.0
  *
- * @package User/Avatar/Errors
+ * @package Plugins/Users/Avatars/Errors
  */
 
 // Exit if accessed directly

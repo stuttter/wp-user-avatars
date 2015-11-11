@@ -3,7 +3,7 @@
 /**
  * User Profile Avatar Metabox
  * 
- * @package User/Profiles/Metaboxes/Avatar
+ * @package Plugins/Users/Profiles/Metaboxes/Avatar
  */
 
 // Exit if accessed directly
@@ -24,8 +24,17 @@ function wp_user_profiles_add_avatar_meta_box( $type = '', $user = null ) {
 		return;
 	}
 
+	// Support for WP User Profiles 0.1.7 and higher
+	if ( function_exists( 'wp_user_profiles_get_section_hooknames' ) ) {
+		$types = wp_user_profiles_get_section_hooknames();
+
+	// WP User Profiles 0.1.6 and lower
+	} else {
+		$types = wp_user_avatars_profile_sections();
+	}
+
 	// Bail if not user metaboxes
-	if ( empty( $user ) || ! in_array( $type, wp_user_avatars_profile_sections() ) ) {
+	if ( empty( $user ) || ! in_array( $type, $types, true ) ) {
 		return;
 	}
 

@@ -3,7 +3,7 @@
 /**
  * User Avatars Capabilities
  *
- * @package User/Avatars/Capabilities
+ * @package Plugins/Users/Avatars/Capabilities
  */
 
 // Exit if accessed directly

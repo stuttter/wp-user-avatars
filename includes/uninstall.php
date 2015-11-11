@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * User Profile Avatar Uninstall
+ * 
+ * @package Plugins/User/Avatars/Uninstall
+ */
+
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
+/**
  * Hokey uninstall routine to remove all avatars
  *
  * @since 0.1.0

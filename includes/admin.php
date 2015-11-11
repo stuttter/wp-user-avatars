@@ -5,7 +5,7 @@
  *
  * @since 0.1.0
  *
- * @package User/Avatar/Admin
+ * @package Plugins/Users/Avatar/Admin
  */
 
 // Exit if accessed directly
