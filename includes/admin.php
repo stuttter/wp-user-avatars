@@ -106,12 +106,20 @@ function wp_user_avatars_sanitize_block_gravatar( $input ) {
 /**
  * Add scripts to the profile editing page
  *
- * @param string $hook_suffix Page hook
+ * @param string $hook Page hook
  */
-function wp_user_avatars_admin_enqueue_scripts( $hook_suffix = '' ) {
+function wp_user_avatars_admin_enqueue_scripts( $hook = '' ) {
+
+	// WP User Profiles support
+	if ( function_exists( '_wp_user_profiles_walk_section_hooknames' ) ) {
+		_wp_user_profiles_walk_section_hooknames( $hook );
+		$types = wp_user_profiles_get_section_hooknames();
+	} else {
+		$types = wp_user_avatars_profile_sections();
+	}
 
 	// Bail if not profile screen
-	if ( ! in_array( $hook_suffix, wp_user_avatars_profile_sections() ) ) {
+	if ( ! in_array( $hook, $types, true ) ) {
 		return;
 	}
 
