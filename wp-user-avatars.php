@@ -23,13 +23,9 @@ function _wp_user_avatars() {
 	// Get the plugin path
 	$plugin_path = plugin_dir_path( __FILE__ );
 
-	// Admin-only common files
-	if ( is_admin() ) {
-		require_once $plugin_path . 'includes/admin.php';
-		require_once $plugin_path . 'includes/ajax.php';
-	}
-
-	// Avatar files
+	// Required files
+	require_once $plugin_path . 'includes/admin.php'; // Only hooked if is_admin()
+	require_once $plugin_path . 'includes/ajax.php';
 	require_once $plugin_path . 'includes/capabilities.php';
 	require_once $plugin_path . 'includes/functions.php';
 	require_once $plugin_path . 'includes/errors.php';
