@@ -63,7 +63,7 @@ function wp_user_avatars_ajax_assign_media() {
 	$user_id  = (int) $_POST['user_id'];
 
 	// Bail if current user cannot proceed
-	if ( ! current_user_can( 'upload_avatars' ) || ! current_user_can( 'edit_avatar', $user_id ) ) {
+	if ( ! current_user_can( 'edit_avatar', $user_id ) ) {
 		die();
 	}
 

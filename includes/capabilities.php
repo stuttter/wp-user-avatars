@@ -26,28 +26,19 @@ function wp_user_avatars_meta_caps( $caps = array(), $cap = '', $user_id = 0, $a
 	// What capability is being checked?
 	switch ( $cap ) {
 
-		// Reading
+		// Upload
 		case 'upload_avatar' :
-		case 'upload_avatars' :
-			$caps = array( 'list_users' );
-			break;
 
-		// Editing
+		// Edit
 		case 'edit_avatar' :
-		case 'edit_avatars' :
-		case 'edit_others_avatars' :
 		case 'edit_avatar_rating' :
-		case 'edit_avatar_ratings' :
-		case 'edit_others_avatar_ratings' :
 
-		// Deleting
+		// Delete
 		case 'remove_avatar' :
 		case 'delete_avatar' :
-		case 'remove_avatars' :
-		case 'delete_avatars' :
-		case 'remove_others_avatars'  :
-		case 'delete_others_avatars'  :
-			$caps = array( 'list_users' );
+			if ( user_can( $user_id, 'edit_user', $args[0] ) ) {
+				$caps = array();
+			}
 			break;
 	}
 

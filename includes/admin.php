@@ -123,10 +123,8 @@ function wp_user_avatars_admin_enqueue_scripts( $hook = '' ) {
 		return;
 	}
 
-	// Maybe enqueue media
-	if ( current_user_can( 'upload_avatars' ) ) {
-		wp_enqueue_media();
-	}
+	// Enqueue media
+	wp_enqueue_media();
 
 	// User ID
 	$user_id = ! empty( $_GET['user_id'] )
