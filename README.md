@@ -16,7 +16,7 @@ Right now, not very well. We're working on this soon.
 
 ### Where can I get support?
 
-The WordPress support forums: https://wordpress.org/plugin/support/wp-user-avatars/
+The WordPress support forums: https://wordpress.org/support/plugin/wp-user-avatars/
 
 ### Can I contribute?
 
