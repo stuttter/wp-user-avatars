@@ -27,9 +27,6 @@ add_action( 'user_edit_form_tag',       'wp_user_avatars_user_edit_form_tag'    
 add_action( 'personal_options_update',  'wp_user_avatars_edit_user_profile_update' );
 add_action( 'edit_user_profile_update', 'wp_user_avatars_edit_user_profile_update' );
 
-// Error output
-add_action( 'user_profile_update_errors', 'wp_user_avatars_profile_update_errors', 10, 3 );
-
 // Avatar defaults
 add_filter( 'avatar_defaults', 'wp_user_avatars_avatar_defaults' );
 
