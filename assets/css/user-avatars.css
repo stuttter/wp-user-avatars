@@ -85,6 +85,7 @@
 }
 
 /* WP User Profiles Support */
+tr.user-profile-picture,
 #side-sortables #user-avatar br,
 #side-sortables #user-avatar .wp-user-avatar-rating-description,
 #side-sortables #user-avatar .fancy-hidden {

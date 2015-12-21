@@ -3,7 +3,7 @@ Contributors: johnjamesjacoby, stuttter
 Tags: avatar, user, profile
 Requires at least: 4.3
 Tested up to: 4.4
-Stable tag: 0.1.7
+Stable tag: 0.1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9Q4F4EL5YJ62J
@@ -57,6 +57,9 @@ The WordPress support forums: https://wordpress.org/support/plugin/wp-user-avata
 http://github.com/stuttter/wp-user-avatars/
 
 == Changelog ==
+
+= 0.1.8 =
+* Hide "Profile Picture" section (WordPress 4.4)
 
 = 0.1.7 =
 * Improve capability mappings
