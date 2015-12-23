@@ -110,6 +110,11 @@ function wp_user_avatars_sanitize_block_gravatar( $input ) {
  */
 function wp_user_avatars_admin_enqueue_scripts() {
 
+	// Bail if not editing a user
+	if ( ! defined( 'IS_PROFILE_PAGE' ) ) {
+		return;
+	}
+
 	// Enqueue media
 	wp_enqueue_media();
 
