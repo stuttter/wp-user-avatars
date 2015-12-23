@@ -19,19 +19,8 @@ defined( 'ABSPATH' ) || exit;
  */
 function wp_user_profiles_add_avatar_meta_box( $type = '', $user = null ) {
 
-	// Bail if no profile sections
-	if ( ! function_exists( 'wp_user_profiles_sections' ) ) {
-		return;
-	}
-
-	// Support for WP User Profiles 0.1.7 and higher
-	if ( function_exists( 'wp_user_profiles_get_section_hooknames' ) ) {
-		$types = wp_user_profiles_get_section_hooknames();
-
-	// WP User Profiles 0.1.6 and lower
-	} else {
-		$types = wp_user_avatars_profile_sections();
-	}
+	// Get hooks
+	$types = wp_user_profiles_get_section_hooknames();
 
 	// Bail if not user metaboxes
 	if ( empty( $user ) || ! in_array( $type, $types, true ) ) {
