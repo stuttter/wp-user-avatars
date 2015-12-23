@@ -3,11 +3,14 @@
 /**
  * Plugin Name: WP User Avatars
  * Plugin URI:  https://wordpress.org/plugins/wp-user-avatars/
+ * Author:      John James Jacoby
+ * Author URI:  https://profiles.wordpress.org/johnjamesjacoby/
+ * License:     GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Description: Avatars for your users, without Gravatar
  * Version:     0.2.0
- * Author:      John James Jacoby
- * Author URI:  http://jjj.me
- * License:     GPLv2 or later
+ * Text Domain: wp-user-avatars
+ * Domain Path: /assets/lang/
  */
 
 // Exit if accessed directly
