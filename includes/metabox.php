@@ -19,14 +19,6 @@ defined( 'ABSPATH' ) || exit;
  */
 function wp_user_profiles_add_avatar_meta_box( $type = '', $user = null ) {
 
-	// Get hooks
-	$types = wp_user_profiles_get_section_hooknames();
-
-	// Bail if not user metaboxes
-	if ( empty( $user ) || ! in_array( $type, $types, true ) ) {
-		return;
-	}
-
 	// Register avatar metabox
 	add_meta_box(
 		'user-avatar',
@@ -34,7 +26,8 @@ function wp_user_profiles_add_avatar_meta_box( $type = '', $user = null ) {
 		'wp_user_profiles_avatar_metabox',
 		$type,
 		'side',
-		'low'
+		'low',
+		$user
 	);
 }
 
