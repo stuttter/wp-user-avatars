@@ -303,8 +303,16 @@ function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email = 0, $siz
 		? ' current-author'
 		: '' ;
 
+	// Filter avatar classes
+	$classes = implode( ' ', apply_filters( 'wp_user_avatars_avatar_classes', array(
+		'avatar',
+		'avatar-' . $size,
+		$author_class,
+		'photo'
+	) ) );
+
 	// Setup the markup
-	$avatar = "<img alt='" . esc_attr( $alt ) . "' src='" . esc_url( $user_avatars[ $size ] ) . "' class='avatar avatar-{$size}{$author_class} photo' height='{$size}' width='{$size}' />";
+	$avatar = "<img alt='" . esc_attr( $alt ) . "' src='" . esc_url( $user_avatars[ $size ] ) . "' class='{$classes}' height='{$size}' width='{$size}' />";
 
 	// Filter & return
 	return apply_filters( 'wp_user_avatars', $avatar, $id_or_email, $size, $default, $alt );
@@ -444,3 +452,4 @@ function wp_user_avatars_profile_sections() {
 
 	return $in_array;
 }
+
