@@ -128,8 +128,11 @@ function wp_user_avatars_admin_enqueue_scripts() {
 	$ver = wp_user_avatars_get_asset_version();
 
 	// Enqueue
-	wp_enqueue_script( 'wp-user-avatars', $url . 'assets/js/user-avatars.js',   array( 'jquery' ), $ver, true  );
-	wp_enqueue_style( 'wp-user-avatars',  $url . 'assets/css/user-avatars.css', array(),           $ver, false );
+	wp_enqueue_script( 'wp-user-avatars',     $url . 'assets/js/user-avatars.js',       array( 'jquery' ),          $ver, true  );
+	wp_enqueue_style( 'wp-user-avatars',      $url . 'assets/css/user-avatars.css',     array(),                    $ver );
+	if ( is_rtl() ) {
+	    wp_enqueue_style( 'wp-user-avatars-rtl',  $url . 'assets/css/user-avatars-rtl.css', array( 'wp-user-avatars' ), $ver );
+	}
 
 	// Localize
 	wp_localize_script( 'wp-user-avatars', 'i10n_WPUserAvatars', array(
