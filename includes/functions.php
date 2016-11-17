@@ -153,66 +153,99 @@ function wp_user_avatars_get_ratings() {
 }
 
 /**
- * More efficient to call directly in theme and avoid Gravatar entirely
+ * Deprecated. Now you can use `get_avatar()` directly.
  *
  * @since 0.1.0
+ * @deprecated 1.0.0
  *
- * @param  mixed   $id_or_email A user ID,  email address, or comment object
- * @param  int     $size        Size of the avatar image
- * @param  string  $default     URL to a default image to use if no avatar is available
- * @param  string  $alt         Alternate text to use in image tag. Defaults to blank
+ * @param mixed  $id_or_email
+ * @param int    $size
+ * @param string $default
+ * @param string $alt
  *
- * @return string  <img> tag for the user's avatar
+ * @return string
  */
 function get_user_avatar( $id_or_email, $size = 250, $default = '', $alt = '' ) {
-
-	// Look for avatar on this site
-	$avatar = wp_user_avatars_filter_get_avatar( '', $id_or_email, $size, $default, $alt );
-
-	// Get Gravatar fallback
-	if ( empty( $avatar ) ) {
-		remove_action( 'get_avatar', 'wp_user_avatars_filter_get_avatar' );
-		$avatar = get_avatar( $id_or_email, $size, $default, $alt );
-		add_action( 'get_avatar', 'wp_user_avatars_filter_get_avatar' );
-	}
-
-	// Return whichever avatar was found
-	return $avatar;
+	return get_avatar( $id_or_email, $size, $default, $alt );
 }
 
 /**
- * Retrieve an avatar for this site for a specific user by email or ID
+ * Calculate a user ID based on whatever object was passed in
  *
- * @since 0.1.0
+ * @since 1.0.0
  *
- * @param  string            $avatar Avatar return by original function
- * @param  int|string|object $id_or_email A user ID,  email address, or comment object
- * @param  int               $size Size of the avatar image
- * @param  string            $default URL to a default image to use if no avatar is available
- * @param  string            $alt Alternative text to use in image tag. Defaults to blank
+ * @param mixed $id_or_email
  *
- * @return string <img> tag for the user's avatar
+ * @return int
  */
-function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email = 0, $size = 250, $default = '', $alt = '' ) {
+function wp_user_avatars_get_user_id( $id_or_email ) {
 
-	// Do some work to figure out the user ID
+	// Default
+	$retval = 0;
+
+	// Numeric, so use ID
 	if ( is_numeric( $id_or_email ) ) {
-		$user_id = (int) $id_or_email;
-	} elseif ( is_string( $id_or_email ) && ( $user = get_user_by( 'email', $id_or_email ) ) ) {
-		$user_id = $user->ID;
-	} elseif ( is_object( $id_or_email ) && ! empty( $id_or_email->user_id ) ) {
-		$user_id = (int) $id_or_email->user_id;
+		$retval = $id_or_email;
+
+	// Maybe email or login
+	} elseif ( is_string( $id_or_email ) ) {
+
+		// User by
+		$user_by = is_email( $id_or_email )
+			? 'email'
+			: 'login';
+
+		// Get user
+		$user = get_user_by( $user_by, $id_or_email );
+
+		// User ID
+		if ( ! empty( $user ) ) {
+			$retval = $user->ID;
+		}
+
+	// User Object
+	} elseif ( $id_or_email instanceof WP_User ) {
+		$user = $id_or_email->ID;
+
+	// Post Object
+	} elseif ( $id_or_email instanceof WP_Post ) {
+		$retval = $id_or_email->post_author;
+
+	// Comment
+	} elseif ( $id_or_email instanceof WP_Comment ) {
+		if ( ! empty( $id_or_email->user_id ) ) {
+			$retval = $id_or_email->user_id;
+		}
 	}
+
+	return (int) apply_filters( 'wp_user_avatars_get_user_id', (int) $retval, $id_or_email );
+}
+
+/**
+ * Look for and return the URL to a local avatar if found
+ *
+ * @since 1.0.0
+ *
+ * @param int    $user_id
+ * @param int    $size
+ * @param string $fallback
+ *
+ * @return mixed
+ */
+function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
+
+	// Try to get user ID
+	$user_id = wp_user_avatars_get_user_id( $user_id );
 
 	// Bail if no user ID
 	if ( empty( $user_id ) ) {
-		return $avatar;
+		return null;
 	}
 
 	// Fetch avatars from usermeta, bail if no full option
 	$user_avatars = get_user_meta( $user_id, 'wp_user_avatars', true );
 	if ( empty( $user_avatars['full'] ) ) {
-		return $avatar;
+		return null;
 	}
 
 	// Get ratings
@@ -223,13 +256,14 @@ function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email = 0, $siz
 	if ( ! empty( $avatar_rating ) && ( 'G' !== $avatar_rating ) && ( $avatar_rating !== $site_rating ) ) {
 
 		// Calculate rating weights
-		$ratings              = array_keys( wp_user_avatars_get_ratings() );
-		$site_rating_weight   = array_search( $site_rating, $ratings );
-		$avatar_rating_weight = array_search( $avatar_rating, $ratings );
+		$ratings              = wp_user_avatars_get_ratings();
+		$ratings_key          = array_keys( $ratings );
+		$site_rating_weight   = array_search( $site_rating,   $ratings_key );
+		$avatar_rating_weight = array_search( $avatar_rating, $ratings_key );
 
 		// Too risky
 		if ( ( false !== $avatar_rating_weight ) && ( $avatar_rating_weight > $site_rating_weight ) ) {
-			return $avatar;
+			return null;
 		}
 	}
 
@@ -245,13 +279,8 @@ function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email = 0, $siz
 				wp_user_avatars_delete_avatar( $user_id );
 			}
 
-			return $avatar;
+			return null;
 		}
-	}
-
-	// Alternate text
-	if ( empty( $alt ) ) {
-		$alt = get_the_author_meta( 'display_name', $user_id );
 	}
 
 	// Generate a new size
@@ -261,7 +290,7 @@ function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email = 0, $siz
 		$user_avatars[ $size ] = $user_avatars['full'];
 
 		// Allow rescaling to be toggled, usually for performance reasons
-		if ( apply_filters( 'wp_user_avatars_dynamic_resize', true ) ) :
+		if ( apply_filters( 'wp_user_avatars_dynamic_resize', true ) ) {
 
 			// Get the upload path (hard to trust this sometimes, though...)
 			$upload_path = wp_upload_dir();
@@ -290,7 +319,7 @@ function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email = 0, $siz
 
 			// Save updated avatar sizes
 			update_user_meta( $user_id, 'wp_user_avatars', $user_avatars );
-		endif;
+		}
 	}
 
 	// URL corrections
@@ -298,24 +327,33 @@ function wp_user_avatars_filter_get_avatar( $avatar = '', $id_or_email = 0, $siz
 		$user_avatars[ $size ] = home_url( $user_avatars[ $size ] );
 	}
 
-	// Current?
-	$author_class = is_author( $user_id )
-		? ' current-author'
-		: '' ;
+	// Return the url
+	return $user_avatars[ $size ];
+}
 
-	// Filter avatar classes
-	$classes = implode( ' ', apply_filters( 'wp_user_avatars_avatar_classes', array(
-		'avatar',
-		'avatar-' . $size,
-		$author_class,
-		'photo'
-	) ) );
+/**
+ * Filter 'get_avatar_url' and maybe return a local avatar
+ *
+ * @since 1.0.0
+ *
+ * @param string $url
+ * @param mixed $id_or_email
+ * @param array $args
+ *
+ * @return string
+ */
+function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 
-	// Setup the markup
-	$avatar = "<img alt='" . esc_attr( $alt ) . "' src='" . esc_url( $user_avatars[ $size ] ) . "' class='{$classes}' height='{$size}' width='{$size}' />";
+	// Look for local avatar
+	$avatar = wp_user_avatars_get_local_avatar_url( $id_or_email, $args['size'] );
 
-	// Filter & return
-	return apply_filters( 'wp_user_avatars', $avatar, $id_or_email, $size, $default, $alt );
+	// Override URL if avatar is found
+	if ( ! empty( $avatar ) ) {
+		$url = $avatar;
+	}
+
+	// Return maybe-local URL
+	return $url;
 }
 
 /**
@@ -397,8 +435,20 @@ function wp_user_avatars_update_avatar( $user_id, $media ) {
  * @since 0.1.0
  */
 function wp_user_avatars_avatar_defaults( $avatar_defaults = array() ) {
-	remove_action( 'get_avatar', 'wp_user_avatars_filter_get_avatar' );
-	return $avatar_defaults;
+
+	// Default
+	$new_avatar_defaults = $avatar_defaults;
+
+	// Maybe block Gravatars
+	if ( get_option( 'wp_user_avatars_block_gravatar' ) ) {
+		$new_avatar_defaults = array(
+			'mystery' => __( 'Mystery Person', 'wp-user-avatars' ),
+			'blank'   => __( 'Blank',          'wp-user-avatars' )
+		);
+	}
+
+	// Return avatar types, maybe without Gravatar options
+	return $new_avatar_defaults;
 }
 
 /**
@@ -452,4 +502,3 @@ function wp_user_avatars_profile_sections() {
 
 	return $in_array;
 }
-

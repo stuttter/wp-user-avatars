@@ -41,7 +41,7 @@ function wp_user_avatars_action_remove_avatars() {
 
 	// Output the default avatar
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-		echo get_user_avatar( $user_id, 90 );
+		echo get_avatar( $user_id, 90 );
 		die();
 	}
 }
@@ -79,7 +79,7 @@ function wp_user_avatars_ajax_assign_media() {
 
 	// Output the new avatar
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-		echo get_user_avatar( $user_id, 90 );
+		echo get_avatar( $user_id, 90 );
 		die();
 	}
 }

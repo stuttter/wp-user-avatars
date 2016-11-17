@@ -188,16 +188,10 @@ function wp_user_avatars_section_content( $user = null ) {
 
 			<tr>
 				<th scope="row"><label for="wp-user-avatars"><?php esc_html_e( 'Upload', 'wp-user-avatars' ); ?></label></th>
-				<td id="wp-user-avatars-photo">
-					<?php
-						add_filter( 'pre_option_avatar_rating', '__return_null' );
-						echo get_user_avatar( $user->ID, 250 );
-						remove_filter( 'pre_option_avatar_rating', '__return_null' );
-					?>
-				</td>
-				<td id="wp-user-avatars-actions">
-
-					<?php
+				<td id="wp-user-avatars-photo"><?php
+					echo get_avatar( $user->ID, 250 );
+				?></td>
+				<td id="wp-user-avatars-actions"><?php
 
 					// User needs additional caps to upload avatars
 					if ( current_user_can( 'upload_avatar', $user->ID ) ) : ?>
