@@ -1,6 +1,6 @@
 {
   "name": "stuttter/wp-user-avatars",
-  "description": "Avatars for your users, without Gravatar",
+  "description": "Allow registered users to upload & select their own avatars",
   "homepage": "https://github.com/stuttter/wp-user-avatars",
   "type": "wordpress-plugin",
   "require": {

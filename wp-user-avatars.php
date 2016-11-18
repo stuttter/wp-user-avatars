@@ -8,9 +8,9 @@
  * License:     GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Description: Avatars for your users, without Gravatar
- * Version:     0.2.0
+ * Version:     1.0.0
  * Text Domain: wp-user-avatars
- * Domain Path: /assets/lang/
+ * Domain Path: /wp-user-avatars/assets/languages/
  */
 
 // Exit if accessed directly
@@ -24,10 +24,10 @@ defined( 'ABSPATH' ) || exit;
 function _wp_user_avatars() {
 
 	// Get the plugin path
-	$plugin_path = plugin_dir_path( __FILE__ );
+	$plugin_path = plugin_dir_path( __FILE__ ) . 'wp-user-avatars/';
 
 	// Required files
-	require_once $plugin_path . 'includes/admin.php'; // Only hooked if is_admin()
+	require_once $plugin_path . 'includes/admin.php';
 	require_once $plugin_path . 'includes/ajax.php';
 	require_once $plugin_path . 'includes/capabilities.php';
 	require_once $plugin_path . 'includes/functions.php';
@@ -46,7 +46,7 @@ add_action( 'plugins_loaded', '_wp_user_avatars' );
  * @return string
  */
 function wp_user_avatars_get_plugin_url() {
-	return plugin_dir_url( __FILE__ );
+	return plugin_dir_url( __FILE__ ) . 'wp-user-avatars/';
 }
 
 /**

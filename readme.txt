@@ -2,15 +2,15 @@
 Contributors: johnjamesjacoby, stuttter
 Tags: avatar, user, profile
 Requires at least: 4.4
-Tested up to: 4.4
-Stable tag: 0.2.0
+Tested up to: 4.7
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9Q4F4EL5YJ62J
 
 == Description ==
 
-WP User Avatars allows registered users to upload and select their own avatars.
+Allow registered users to upload & select their own avatars.
 
 = Also checkout =
 
@@ -50,13 +50,18 @@ Right now, not very well. We're working on this soon.
 
 = Where can I get support? =
 
-The WordPress support forums: https://wordpress.org/support/plugin/wp-user-avatars/
+* Basic: https://wordpress.org/support/plugin/wp-user-avatars/
+* Priority: https://chat.flox.io/support/channels/wp-user-avatars/
 
 = Where can I find documentation? =
 
 http://github.com/stuttter/wp-user-avatars/
 
 == Changelog ==
+
+= 1.0.0 =
+* Improved mu-plugins location support
+* Use WordPress 4.2+ functions & filters
 
 = 0.2.0 =
 * Support for User Profiles 0.2.0
