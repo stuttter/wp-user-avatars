@@ -3,7 +3,7 @@ Contributors: johnjamesjacoby, stuttter
 Tags: avatar, user, profile
 Requires at least: 4.4
 Tested up to: 4.7
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9Q4F4EL5YJ62J
@@ -58,6 +58,9 @@ Right now, not very well. We're working on this soon.
 http://github.com/stuttter/wp-user-avatars/
 
 == Changelog ==
+
+= 1.0.2 =
+* Fix bug with "Default Avatar" display introduced in 1.0.1
 
 = 1.0.1 =
 * Improved mu-plugins location support
