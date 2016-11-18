@@ -3,23 +3,23 @@
  */
 @media screen and ( min-width: 1110px ) {
 	#your-profile > table {
-                margin-left: 390px;
+		margin-left: 390px;
 		margin-right: 0;
 	}
 
 	#wp-user-avatars-user-settings {
 		right: auto;
-                left: 0;
+		left: 0;
 	}
 
 	#wp-user-avatars-ratings fieldset {
 		padding-left: 0;
-                padding-right: 110px;
+		padding-right: 110px;
 	}
 
 	#wp-user-avatars-user-settings .wp-user-avatar-rating {
 		margin-right: 0;
-                margin-left: 15px;
+		margin-left: 15px;
 	}
 
 	#wp-user-avatars-user-settings p.submit {
@@ -30,12 +30,12 @@
 #normal-sortables #wp-user-avatars-ratings fieldset,
 #side-sortables #wp-user-avatars-ratings fieldset {
 	padding-left: auto;
-        padding-right: 0;
+	padding-right: 0;
 }
 
 #side-sortables #user-avatar .wp-user-avatar-rating {
 	margin-right: 0;
-        margin-left: 25px;
+	margin-left: 25px;
 }
 
 #side-sortables #wp-user-avatars-photo,
