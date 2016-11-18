@@ -57,14 +57,14 @@ function wp_user_avatars_get_plugin_url() {
  * @return int
  */
 function wp_user_avatars_get_asset_version() {
-	return 201512230001;
+	return 201611170001;
 }
 
 /**
  * Loads the translation file.
  *
- * @since 0.1.0
+ * @since 1.0.0
  */
 function wp_user_avatars_i18n() {
-	load_plugin_textdomain( 'wp-user-avatars', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+	load_plugin_textdomain( 'wp-user-avatars', false, dirname( plugin_basename( __FILE__ ) ) . '/wp-user-avatars/assets/languages/' );
 }

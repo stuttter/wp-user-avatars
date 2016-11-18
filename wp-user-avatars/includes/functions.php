@@ -442,8 +442,8 @@ function wp_user_avatars_avatar_defaults( $avatar_defaults = array() ) {
 	// Maybe block Gravatars
 	if ( get_option( 'wp_user_avatars_block_gravatar' ) ) {
 		$new_avatar_defaults = array(
-			'mystery' => __( 'Mystery Person', 'wp-user-avatars' ),
-			'blank'   => __( 'Blank',          'wp-user-avatars' )
+			'mystery' => esc_html__( 'Mystery Person', 'wp-user-avatars' ),
+			'blank'   => esc_html__( 'Blank',          'wp-user-avatars' )
 		);
 	}
 
