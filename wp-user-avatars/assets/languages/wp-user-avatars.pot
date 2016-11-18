@@ -1,0 +1,120 @@
+# Copyright (C) 2016 WP User Avatars
+# This file is distributed under the same license as the WP User Avatars package.
+msgid ""
+msgstr ""
+"Project-Id-Version: WP User Avatars 1.0.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-user-avatars\n"
+"POT-Creation-Date: 2016-11-18 15:04:47+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-11-18 09:00+0\n"
+"Last-Translator: John James Jacoby\n"
+"Language-Team: English\n"
+
+#: wp-user-avatars/includes/admin.php:26
+msgid "Allowed Roles"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:29
+msgid "Block Gravatar"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:44
+msgid "Prevent avatar requests from reaching out to Gravatar.com."
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:62
+msgid "Upload Options"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:139
+msgid "Choose an Avatar"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:140
+msgid "Set as avatar"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:162
+msgid "Avatar"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:193
+msgid "Upload"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:216
+msgid "Choose from Media"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:233
+msgid "Remove"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:253
+#: wp-user-avatars/includes/admin.php:256
+msgid "Rating"
+msgstr ""
+
+#: wp-user-avatars/includes/ajax.php:36
+msgid "You do not have permission to edit this user."
+msgstr ""
+
+#: wp-user-avatars/includes/errors.php:22
+msgid "This image file appears to be invalid, or violates an upload rule."
+msgstr ""
+
+#: wp-user-avatars/includes/errors.php:33
+msgid "Avatar upload failed."
+msgstr ""
+
+#: wp-user-avatars/includes/functions.php:148
+msgid "Suitable for all audiences"
+msgstr ""
+
+#: wp-user-avatars/includes/functions.php:149
+msgid "Possibly offensive, usually for audiences 13 and above"
+msgstr ""
+
+#: wp-user-avatars/includes/functions.php:150
+msgid "Intended for adult audiences above 17"
+msgstr ""
+
+#: wp-user-avatars/includes/functions.php:151
+msgid "Even more mature than above"
+msgstr ""
+
+#: wp-user-avatars/includes/functions.php:445
+msgid "Mystery Person"
+msgstr ""
+
+#: wp-user-avatars/includes/functions.php:446
+msgid "Blank"
+msgstr ""
+
+#: wp-user-avatars/includes/metabox.php:25
+msgctxt "users user-admin edit screen"
+msgid "Avatar"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "WP User Avatars"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://wordpress.org/plugins/wp-user-avatars/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Allow registered users to upload & select their own avatars"
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "John James Jacoby"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://profiles.wordpress.org/johnjamesjacoby/"
+msgstr ""
+
