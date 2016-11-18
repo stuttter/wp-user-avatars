@@ -159,7 +159,7 @@ function wp_user_avatars_edit_user_profile( $user = 0 ) {
 	} ?>
 
 	<div id="wp-user-avatars-user-settings">
-		<h3><?php esc_html_e( 'Avatar','wp-user-avatars' ); ?></h3>
+		<h2><?php esc_html_e( 'Avatar','wp-user-avatars' ); ?></h2>
 
 		<?php wp_user_avatars_section_content( $user ); ?>
 

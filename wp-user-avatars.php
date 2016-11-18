@@ -7,7 +7,7 @@
  * Author URI:  https://profiles.wordpress.org/johnjamesjacoby/
  * License:     GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Description: Avatars for your users, without Gravatar
+ * Description: Allow registered users to upload & select their own avatars
  * Version:     1.0.0
  * Text Domain: wp-user-avatars
  * Domain Path: /wp-user-avatars/assets/languages/
@@ -57,7 +57,7 @@ function wp_user_avatars_get_plugin_url() {
  * @return int
  */
 function wp_user_avatars_get_asset_version() {
-	return 201611170001;
+	return 201611170002;
 }
 
 /**
