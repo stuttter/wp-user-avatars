@@ -344,6 +344,11 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
  */
 function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 
+	// Bail if forcing default
+	if ( ! empty( $args['force_default'] ) ) {
+		return $url;
+	}
+
 	// Look for local avatar
 	$avatar = wp_user_avatars_get_local_avatar_url( $id_or_email, $args['size'] );
 
