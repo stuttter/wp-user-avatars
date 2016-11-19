@@ -35,6 +35,9 @@ function _wp_user_avatars() {
 	require_once $plugin_path . 'includes/metabox.php';
 	require_once $plugin_path . 'includes/uninstall.php';
 	require_once $plugin_path . 'includes/hooks.php';
+
+	// Load translations
+	load_plugin_textdomain( 'wp-user-avatars', false, $plugin_path . 'assets/languages/' );
 }
 add_action( 'plugins_loaded', '_wp_user_avatars' );
 
@@ -58,13 +61,4 @@ function wp_user_avatars_get_plugin_url() {
  */
 function wp_user_avatars_get_asset_version() {
 	return 201611180001;
-}
-
-/**
- * Loads the translation file.
- *
- * @since 1.0.0
- */
-function wp_user_avatars_i18n() {
-	load_plugin_textdomain( 'wp-user-avatars', false, dirname( plugin_basename( __FILE__ ) ) . '/wp-user-avatars/assets/languages/' );
 }
