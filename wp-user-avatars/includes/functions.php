@@ -424,6 +424,7 @@ function wp_user_avatars_update_avatar( $user_id, $media ) {
 	// Set the attachment URL
 	if ( is_int( $media ) ) {
 		$meta_value['media_id'] = $media;
+		$meta_value['site_id']  = get_current_blog_id();
 		$media                  = wp_get_attachment_url( $media );
 	}
 
