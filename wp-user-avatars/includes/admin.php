@@ -23,10 +23,10 @@ function wp_user_avatars_register_settings() {
 	register_setting( 'discussion', 'wp_user_avatars_block_gravatar', 'wp_user_avatars_sanitize_block_gravatar' );
 
 	// Capabilities
-	add_settings_field( 'wp_user_avatars_roles', esc_html__( 'Allowed Roles', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_roles', 'discussion', 'avatars' );
+	add_settings_field( 'wp_user_avatars_roles', esc_html__( 'Allowed Roles', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_roles', 'discussion', 'avatars', array( 'class' => 'avatar-settings' ) );
 
 	// Local only (no Gravatars)
-	add_settings_field( 'wp_user_avatars_block_gravatar', esc_html__( 'Block Gravatar', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_gravatar', 'discussion', 'avatars' );
+	add_settings_field( 'wp_user_avatars_block_gravatar', esc_html__( 'Block Gravatar', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_gravatar', 'discussion', 'avatars', array( 'class' => 'avatar-settings' ) );
 }
 
 /**
