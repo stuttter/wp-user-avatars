@@ -270,8 +270,20 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 	// Handle "real" media
 	if ( ! empty( $user_avatars['media_id'] ) ) {
 
+		// Maybe switch to blog
+		if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
+			switch_to_blog( $user_avatars['site_id'] );
+		}
+
 		// Has the media been deleted?
 		$avatar_full_path = get_attached_file( $user_avatars['media_id'] );
+
+		// Maybe switch back
+		if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
+			restore_current_blog();
+		}
+
+		// Maybe return null & maybe delete the avatar setting
 		if ( empty( $avatar_full_path ) ) {
 
 			// Only let logged in users delete missing avatars
