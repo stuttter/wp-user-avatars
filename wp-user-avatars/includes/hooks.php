@@ -30,8 +30,13 @@ add_action( 'edit_user_profile_update', 'wp_user_avatars_edit_user_profile_updat
 // Avatar defaults
 add_filter( 'avatar_defaults', 'wp_user_avatars_avatar_defaults' );
 
+// Default avatar
+add_filter( 'option_avatar_default',            'wp_user_avatars_option_avatar_default'        );
+add_filter( 'pre_update_option_avatar_default', 'wp_user_avatars_update_option_avatar_default' );
+
 // Filter avatars
 add_filter( 'get_avatar_url', 'wp_user_avatars_filter_get_avatar_url', 10, 3 );
+add_filter( 'get_avatar_url', 'wp_user_avatars_maybe_use_local_mystery_person' );
 
 // Ajax
 add_action( 'wp_ajax_assign_wp_user_avatars_media', 'wp_user_avatars_ajax_assign_media'     );

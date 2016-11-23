@@ -447,13 +447,103 @@ function wp_user_avatars_avatar_defaults( $avatar_defaults = array() ) {
 	// Maybe block Gravatars
 	if ( get_option( 'wp_user_avatars_block_gravatar' ) ) {
 		$new_avatar_defaults = array(
-			'mystery' => esc_html__( 'Mystery Person', 'wp-user-avatars' ),
-			'blank'   => esc_html__( 'Blank',          'wp-user-avatars' )
+			wp_user_avatars_get_mystery_url() => esc_html__( 'Mystery Person', 'wp-user-avatars' ),
+			'blank'                           => esc_html__( 'Blank',          'wp-user-avatars' )
 		);
 	}
 
 	// Return avatar types, maybe without Gravatar options
 	return $new_avatar_defaults;
+}
+
+/**
+ * Maybe divert Gravatar requests to use the local mystery person image.
+ *
+ * @since 1.1.0
+ *
+ * @param string $url
+ *
+ * @return string
+ */
+function wp_user_avatars_maybe_use_local_mystery_person( $url = '' ) {
+
+	// Bail if not blocking gravatar requests
+	if ( ! get_option( 'wp_user_avatars_block_gravatar' ) ) {
+		return $url;
+	}
+
+	// Local mystery
+	$mystery = wp_user_avatars_get_mystery_url();
+
+	// Bail if not already requesting the local mystery person
+	if ( false === strpos( $url, urlencode( $mystery ) ) ) {
+		return $url;
+	}
+
+	// Return the local mystery person
+	return $mystery;
+}
+
+/**
+ * Maybe change the 'mystery' avatar_default setting to be the local mystery person.
+ *
+ * @since 1.1.0
+ *
+ * @param string $value
+ *
+ * @return string
+ */
+function wp_user_avatars_update_option_avatar_default( $value = null ) {
+
+	// Bail if not defaulting to mystery
+	if ( wp_user_avatars_get_mystery_url() !== $value ) {
+		return $value;
+	}
+
+	// Bail if not blocking gravatar requests
+	if ( ! get_option( 'wp_user_avatars_block_gravatar' ) ) {
+		return $value;
+	}
+
+	// Return the local mystery person
+	return 'mystery';
+}
+
+/**
+ * Maybe change the 'mystery' avatar_default setting to be the local mystery person.
+ *
+ * @since 1.1.0
+ *
+ * @param string $value
+ *
+ * @return string
+ */
+function wp_user_avatars_option_avatar_default( $value = null ) {
+
+	// Bail if not defaulting to mystery
+	if ( 'mystery' !== $value ) {
+		return $value;
+	}
+
+	// Bail if not blocking gravatar requests
+	if ( ! get_option( 'wp_user_avatars_block_gravatar' ) ) {
+		return $value;
+	}
+
+	// Return the local mystery person
+	return wp_user_avatars_get_mystery_url();
+}
+
+/**
+ * Return URL to local mystery person image
+ *
+ * @since 1.1.0
+ *
+ * @return string
+ */
+function wp_user_avatars_get_mystery_url() {
+	$mystery = wp_user_avatars_get_plugin_url() . 'assets/images/mystery.jpg';
+	return apply_filters( 'wp_user_avatars_get_mystery_url', $mystery );
 }
 
 /**
