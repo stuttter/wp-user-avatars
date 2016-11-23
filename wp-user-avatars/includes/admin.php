@@ -22,11 +22,16 @@ function wp_user_avatars_register_settings() {
 	register_setting( 'discussion', 'wp_user_avatars_roles',          'wp_user_avatars_sanitize_roles'          );
 	register_setting( 'discussion', 'wp_user_avatars_block_gravatar', 'wp_user_avatars_sanitize_block_gravatar' );
 
+	// Maybe hide by default
+	$args = get_option( 'show_avatars' )
+		? array( 'class' => 'avatar-settings' )
+		: array( 'class' => 'avatar-settings hide-if-js' );
+
 	// Capabilities
-	add_settings_field( 'wp_user_avatars_roles', esc_html__( 'Allowed Roles', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_roles', 'discussion', 'avatars', array( 'class' => 'avatar-settings' ) );
+	add_settings_field( 'wp_user_avatars_roles', esc_html__( 'Allowed Roles', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_roles', 'discussion', 'avatars', $args );
 
 	// Local only (no Gravatars)
-	add_settings_field( 'wp_user_avatars_block_gravatar', esc_html__( 'Block Gravatar', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_gravatar', 'discussion', 'avatars', array( 'class' => 'avatar-settings' ) );
+	add_settings_field( 'wp_user_avatars_block_gravatar', esc_html__( 'Block Gravatar', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_gravatar', 'discussion', 'avatars', $args );
 }
 
 /**
