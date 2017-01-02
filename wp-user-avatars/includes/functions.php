@@ -49,6 +49,9 @@ function wp_user_avatars_edit_user_profile_update( $user_id = 0 ) {
 		// Override avatar file-size
 		add_filter( 'upload_size_limit', 'wp_user_avatars_upload_size_limit' );
 
+		// Temporary global
+		$GLOBALS['wp_user_avatars_user_id'] = $user_id;
+
 		// Handle upload
 		$avatar = wp_handle_upload( $_FILES['wp-user-avatars'], array(
 			'mimes' => array(
@@ -59,6 +62,9 @@ function wp_user_avatars_edit_user_profile_update( $user_id = 0 ) {
 			'test_form' => false,
 			'unique_filename_callback' => 'wp_user_avatars_unique_filename_callback'
 		) );
+
+		// No more global
+		unset( $GLOBALS['wp_user_avatars_user_id'] );
 
 		remove_filter( 'upload_size_limit', 'wp_user_avatars_upload_size_limit' );
 
@@ -104,7 +110,7 @@ function wp_user_avatars_edit_user_profile_update( $user_id = 0 ) {
 function wp_user_avatars_unique_filename_callback( $dir, $name, $ext ) {
 
 	// Get user
-	$user = get_user_by( 'id', $GLOBALS['user_id'] );
+	$user = get_user_by( 'id', $GLOBALS['wp_user_avatars_user_id'] );
 
 	// File suffix
 	$suffix = time();
