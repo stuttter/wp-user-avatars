@@ -251,6 +251,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 	// Get ratings
 	$avatar_rating = get_user_meta( $user_id, 'wp_user_avatars_rating', true );
 	$site_rating   = get_option( 'avatar_rating', 'G' );
+	$switched      = false;
 
 	// Compare ratings
 	if ( ! empty( $avatar_rating ) && ( 'G' !== $avatar_rating ) && ( $avatar_rating !== $site_rating ) ) {
@@ -272,6 +273,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 
 		// Maybe switch to blog
 		if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
+			$switched = true;
 			switch_to_blog( $user_avatars['site_id'] );
 		}
 
@@ -279,7 +281,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 		$avatar_full_path = get_attached_file( $user_avatars['media_id'] );
 
 		// Maybe switch back
-		if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
+		if ( true === $switched ) {
 			restore_current_blog();
 		}
 
@@ -334,9 +336,22 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 		}
 	}
 
+	// Not switched
+	$switched = false;
+
 	// URL corrections
 	if ( 'http' !== substr( $user_avatars[ $size ], 0, 4 ) ) {
+		if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
+			$switched = true;
+			switch_to_blog( $user_avatars['site_id'] );
+		}
+
 		$user_avatars[ $size ] = home_url( $user_avatars[ $size ] );
+
+		// Maybe switch back
+		if ( true === $switched ) {
+			restore_current_blog();
+		}
 	}
 
 	// Return the url
