@@ -268,22 +268,17 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 		}
 	}
 
+	// Maybe switch to blog
+	if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
+		$switched = true;
+		switch_to_blog( $user_avatars['site_id'] );
+	}
+
 	// Handle "real" media
 	if ( ! empty( $user_avatars['media_id'] ) ) {
 
-		// Maybe switch to blog
-		if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
-			$switched = true;
-			switch_to_blog( $user_avatars['site_id'] );
-		}
-
 		// Has the media been deleted?
 		$avatar_full_path = get_attached_file( $user_avatars['media_id'] );
-
-		// Maybe switch back
-		if ( true === $switched ) {
-			restore_current_blog();
-		}
 
 		// Maybe return null & maybe delete the avatar setting
 		if ( empty( $avatar_full_path ) ) {
@@ -291,6 +286,11 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 			// Only let logged in users delete missing avatars
 			if ( is_user_logged_in() ) {
 				wp_user_avatars_delete_avatar( $user_id );
+			}
+
+			// Maybe switch back
+			if ( true === $switched ) {
+				restore_current_blog();
 			}
 
 			return null;
@@ -343,11 +343,12 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 
 	// URL corrections
 	if ( 'http' !== substr( $user_avatars[ $size ], 0, 4 ) ) {
-		if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
-			$user_avatars[ $size ] = get_home_url( $user_avatars['site_id'], $user_avatars[ $size ] );
-		} else {
-			$user_avatars[ $size ] = home_url( $user_avatars[ $size ] );
-		}
+		$user_avatars[ $size ] = home_url( $user_avatars[ $size ] );
+	}
+
+	// Maybe switch back
+	if ( true === $switched ) {
+		restore_current_blog();
 	}
 
 	// Return the url
