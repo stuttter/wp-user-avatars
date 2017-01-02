@@ -336,6 +336,20 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 		}
 	}
 
+	// Fallback to full
+	if ( empty( $user_avatars[ $size ] ) ) {
+		$user_avatars[ $size ] = $user_avatars['full'];
+	}
+
+	// URL corrections
+	if ( 'http' !== substr( $user_avatars[ $size ], 0, 4 ) ) {
+		if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
+			$user_avatars[ $size ] = get_home_url( $user_avatars['site_id'], $user_avatars[ $size ] );
+		} else {
+			$user_avatars[ $size ] = home_url( $user_avatars[ $size ] );
+		}
+	}
+
 	// Return the url
 	return $user_avatars[ $size ];
 }
