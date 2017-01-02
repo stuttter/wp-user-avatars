@@ -298,7 +298,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 	}
 
 	// Generate a new size
-	if ( ! array_key_exists( $size, $user_avatars ) ) {
+	if ( empty( $user_avatars[ $size ] ) ) {
 
 		// Set full size
 		$user_avatars[ $size ] = $user_avatars['full'];
@@ -334,11 +334,6 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 			// Save updated avatar sizes
 			update_user_meta( $user_id, 'wp_user_avatars', $user_avatars );
 		}
-	}
-
-	// Fallback to full
-	if ( empty( $user_avatars[ $size ] ) ) {
-		$user_avatars[ $size ] = $user_avatars['full'];
 	}
 
 	// URL corrections
