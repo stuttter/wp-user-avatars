@@ -336,18 +336,6 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 		}
 	}
 
-	// Not switched
-	$switched = false;
-
-	// URL corrections
-	if ( 'http' !== substr( $user_avatars[ $size ], 0, 3 ) ) {
-		if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
-			$user_avatars[ $size ] = get_home_url( $user_avatars['site_id'], $user_avatars[ $size ] );
-		} else {
-			$user_avatars[ $size ] = home_url( $user_avatars[ $size ] );
-		}
-	}
-
 	// Return the url
 	return $user_avatars[ $size ];
 }
