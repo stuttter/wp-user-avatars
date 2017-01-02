@@ -304,7 +304,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 	}
 
 	// Generate a new size
-	if ( empty( $user_avatars[ $size ] ) ) {
+	if ( empty( $user_avatars[ "{$size}px" ] ) ) {
 
 		// Set full size
 		$user_avatars[ $size ] = $user_avatars['full'];
@@ -332,7 +332,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 					$saved     = $editor->save( $dest_file );
 
 					if ( ! is_wp_error( $saved ) ) {
-						$user_avatars[ $size ] = str_replace( $upload_path['basedir'], $upload_path['baseurl'], $dest_file );
+						$user_avatars[ "{$size}px" ] = str_replace( $upload_path['basedir'], $upload_path['baseurl'], $dest_file );
 					}
 				}
 			}
@@ -343,8 +343,8 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 	}
 
 	// URL corrections
-	if ( 'http' !== substr( $user_avatars[ $size ], 0, 4 ) ) {
-		$user_avatars[ $size ] = home_url( $user_avatars[ $size ] );
+	if ( 'http' !== substr( $user_avatars[ "{$size}px" ], 0, 4 ) ) {
+		$user_avatars[ "{$size}px" ] = home_url( $user_avatars[ "{$size}px" ] );
 	}
 
 	// Maybe switch back
