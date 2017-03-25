@@ -8,7 +8,7 @@
  * License:     GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Description: Allow registered users to upload & select their own avatars
- * Version:     1.1.0
+ * Version:     1.1.1
  * Text Domain: wp-user-avatars
  * Domain Path: /wp-user-avatars/assets/languages/
  */
@@ -30,7 +30,7 @@ function _wp_user_avatars() {
 	require_once $plugin_path . 'includes/admin.php';
 	require_once $plugin_path . 'includes/ajax.php';
 	require_once $plugin_path . 'includes/capabilities.php';
-	require_once $plugin_path . 'includes/functions.php';
+	require_once $plugin_path . 'includes/common.php';
 	require_once $plugin_path . 'includes/errors.php';
 	require_once $plugin_path . 'includes/metabox.php';
 	require_once $plugin_path . 'includes/uninstall.php';
