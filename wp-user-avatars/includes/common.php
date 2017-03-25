@@ -1,11 +1,11 @@
 <?php
 
 /**
- * User Avatar Functions
+ * User Avatar Common Functions
  *
  * @since 0.1.0
  *
- * @package Plugins/Users/Avatars/Functions
+ * @package Plugins/Users/Avatars/Functions/Common
  */
 
 // Exit if accessed directly

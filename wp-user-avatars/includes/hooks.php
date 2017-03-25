@@ -46,3 +46,4 @@ add_action( 'admin_action_remove-wp-user-avatars',  'wp_user_avatars_action_remo
 // User Profiles
 add_action( 'wp_user_profiles_add_meta_boxes', 'wp_user_profiles_add_avatar_meta_box', 10, 2 );
 add_action( 'wp_user_profiles_do_admin_head',  'wp_user_avatars_admin_enqueue_scripts' );
+add_action( 'init',                            'wp_user_profiles_unhook_legacy_fields', 2 );
