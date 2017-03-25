@@ -82,6 +82,11 @@
 		background-color: #f5f5f5;
 		text-align: right;
 	}
+
+	/* BuddyPress Support */
+	body.buddypress #wp-user-avatars-user-settings {
+		top: 60px;
+	}
 }
 
 /* WP User Profiles Support */
