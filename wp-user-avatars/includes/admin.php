@@ -283,7 +283,7 @@ function wp_user_avatars_section_content( $user = null ) {
 /**
  * Maybe remove legacy actions and rely on WP User Profiles instead.
  *
- * @since 1.2.0
+ * @since 1.1.0
  */
 function wp_user_profiles_unhook_legacy_fields() {
 	if ( class_exists( 'WP_User_Profile_Section' ) ) {
