@@ -374,6 +374,12 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 		return $url;
 	}
 
+	// Bail if explicitly an md5'd Gravatar url
+	// https://github.com/stuttter/wp-user-avatars/issues/11
+	if ( strpos( $id_or_email, '@md5.gravatar.com' ) ) {
+		return $url;
+	}
+
 	// Look for local avatar
 	$avatar = wp_user_avatars_get_local_avatar_url( $id_or_email, $args['size'] );
 
