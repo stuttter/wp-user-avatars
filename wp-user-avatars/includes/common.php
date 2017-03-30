@@ -376,7 +376,7 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 
 	// Bail if explicitly an md5'd Gravatar url
 	// https://github.com/stuttter/wp-user-avatars/issues/11
-	if ( strpos( $id_or_email, '@md5.gravatar.com' ) ) {
+	if ( is_string( $id_or_email ) && strpos( $id_or_email, '@md5.gravatar.com' ) ) {
 		return $url;
 	}
 
