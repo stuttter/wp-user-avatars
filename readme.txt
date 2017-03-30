@@ -3,7 +3,7 @@ Contributors: johnjamesjacoby, stuttter
 Tags: avatar, user, profile
 Requires at least: 4.4
 Tested up to: 4.8
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9Q4F4EL5YJ62J
@@ -11,6 +11,8 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 == Description ==
 
 Allow registered users to upload & select their own avatars.
+
+> If you like this plugin, please consider purchasing a copy from [Plugins Loaded](https://pluginsloaded.com "Production-ready WordPress Plugins and Add-ons") to support future development.
 
 = Also checkout =
 
@@ -46,7 +48,7 @@ Allow registered users to upload & select their own avatars.
 
 = How does this work with multisite? =
 
-Right now, not very well. We're working on this soon.
+It works OK, but you'll want to consider exactly what level of privacy is best for your installation.
 
 = Where can I get support? =
 
@@ -58,6 +60,9 @@ Right now, not very well. We're working on this soon.
 http://github.com/stuttter/wp-user-avatars/
 
 == Changelog ==
+
+= 1.3.0 =
+* Fix local avatars in comments
 
 = 1.2.0 =
 * BuddyPress profile styling support
