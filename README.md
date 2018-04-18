@@ -29,13 +29,13 @@ Coming soon...
 ## Help
 
 * Basic: https://wordpress.org/support/plugin/wp-user-avatars/
-* Priority: https://chat.flox.io/support/channels/wp-user-avatars/
+* Priority: https://jjj.software
 
 ## Contributors
 
-Designed by @JJJ
-
-Made better by @nash-ye
+* Created by @JJJ
+* Made better by @nash-ye
+* Pull requests welcome!
 
 ## Support
 

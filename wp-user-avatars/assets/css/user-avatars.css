@@ -10,8 +10,13 @@
 	width: 90px;
 }
 
-#wp-user-avatars-actions input[type=file]{
-	margin: 0 0 8px;
+#wp-user-avatars-actions div,
+#wp-user-avatars-actions input[type=file] {
+	text-overflow: ellipsis;
+	width: 100%;
+}
+#wp-user-avatars-actions input[type=file] {
+	margin: 0 0 10px;
 }
 
 /**
@@ -137,7 +142,7 @@ tr.user-profile-picture,
 #side-sortables #wp-user-avatars-photo,
 #side-sortables #wp-user-avatars-actions {
 	float: left;
-	width: 90%;
+	width: 100%;
 }
 
 #side-sortables #wp-user-avatars-photo {
