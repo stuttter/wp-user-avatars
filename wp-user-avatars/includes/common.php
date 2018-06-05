@@ -274,6 +274,16 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 		}
 	}
 
+	$dynamic_resize = apply_filters( 'wp_user_avatars_dynamic_resize', true, $user_id, $size, $user_avatars );
+
+	// Return early if there's no media to check and we either have an avatar of the correct size or don't dynamically resize
+	if ( empty( $user_avatars['media_id'] ) && ( ! empty( $user_avatars[ $size ] ) || $dynamic_resize === false ) ) {
+		if ( empty( $user_avatars[ $size ] ) ) {
+			return $user_avatars['full'];
+		}
+		return $user_avatars[ $size ];
+    }
+
 	// Maybe switch to blog
 	if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
 		$switched = true;
@@ -310,7 +320,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 		$user_avatars[ $size ] = $user_avatars['full'];
 
 		// Allow rescaling to be toggled, usually for performance reasons
-		if ( apply_filters( 'wp_user_avatars_dynamic_resize', true ) ) {
+		if ( $dynamic_resize ) {
 
 			// Get the upload path (hard to trust this sometimes, though...)
 			$upload_path = wp_upload_dir();
