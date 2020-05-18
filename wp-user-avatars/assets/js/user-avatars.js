@@ -8,7 +8,7 @@ jQuery( document ).ready( function ( $ ) {
 		var windowsize = $( window ).width();
 
 		if ( windowsize > 1110 ) {
-			$( '#your-profile p.submit' ).appendTo( $( '#wp-user-avatars-user-settings' ) );
+			$( '#your-profile p.submit' ).last().appendTo( $( '#wp-user-avatars-user-settings' ) );
 		} else {
 			$( '#wp-user-avatars-user-settings p.submit' ).appendTo( $( '#your-profile' ) );
 		}
