@@ -211,7 +211,7 @@ function wp_user_avatars_get_user_id( $id_or_email ) {
 
 	// User Object
 	} elseif ( $id_or_email instanceof WP_User ) {
-		$user = $id_or_email->ID;
+		$retval = $id_or_email->ID;
 
 	// Post Object
 	} elseif ( $id_or_email instanceof WP_Post ) {
