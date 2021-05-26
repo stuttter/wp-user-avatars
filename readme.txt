@@ -1,26 +1,22 @@
 === WP User Avatars ===
 Contributors: johnjamesjacoby, stuttter
 Tags: avatar, user, profile
-Requires at least: 4.4
-Tested up to: 4.9
+Requires at least: 5.0
+Tested up to: 5.8
 Stable tag: 1.4.0
 License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9Q4F4EL5YJ62J
 
 == Description ==
 
 Allow registered users to upload & select their own avatars.
 
-> If you like this plugin, please consider purchasing a copy from [Plugins Loaded](https://pluginsloaded.com "Production-ready WordPress Plugins and Add-ons") to support future development.
-
 = Also checkout =
 
 * [WP Chosen](https://wordpress.org/plugins/wp-chosen/ "Make long, unwieldy select boxes much more user-friendly.")
 * [WP Pretty Filters](https://wordpress.org/plugins/wp-pretty-filters/ "Makes post filters better match what's already in Media & Attachments.")
-* [WP Event Calendar](https://wordpress.org/plugins/wp-event-calendar/ "The best way to manage events in WordPress.")
 * [WP Media Categories](https://wordpress.org/plugins/wp-media-categories/ "Add categories to media & attachments.")
-* [WP Term Meta](https://wordpress.org/plugins/wp-term-meta/ "Metadata, for taxonomy terms.")
 * [WP Term Authors](https://wordpress.org/plugins/wp-term-authors/ "Authors for categories, tags, and other taxonomy terms.")
 * [WP Term Colors](https://wordpress.org/plugins/wp-term-colors/ "Pretty colors for categories, tags, and other taxonomy terms.")
 * [WP Term Families](https://wordpress.org/plugins/wp-term-icons/ "Families for categories, tags, and other taxonomy terms.")
@@ -57,7 +53,7 @@ It works OK, but you'll want to consider exactly what level of privacy is best f
 
 = Where can I find documentation? =
 
-http://github.com/stuttter/wp-user-avatars/
+https://github.com/stuttter/wp-user-avatars/
 
 == Changelog ==
 

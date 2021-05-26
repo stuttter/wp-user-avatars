@@ -60,5 +60,5 @@ function wp_user_avatars_get_plugin_url() {
  * @return int
  */
 function wp_user_avatars_get_asset_version() {
-	return 201804180002;
+	return 202005260001;
 }
