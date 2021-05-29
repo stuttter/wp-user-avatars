@@ -63,6 +63,10 @@ It works OK, but you'll want to consider exactly what level of privacy is best f
 
 == Changelog ==
 
+= [1.4.1] - 2021-05-29 =
+* Update author info
+* Add sponsor link
+
 = 1.4.0 =
 * Improved support for long file names
 
