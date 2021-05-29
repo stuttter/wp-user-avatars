@@ -12,12 +12,13 @@ I decided to create this plugin because no existing solutions integrated into Wo
 
 * Download and install using the built in WordPress plugin installer.
 * Activate in the "Plugins" area of your admin by clicking the "Activate" link.
+* Consider sponsoring future development by clicking "Sponsor".
 * No further setup or configuration is necessary.
 
 ## Help
 
-* Basic: https://wordpress.org/support/plugin/wp-user-avatars/
-* Priority: https://jjj.software
+* Community: https://wordpress.org/support/plugin/wp-user-avatars
+* Development: https://github.com/stuttter/wp-user-avatars/discussions
 
 ## Contributors
 
@@ -25,10 +26,6 @@ I decided to create this plugin because no existing solutions integrated into Wo
 * Made better by @nash-ye
 * Pull requests welcome!
 
-## Support
+## Contributing
 
-Support for this plugin is brought to you by John James Jacoby.
-
-## License
-
-This WordPress plugin is licensed GPL v2 or later, in accordance with freedom 0, specifically regarding "derivative works".
+Please [open a new issue](/pull/new/master) to discuss whether the feature is a good fit for the project. Once you've decided to work on a pull request, please follow the [WordPress Coding Standards](http://make.wordpress.org/core/handbook/coding-standards/).
