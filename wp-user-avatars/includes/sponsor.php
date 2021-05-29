@@ -32,7 +32,6 @@ add_action( 'admin_init', function() {
 /**
  * Filter plugin action links, and add a sponsorship link.
  *
- * @since 1.5.0
  * @param array $actions
  * @return array
  */
