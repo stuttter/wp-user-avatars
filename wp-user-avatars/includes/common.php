@@ -58,6 +58,7 @@ function wp_user_avatars_edit_user_profile_update( $user_id = 0 ) {
 				'jpg|jpeg|jpe' => 'image/jpeg',
 				'gif'          => 'image/gif',
 				'png'          => 'image/png',
+				'webp'         => 'image/webp'
 			),
 			'test_form' => false,
 			'unique_filename_callback' => 'wp_user_avatars_unique_filename_callback'
