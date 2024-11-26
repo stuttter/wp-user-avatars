@@ -12,8 +12,8 @@
  * Domain Path:       /wp-user-avatars/assets/languages
  * Requires at least: 5.2
  * Requires PHP:      7.0
- * Tested up to:      5.8
- * Version:           1.4.1
+ * Tested up to:      6.7.1
+ * Version:           1.4.2
  */
 
 // Exit if accessed directly
@@ -41,7 +41,9 @@ function _wp_user_avatars() {
 	require_once $plugin_path . 'includes/hooks.php';
 
 	// Load translations
-	load_plugin_textdomain( 'wp-user-avatars', false, $plugin_path . 'assets/languages/' );
+	add_action('init', static function() {
+		load_plugin_textdomain( 'wp-user-avatars', false, $plugin_path . 'assets/languages/' );
+	});
 }
 add_action( 'plugins_loaded', '_wp_user_avatars' );
 
