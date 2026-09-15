@@ -12,6 +12,8 @@ Requires at least: 5.2
 Tested up to:      5.8
 Stable tag:        1.4.1
 
+Allow registered users to upload and select their own avatars.
+
 == Description ==
 
 Allow registered users to upload & select their own avatars.
