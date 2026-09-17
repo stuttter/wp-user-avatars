@@ -67,6 +67,31 @@ final class CommonFunctionsTest extends TestCase {
 		);
 	}
 
+	public function test_generated_avatar_is_deleted_through_wordpress_api(): void {
+		$file = tempnam( sys_get_temp_dir(), 'wpua-' );
+		$this->assertNotFalse( $file );
+
+		$directory = dirname( $file );
+		$filename  = basename( $file );
+		$GLOBALS['wpua_test']['returns']['get_user_meta'] = array(
+			'full' => 'https://example.test/uploads/' . $filename,
+		);
+		$GLOBALS['wpua_test']['returns']['wp_upload_dir'] = array(
+			'baseurl' => 'https://example.test/uploads',
+			'basedir' => $directory,
+		);
+
+		try {
+			wp_user_avatars_delete_avatar( 7 );
+
+			$this->assertSame( array( array( $file ) ), $GLOBALS['wpua_test']['calls']['wp_delete_file'] );
+		} finally {
+			if ( file_exists( $file ) ) {
+				unlink( $file );
+			}
+		}
+	}
+
 	public function test_blocking_gravatar_replaces_remote_defaults(): void {
 		$GLOBALS['wpua_test']['returns']['get_option'] = true;
 
