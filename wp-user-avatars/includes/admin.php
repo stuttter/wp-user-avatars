@@ -70,7 +70,7 @@ function wp_user_avatars_settings_field_roles() {
 
 		<label>
 			<input type="checkbox" name="wp_user_avatars_roles[]" value="<?php echo esc_attr( $role_id ); ?>" <?php checked( in_array( $role_id, $val ) ); ?> />
-			<?php echo translate_user_role( $role['name'] ); ?>
+			<?php echo esc_html( translate_user_role( $role['name'] ) ); ?>
 		</label>
 		<br>
 

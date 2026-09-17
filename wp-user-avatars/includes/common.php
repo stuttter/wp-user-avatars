@@ -437,7 +437,7 @@ function wp_user_avatars_delete_avatar( $user_id = 0 ) {
 
 			// Maybe delete the file
 			if ( file_exists( $old_avatar_path ) ) {
-				unlink( $old_avatar_path );
+				wp_delete_file( $old_avatar_path );
 			}
 		}
 	}
@@ -598,9 +598,6 @@ function wp_user_avatars_get_mystery_url() {
  */
 function wp_user_avatars_user_rating_form_field( WP_User $user ) {
 
-	// Start an output buffer
-	ob_start();
-
 	// Output ratings
 	foreach ( wp_user_avatars_get_ratings() as $key => $rating ) : ?>
 
@@ -613,8 +610,6 @@ function wp_user_avatars_user_rating_form_field( WP_User $user ) {
 
 	<?php endforeach;
 
-	// Output the buffer
-	echo ob_get_clean();
 }
 
 /**
