@@ -1,8 +1,9 @@
 # WP User Avatars
 
-## Synopsis
-
-A WordPress plugin to allow registered users to upload & select their own avatars.
+WP User Avatars lets registered users upload an avatar or select one from the
+WordPress Media Library. It integrates with the native user profile screens and
+WP User Profiles, supports multisite, and can keep avatar requests local instead
+of contacting Gravatar.
 
 ## Motivation
 
@@ -10,22 +11,25 @@ I decided to create this plugin because no existing solutions integrated into Wo
 
 ## Installation
 
-* Download and install using the built in WordPress plugin installer.
-* Activate in the "Plugins" area of your admin by clicking the "Activate" link.
-* Consider sponsoring future development by clicking "Sponsor".
-* No further setup or configuration is necessary.
+- Install through the WordPress plugin installer or Composer.
+- Activate WP User Avatars from the Plugins screen.
+- Edit a user profile to upload or select an avatar.
+- Configure allowed roles and local-only avatars under Settings > Discussion.
 
 ## Help
 
-* Community: https://wordpress.org/support/plugin/wp-user-avatars
-* Development: https://github.com/stuttter/wp-user-avatars/discussions
+- Community support: https://wordpress.org/support/plugin/wp-user-avatars/
+- Development discussions: https://github.com/stuttter/wp-user-avatars/discussions
+- Reproducible defects: https://github.com/stuttter/wp-user-avatars/issues
 
 ## Contributors
 
-* Created by @JJJ
-* Made better by @nash-ye
-* Pull requests welcome!
+- Created by [@JJJ](https://github.com/JJJ).
+- Made better by [@nash-ye](https://github.com/nash-ye) and other contributors.
+- Pull requests are welcome.
 
 ## Contributing
 
-Please [open a new issue](/pull/new/master) to discuss whether the feature is a good fit for the project. Once you've decided to work on a pull request, please follow the [WordPress Coding Standards](http://make.wordpress.org/core/handbook/coding-standards/).
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before changing behavior. The development
+toolchain requires PHP 7.4 or newer: install the locked dependencies with
+`composer install`, then run `composer test`.

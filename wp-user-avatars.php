@@ -10,9 +10,9 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-user-avatars
  * Domain Path:       /wp-user-avatars/assets/languages
- * Requires at least: 5.2
- * Requires PHP:      7.0
- * Tested up to:      5.8
+ * Requires at least: 6.4
+ * Requires PHP:      7.4
+ * Tested up to:      7.1
  * Version:           1.4.1
  */
 
