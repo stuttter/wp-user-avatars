@@ -60,6 +60,7 @@ function restore_current_blog() { return wpua_test_call( __FUNCTION__, array() )
 function get_attached_file( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function is_user_logged_in() { return (bool) wpua_test_call( __FUNCTION__, array() ); }
 function wp_upload_dir() { return wpua_test_call( __FUNCTION__, array() ); }
+function wp_delete_file( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function wp_get_image_editor( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function is_wp_error( $value ) { return $value instanceof WP_Error; }
 function home_url( $path = '' ) { return 'https://example.test' . $path; }
