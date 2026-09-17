@@ -7,9 +7,9 @@ License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 License:           GPLv2 or later
 Contributors:      johnjamesjacoby
 Tags:              user, profile, avatar, media, local
-Requires PHP:      7.2
-Requires at least: 5.2
-Tested up to:      5.8
+Requires PHP:      7.4
+Requires at least: 6.4
+Tested up to:      7.1
 Stable tag:        1.4.1
 
 Allow registered users to upload and select their own avatars.
