@@ -23,7 +23,7 @@ try {
 	$assert( is_multisite(), 'WP User Avatars must use the multisite integration profile.' );
 	$assert( function_exists( 'wp_user_avatars_update_avatar' ), 'The production plugin did not load.' );
 
-	$user_id = wp_insert_user(
+	$created_user_id = wp_insert_user(
 		array(
 			'user_login' => 'portfolio-avatar-' . strtolower( wp_generate_password( 12, false, false ) ),
 			'user_pass'  => wp_generate_password( 24, true, true ),
@@ -31,8 +31,8 @@ try {
 			'role'       => 'subscriber',
 		)
 	);
-	$assert( ! is_wp_error( $user_id ), 'WordPress could not create the smoke-test user.' );
-	$user_id = (int) $user_id;
+	$assert( ! is_wp_error( $created_user_id ), 'WordPress could not create the smoke-test user.' );
+	$user_id = (int) $created_user_id;
 
 	$avatar_url = 'https://example.test/uploads/portfolio-avatar.jpg';
 	wp_user_avatars_update_avatar( $user_id, $avatar_url );
