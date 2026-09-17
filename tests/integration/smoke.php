@@ -43,8 +43,11 @@ try {
 
 	$disable_resize = static function () { return false; };
 	add_filter( 'wp_user_avatars_dynamic_resize', $disable_resize );
-	$assert( $avatar_url === get_avatar_url( $user_id, array( 'size' => 96 ) ), 'The local avatar did not filter get_avatar_url().' );
-	remove_filter( 'wp_user_avatars_dynamic_resize', $disable_resize );
+	try {
+		$assert( $avatar_url === get_avatar_url( $user_id, array( 'size' => 96 ) ), 'The local avatar did not filter get_avatar_url().' );
+	} finally {
+		remove_filter( 'wp_user_avatars_dynamic_resize', $disable_resize );
+	}
 
 	wp_user_avatars_delete_avatar( $user_id );
 	$assert( '' === get_user_meta( $user_id, 'wp_user_avatars', true ), 'Avatar deletion left user metadata behind.' );
