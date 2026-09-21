@@ -15,6 +15,8 @@ defined( 'ABSPATH' ) || exit;
  * Register avatar settings
  *
  * @since 0.1.0
+ *
+ * @return void
  */
 function wp_user_avatars_register_settings() {
 
@@ -38,6 +40,8 @@ function wp_user_avatars_register_settings() {
  * Settings field for preventing requests to Gravatar
  *
  * @since 0.1.0
+ *
+ * @return void
  */
 function wp_user_avatars_settings_field_gravatar() {
 
@@ -56,6 +60,8 @@ function wp_user_avatars_settings_field_gravatar() {
  * Settings field for cherry-picking which roles are allowed to upload avatars
  *
  * @since 0.1.0
+ *
+ * @return void
  */
 function wp_user_avatars_settings_field_roles() {
 
@@ -86,9 +92,9 @@ function wp_user_avatars_settings_field_roles() {
  *
  * @since 0.1.0
  *
- * @param  array $input Passed input values to sanitize
+ * @param  array<int, string> $input Passed input values to sanitize
  *
- * @return array Sanitized input fields
+ * @return array<int, string> Sanitized input fields
  */
 function wp_user_avatars_sanitize_roles( $input ) {
 	$roles = array_keys( get_editable_roles() );
@@ -100,9 +106,9 @@ function wp_user_avatars_sanitize_roles( $input ) {
  *
  * @since 0.1.0
  *
- * @param  array $input Passed input values to sanitize
+ * @param  mixed $input Passed input value to sanitize
  *
- * @return array Sanitized input fields
+ * @return bool Sanitized input field
  */
 function wp_user_avatars_sanitize_block_gravatar( $input ) {
 	return (bool) $input;
@@ -112,6 +118,8 @@ function wp_user_avatars_sanitize_block_gravatar( $input ) {
  * Add scripts to the profile editing page
  *
  * @since 0.1.0
+ *
+ * @return void
  */
 function wp_user_avatars_admin_enqueue_scripts() {
 
@@ -154,9 +162,15 @@ function wp_user_avatars_admin_enqueue_scripts() {
  *
  * @since 0.1.0
  *
- * @param object $user User object
+ * @param WP_User|int $user User object
+ *
+ * @return void
  */
 function wp_user_avatars_edit_user_profile( $user = 0 ) {
+
+	if ( ! $user instanceof WP_User ) {
+		return;
+	}
 
 	// Bail if current user cannot edit this user's avatar and rating
 	if ( ! current_user_can( 'edit_avatar', $user->ID ) && ! current_user_can( 'edit_avatar_rating', $user->ID ) ) {
@@ -178,7 +192,9 @@ function wp_user_avatars_edit_user_profile( $user = 0 ) {
  *
  * @since 0.1.0
  *
- * @param  object $user
+ * @param WP_User|null $user User object.
+ *
+ * @return void
  */
 function wp_user_avatars_section_content( $user = null ) {
 
@@ -284,6 +300,8 @@ function wp_user_avatars_section_content( $user = null ) {
  * Maybe remove legacy actions and rely on WP User Profiles instead.
  *
  * @since 1.1.0
+ *
+ * @return void
  */
 function wp_user_profiles_unhook_legacy_fields() {
 	if ( class_exists( 'WP_User_Profile_Section' ) ) {

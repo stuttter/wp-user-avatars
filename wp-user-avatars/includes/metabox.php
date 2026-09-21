@@ -16,6 +16,8 @@ defined( 'ABSPATH' ) || exit;
  *
  * @param   string  $type
  * @param   mixed   $user
+ *
+ * @return void
  */
 function wp_user_profiles_add_avatar_meta_box( $type = '', $user = null ) {
 
@@ -37,6 +39,8 @@ function wp_user_profiles_add_avatar_meta_box( $type = '', $user = null ) {
  * @since 0.1.0
  *
  * @param WP_User $user The WP_User object to be edited.
+ *
+ * @return void
  */
 function wp_user_profiles_avatar_metabox( $user = null ) {
 

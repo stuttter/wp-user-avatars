@@ -23,6 +23,8 @@ defined( 'ABSPATH' ) || exit;
  * Include the plugin files
  *
  * @since 0.1.0
+ *
+ * @return void
  */
 function _wp_user_avatars() {
 

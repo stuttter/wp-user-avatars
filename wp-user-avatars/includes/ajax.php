@@ -15,6 +15,8 @@ defined( 'ABSPATH' ) || exit;
  * Runs when a user clicks the Remove button for the avatar
  *
  * @since 0.1.0
+ *
+ * @return void
  */
 function wp_user_avatars_action_remove_avatars() {
 
@@ -50,6 +52,8 @@ function wp_user_avatars_action_remove_avatars() {
  * AJAX callback for setting media ID as user avatar
  *
  * @since 0.1.0
+ *
+ * @return void
  */
 function wp_user_avatars_ajax_assign_media() {
 

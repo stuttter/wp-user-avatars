@@ -19,6 +19,19 @@ final class CommonFunctionsTest extends TestCase {
 		$this->assertSame( 31, wp_user_avatars_get_user_id( new WP_Comment( 31 ) ) );
 	}
 
+	/**
+	 * A missing user should not make the upload callback fatal.
+	 */
+	public function test_unique_filename_falls_back_when_user_no_longer_exists(): void {
+		$GLOBALS['wp_user_avatars_user_id']             = 17;
+		$GLOBALS['wpua_test']['returns']['get_user_by'] = false;
+
+		$this->assertSame(
+			'avatar.jpg',
+			wp_user_avatars_unique_filename_callback( '/tmp', 'avatar', '.jpg' )
+		);
+	}
+
 	public function test_local_avatar_uses_cached_size_without_resizing(): void {
 		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
 			return 'wp_user_avatars' === $key
@@ -65,6 +78,19 @@ final class CommonFunctionsTest extends TestCase {
 			array( 7, 'wp_user_avatars', array( 'media_id' => 42, 'site_id' => 4, 'full' => 'https://example.test/avatar.jpg' ) ),
 			$GLOBALS['wpua_test']['calls']['update_user_meta'][0]
 		);
+	}
+
+	/**
+	 * A deleted attachment should not leave an empty avatar record.
+	 */
+	public function test_missing_attachment_does_not_store_an_empty_avatar_url(): void {
+		$GLOBALS['wpua_test']['returns']['get_user_meta']         = array();
+		$GLOBALS['wpua_test']['returns']['get_current_blog_id']   = 4;
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url'] = false;
+
+		wp_user_avatars_update_avatar( 7, 42 );
+
+		$this->assertArrayNotHasKey( 'update_user_meta', $GLOBALS['wpua_test']['calls'] );
 	}
 
 	public function test_generated_avatar_is_deleted_through_wordpress_api(): void {
