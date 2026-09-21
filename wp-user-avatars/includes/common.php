@@ -15,6 +15,8 @@ defined( 'ABSPATH' ) || exit;
  * Output the proper encoding type for the user edit form
  *
  * @since 0.1.0
+ *
+ * @return void
  */
 function wp_user_avatars_user_edit_form_tag() {
 	echo 'enctype="multipart/form-data"';
@@ -24,6 +26,8 @@ function wp_user_avatars_user_edit_form_tag() {
  * Save any changes to the user profile
  *
  * @param int $user_id ID of user being updated
+ *
+ * @return void
  */
 function wp_user_avatars_edit_user_profile_update( $user_id = 0 ) {
 
@@ -112,6 +116,9 @@ function wp_user_avatars_unique_filename_callback( $dir, $name, $ext ) {
 
 	// Get user
 	$user = get_user_by( 'id', $GLOBALS['wp_user_avatars_user_id'] );
+	if ( false === $user ) {
+		return sanitize_file_name( $name ) . $ext;
+	}
 
 	// File suffix
 	$suffix = time();
@@ -148,7 +155,7 @@ function wp_user_avatars_upload_size_limit( $bytes = 2000 ) {
  *
  * @since 0.1.0
  *
- * @return array
+ * @return array<string, string>
  */
 function wp_user_avatars_get_ratings() {
 	return apply_filters( 'wp_user_avatars_get_ratings', array(
@@ -170,7 +177,7 @@ function wp_user_avatars_get_ratings() {
  * @param string $default
  * @param string $alt
  *
- * @return string
+ * @return string|false
  */
 function get_user_avatar( $id_or_email, $size = 250, $default = '', $alt = '' ) {
 	return get_avatar( $id_or_email, $size, $default, $alt );
@@ -233,9 +240,8 @@ function wp_user_avatars_get_user_id( $id_or_email ) {
  *
  * @since 1.0.0
  *
- * @param int    $user_id
- * @param int    $size
- * @param string $fallback
+ * @param mixed $user_id
+ * @param int   $size
  *
  * @return mixed
  */
@@ -374,7 +380,9 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
  *
  * @param string $url
  * @param mixed $id_or_email
- * @param array $args
+ * @param array  $args
+ *
+ * @phpstan-param array<string, mixed> $args
  *
  * @return string
  */
@@ -410,7 +418,7 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
  *
  * @param  int $user_id
  *
- * @return type
+ * @return void
  */
 function wp_user_avatars_delete_avatar( $user_id = 0 ) {
 
@@ -454,6 +462,8 @@ function wp_user_avatars_delete_avatar( $user_id = 0 ) {
  *
  * @param int        $user_id  ID of user to assign image to
  * @param int|string $media    Local URL for avatar or ID of attachment
+ *
+ * @return void
  */
 function wp_user_avatars_update_avatar( $user_id, $media ) {
 
@@ -470,6 +480,10 @@ function wp_user_avatars_update_avatar( $user_id, $media ) {
 		$media                  = wp_get_attachment_url( $media );
 	}
 
+	if ( false === $media ) {
+		return;
+	}
+
 	// Set full value to media URL
 	$meta_value['full'] = esc_url_raw( $media );
 
@@ -481,6 +495,13 @@ function wp_user_avatars_update_avatar( $user_id, $media ) {
  * Remove user-avatars filter for the avatar list in options-discussion.php.
  *
  * @since 0.1.0
+ *
+ * @param array $avatar_defaults Avatar defaults.
+ *
+ * @return array<string, string>
+ *
+ * @phpstan-param array<string, string> $avatar_defaults
+ * @phpstan-return array<string, string>
  */
 function wp_user_avatars_avatar_defaults( $avatar_defaults = array() ) {
 
@@ -595,6 +616,8 @@ function wp_user_avatars_get_mystery_url() {
  * @since 0.1.0
  *
  * @param WP_User $user
+ *
+ * @return void
  */
 function wp_user_avatars_user_rating_form_field( WP_User $user ) {
 
@@ -617,7 +640,7 @@ function wp_user_avatars_user_rating_form_field( WP_User $user ) {
  *
  * @since 0.1.0
  *
- * @return string
+ * @return array<int, string>
  */
 function wp_user_avatars_profile_sections() {
 

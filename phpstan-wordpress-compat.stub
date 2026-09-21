@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * WordPress accepts the pre-4.7 callable form and wraps it before filtering.
+ *
+ * @param string                        $option_group
+ * @param string                        $option_name
+ * @param array<string, mixed>|callable $args
+ * @return void
+ */
+function register_setting( $option_group, $option_name, $args = array() ) {}
+
+/**
+ * Integer versions are retained by WP_Dependencies and stringified in URLs.
+ *
+ * @param string               $handle
+ * @param string               $src
+ * @param array<int, string>   $deps
+ * @param string|int|bool|null $ver
+ * @param array<string, mixed>|bool $args
+ * @return void
+ */
+function wp_enqueue_script( $handle, $src = '', $deps = array(), $ver = false, $args = array() ) {}
+
+/**
+ * Integer versions are retained by WP_Dependencies and stringified in URLs.
+ *
+ * @param string               $handle
+ * @param string               $src
+ * @param array<int, string>   $deps
+ * @param string|int|bool|null $ver
+ * @param string               $media
+ * @return void
+ */
+function wp_enqueue_style( $handle, $src = '', $deps = array(), $ver = false, $media = 'all' ) {}
