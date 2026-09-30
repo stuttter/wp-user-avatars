@@ -67,6 +67,7 @@ function wp_user_avatars_ajax_assign_media() {
 	$user_id  = (int) $_POST['user_id'];
 
 	// Bail if current user cannot proceed
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 	if ( ! current_user_can( 'select_avatar', $user_id ) ) {
 		die();
 	}
@@ -107,6 +108,7 @@ function wp_user_avatars_ajax_upload() {
 
 	$user_id = (int) $_POST['user_id'];
 
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 	if ( ! current_user_can( 'upload_avatar', $user_id ) ) {
 		wp_send_json_error( array( 'message' => esc_html__( 'You do not have permission to edit this user.', 'wp-user-avatars' ) ), 403 );
 	}
@@ -124,7 +126,9 @@ function wp_user_avatars_ajax_upload() {
 	$rating = isset( $_POST['rating'] ) ? sanitize_key( wp_unslash( $_POST['rating'] ) ) : '';
 	wp_user_avatars_update_rating( $user_id, $rating );
 
-	wp_send_json_success( array(
-		'avatar' => wp_user_avatars_get_avatar_preview( $user_id, 90 ),
-	) );
+	wp_send_json_success(
+		array(
+			'avatar' => wp_user_avatars_get_avatar_preview( $user_id, 90 ),
+		)
+	);
 }

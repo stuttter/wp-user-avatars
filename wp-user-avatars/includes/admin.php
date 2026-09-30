@@ -141,6 +141,7 @@ function wp_user_avatars_admin_enqueue_scripts() {
 	}
 
 	// Only users with Media Library access should load or browse it.
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 	if ( current_user_can( 'select_avatar', $user_id ) ) {
 		wp_enqueue_media();
 	}
@@ -243,6 +244,7 @@ function wp_user_avatars_section_content( $user = null ) {
 						<?php
 
 						// Only expose the Media Library to users who can browse it
+						// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 						if ( current_user_can( 'select_avatar', $user->ID ) ) : ?>
 
 							<a href="#" class="button hide-if-no-js" id="wp-user-avatars-media">

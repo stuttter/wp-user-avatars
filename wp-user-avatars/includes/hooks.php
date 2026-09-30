@@ -19,7 +19,7 @@ add_filter( 'map_meta_cap', 'wp_user_avatars_meta_caps', 10, 4 );
 
 // Scripts
 add_action( 'admin_enqueue_scripts', 'wp_user_avatars_admin_enqueue_scripts' );
-add_action( 'wp_enqueue_scripts',    'wp_user_avatars_admin_enqueue_scripts' );
+add_action( 'wp_enqueue_scripts', 'wp_user_avatars_admin_enqueue_scripts' );
 
 // User profile
 add_action( 'show_user_profile',        'wp_user_avatars_edit_user_profile'        );
@@ -41,7 +41,7 @@ add_filter( 'get_avatar_url', 'wp_user_avatars_maybe_use_local_mystery_person' )
 
 // Ajax
 add_action( 'wp_ajax_assign_wp_user_avatars_media', 'wp_user_avatars_ajax_assign_media'     );
-add_action( 'wp_ajax_upload_wp_user_avatars',       'wp_user_avatars_ajax_upload'           );
+add_action( 'wp_ajax_upload_wp_user_avatars', 'wp_user_avatars_ajax_upload' );
 add_action( 'wp_ajax_remove_wp_user_avatars',       'wp_user_avatars_action_remove_avatars' );
 add_action( 'admin_action_remove-wp-user-avatars',  'wp_user_avatars_action_remove_avatars' );
 

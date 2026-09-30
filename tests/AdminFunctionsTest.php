@@ -1,16 +1,34 @@
 <?php
+/**
+ * Avatar editor asset regression tests.
+ *
+ * @package WP_User_Avatars
+ */
 
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Verify assets and Media Library access on bbPress profile screens.
+ */
 final class AdminFunctionsTest extends TestCase {
+	/**
+	 * Reset the recorded WordPress calls.
+	 *
+	 * @return void
+	 */
 	protected function setUp(): void {
-		$GLOBALS['wpua_test'] = array();
-		$GLOBALS['wpua_test']['returns']['bbp_is_single_user_edit']    = true;
+		$GLOBALS['wpua_test']                                       = array();
+		$GLOBALS['wpua_test']['returns']['bbp_is_single_user_edit'] = true;
 		$GLOBALS['wpua_test']['returns']['bbp_get_displayed_user_id'] = 7;
 	}
 
+	/**
+	 * Verify bbpress profile loads avatar assets and media for authorized users.
+	 *
+	 * @return void
+	 */
 	public function test_bbpress_profile_loads_avatar_assets_and_media_for_authorized_users(): void {
 		$GLOBALS['wpua_test']['returns']['current_user_can'] = true;
 
@@ -25,6 +43,11 @@ final class AdminFunctionsTest extends TestCase {
 		);
 	}
 
+	/**
+	 * Verify bbpress profile does not load media without selection capability.
+	 *
+	 * @return void
+	 */
 	public function test_bbpress_profile_does_not_load_media_without_selection_capability(): void {
 		$GLOBALS['wpua_test']['returns']['current_user_can'] = false;
 

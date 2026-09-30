@@ -33,13 +33,33 @@ class WP_Comment {
 
 class WP_Error {
 	public $errors = array();
+	/**
+	 * Provide the __construct test double.
+	 *
+	 * @param mixed $code Test input.
+	 * @param mixed $message Test input.
+	 *
+	 * @return mixed
+	 */
 	public function __construct( $code = '', $message = '' ) {
 		if ( $code ) {
 			$this->add( $code, $message );
 		}
 	}
 	public function add( $code, $message ) { $this->errors[ $code ][] = $message; }
-	public function get_error_code() { return key( $this->errors ); }
+	/**
+	 * Provide the get_error_code test double.
+	 *
+	 * @return mixed
+	 */
+	public function get_error_code() {
+		return key( $this->errors );
+	}
+	/**
+	 * Provide the get_error_message test double.
+	 *
+	 * @return mixed
+	 */
 	public function get_error_message() {
 		$code = $this->get_error_code();
 		return $code ? $this->errors[ $code ][0] : '';
@@ -49,7 +69,16 @@ class WP_Error {
 function add_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 function add_filter( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 function remove_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
-function remove_filter( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
+/**
+ * Provide the remove_filter test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function remove_filter( ...$arguments ) {
+	wpua_test_call( __FUNCTION__, $arguments );
+}
 function plugin_dir_path( $file ) { return dirname( $file ) . '/'; }
 function plugin_dir_url() { return 'https://example.test/wp-content/plugins/wp-user-avatars/'; }
 function load_plugin_textdomain( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
@@ -73,33 +102,196 @@ function is_user_logged_in() { return (bool) wpua_test_call( __FUNCTION__, array
 function wp_upload_dir() { return wpua_test_call( __FUNCTION__, array() ); }
 function wp_delete_file( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function wp_get_image_editor( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
-function wp_handle_upload( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
+/**
+ * Provide the wp_handle_upload test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function wp_handle_upload( ...$arguments ) {
+	return wpua_test_call( __FUNCTION__, $arguments );
+}
 function is_wp_error( $value ) { return $value instanceof WP_Error; }
-function wp_parse_url( $url, $component = -1 ) { return parse_url( $url, $component ); }
-function wp_is_stream( $path ) { return false !== strpos( $path, '://' ); }
+/**
+ * Provide the wp_parse_url test double.
+ *
+ * @param mixed $url Test input.
+ * @param mixed $component Test input.
+ *
+ * @return mixed
+ */
+function wp_parse_url( $url, $component = -1 ) {
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- This WordPress test double delegates to PHP's URL parser.
+	return parse_url( $url, $component );
+}
+/**
+ * Provide the wp_is_stream test double.
+ *
+ * @param mixed $path Test input.
+ *
+ * @return mixed
+ */
+function wp_is_stream( $path ) {
+	return false !== strpos( $path, '://' );
+}
 function home_url( $path = '' ) { return 'https://example.test' . $path; }
 function get_current_blog_id() { return (int) ( wpua_test_call( __FUNCTION__, array() ) ?? 1 ); }
 function wp_get_attachment_url( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
-function wp_get_attachment_image_url( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
+/**
+ * Provide the wp_get_attachment_image_url test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function wp_get_attachment_image_url( ...$arguments ) {
+	return wpua_test_call( __FUNCTION__, $arguments );
+}
 function esc_url_raw( $value ) { return (string) $value; }
-function wp_kses_post( $value ) { return $value; }
+/**
+ * Provide the wp_kses_post test double.
+ *
+ * @param mixed $value Test input.
+ *
+ * @return mixed
+ */
+function wp_kses_post( $value ) {
+	return $value;
+}
 function user_can( ...$arguments ) { return (bool) wpua_test_call( __FUNCTION__, $arguments ); }
 function get_editable_roles() { return wpua_test_call( __FUNCTION__, array() ) ?? array(); }
 function sanitize_file_name( $value ) { return preg_replace( '/[^A-Za-z0-9._-]/', '-', $value ); }
-function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( $value ) ); }
-function sanitize_text_field( $value ) { return trim( (string) $value ); }
-function wp_unslash( $value ) { return stripslashes( (string) $value ); }
-function current_user_can( ...$arguments ) { return (bool) wpua_test_call( __FUNCTION__, $arguments ); }
-function bbp_is_single_user_edit() { return (bool) wpua_test_call( __FUNCTION__, array() ); }
-function bbp_get_displayed_user_id() { return (int) wpua_test_call( __FUNCTION__, array() ); }
-function wp_enqueue_media() { return wpua_test_call( __FUNCTION__, array() ); }
-function wp_enqueue_script( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
-function wp_enqueue_style( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
-function wp_localize_script( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
-function wp_create_nonce( $action ) { return $action . '-nonce'; }
-function admin_url( $path = '' ) { return 'https://example.test/wp-admin/' . $path; }
-function get_current_user_id() { return 1; }
-function is_rtl() { return false; }
+/**
+ * Provide the sanitize_key test double.
+ *
+ * @param mixed $value Test input.
+ *
+ * @return mixed
+ */
+function sanitize_key( $value ) {
+	return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( $value ) );
+}
+/**
+ * Provide the sanitize_text_field test double.
+ *
+ * @param mixed $value Test input.
+ *
+ * @return mixed
+ */
+function sanitize_text_field( $value ) {
+	return trim( (string) $value );
+}
+/**
+ * Provide the wp_unslash test double.
+ *
+ * @param mixed $value Test input.
+ *
+ * @return mixed
+ */
+function wp_unslash( $value ) {
+	return stripslashes( (string) $value );
+}
+/**
+ * Provide the current_user_can test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function current_user_can( ...$arguments ) {
+	return (bool) wpua_test_call( __FUNCTION__, $arguments );
+}
+/**
+ * Provide the bbp_is_single_user_edit test double.
+ *
+ * @return mixed
+ */
+function bbp_is_single_user_edit() {
+	return (bool) wpua_test_call( __FUNCTION__, array() );
+}
+/**
+ * Provide the bbp_get_displayed_user_id test double.
+ *
+ * @return mixed
+ */
+function bbp_get_displayed_user_id() {
+	return (int) wpua_test_call( __FUNCTION__, array() );
+}
+/**
+ * Provide the wp_enqueue_media test double.
+ *
+ * @return mixed
+ */
+function wp_enqueue_media() {
+	return wpua_test_call( __FUNCTION__, array() );
+}
+/**
+ * Provide the wp_enqueue_script test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function wp_enqueue_script( ...$arguments ) {
+	return wpua_test_call( __FUNCTION__, $arguments );
+}
+/**
+ * Provide the wp_enqueue_style test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function wp_enqueue_style( ...$arguments ) {
+	return wpua_test_call( __FUNCTION__, $arguments );
+}
+/**
+ * Provide the wp_localize_script test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function wp_localize_script( ...$arguments ) {
+	return wpua_test_call( __FUNCTION__, $arguments );
+}
+/**
+ * Provide the wp_create_nonce test double.
+ *
+ * @param mixed $action Test input.
+ *
+ * @return mixed
+ */
+function wp_create_nonce( $action ) {
+	return $action . '-nonce';
+}
+/**
+ * Provide the admin_url test double.
+ *
+ * @param mixed $path Test input.
+ *
+ * @return mixed
+ */
+function admin_url( $path = '' ) {
+	return 'https://example.test/wp-admin/' . $path;
+}
+/**
+ * Provide the get_current_user_id test double.
+ *
+ * @return mixed
+ */
+function get_current_user_id() {
+	return 1;
+}
+/**
+ * Provide the is_rtl test double.
+ *
+ * @return mixed
+ */
+function is_rtl() {
+	return false;
+}
 
 require_once dirname( __DIR__ ) . '/wp-user-avatars.php';
 require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/common.php';

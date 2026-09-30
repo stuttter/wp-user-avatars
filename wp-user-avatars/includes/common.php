@@ -40,6 +40,7 @@ function wp_user_avatars_edit_user_profile_update( $user_id = 0 ) {
 
 	// Check for upload
 	if ( ! empty( $_FILES['wp-user-avatars']['name'] ) ) {
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 		if ( ! current_user_can( 'upload_avatar', $user_id ) ) {
 			return;
 		}
@@ -59,6 +60,7 @@ function wp_user_avatars_edit_user_profile_update( $user_id = 0 ) {
 	}
 
 	// Rating
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 	if ( current_user_can( 'edit_avatar_rating', $user_id ) && ( $avatar_updated || get_user_meta( $user_id, 'wp_user_avatars', true ) ) ) {
 		$rating = isset( $_POST['wp_user_avatars_rating'] )
 			? sanitize_key( wp_unslash( $_POST['wp_user_avatars_rating'] ) )
@@ -95,16 +97,19 @@ function wp_user_avatars_handle_upload( $user_id, $file ) {
 	$GLOBALS['wp_user_avatars_user_id'] = $user_id;
 
 	try {
-		$avatar = wp_handle_upload( $file, array(
-			'mimes' => array(
-				'jpg|jpeg|jpe' => 'image/jpeg',
-				'gif'          => 'image/gif',
-				'png'          => 'image/png',
-				'webp'         => 'image/webp'
-			),
-			'test_form'                => false,
-			'unique_filename_callback' => 'wp_user_avatars_unique_filename_callback'
-		) );
+		$avatar = wp_handle_upload(
+			$file,
+			array(
+				'mimes'                    => array(
+					'jpg|jpeg|jpe' => 'image/jpeg',
+					'gif'          => 'image/gif',
+					'png'          => 'image/png',
+					'webp'         => 'image/webp',
+				),
+				'test_form'                => false,
+				'unique_filename_callback' => 'wp_user_avatars_unique_filename_callback',
+			)
+		);
 	} finally {
 		unset( $GLOBALS['wp_user_avatars_user_id'] );
 		remove_filter( 'upload_size_limit', 'wp_user_avatars_upload_size_limit' );
@@ -114,7 +119,7 @@ function wp_user_avatars_handle_upload( $user_id, $file ) {
 		$error_code = isset( $avatar['error'] ) && 'File type does not meet security guidelines. Try another.' === $avatar['error']
 			? 'invalid_file_type'
 			: 'upload_error';
-		$message = isset( $avatar['error'] ) ? (string) $avatar['error'] : esc_html__( 'The avatar could not be uploaded.', 'wp-user-avatars' );
+		$message    = isset( $avatar['error'] ) ? (string) $avatar['error'] : esc_html__( 'The avatar could not be uploaded.', 'wp-user-avatars' );
 
 		return new WP_Error( $error_code, $message );
 	}
@@ -151,9 +156,9 @@ function wp_user_avatars_update_rating( $user_id, $rating = '' ) {
  *
  * @since 0.1.0
  *
- * @param  string  $dir   Path for file
- * @param  string  $name  Filename
- * @param  string  $ext   File extension (e.g. ".jpg")
+ * @param  string $dir   Path for file
+ * @param  string $name  Filename
+ * @param  string $ext   File extension (e.g. ".jpg")
  *
  * @return string Final filename
  */
@@ -172,7 +177,7 @@ function wp_user_avatars_unique_filename_callback( $dir, $name, $ext ) {
 	$number = 1;
 	while ( file_exists( $dir . "/{$_name}{$ext}" ) ) {
 		$_name = $base_name . '_' . $number;
-		$number++;
+		++$number;
 	}
 
 	// Return the unique filename
@@ -200,12 +205,15 @@ function wp_user_avatars_upload_size_limit( $bytes = 2000 ) {
  * @return array<string, string>
  */
 function wp_user_avatars_get_ratings() {
-	return apply_filters( 'wp_user_avatars_get_ratings', array(
-		'G'  => esc_html__( 'Suitable for all audiences',                             'wp-user-avatars' ),
-		'PG' => esc_html__( 'Possibly offensive, usually for audiences 13 and above', 'wp-user-avatars' ),
-		'R'  => esc_html__( 'Intended for adult audiences above 17',                  'wp-user-avatars' ),
-		'X'  => esc_html__( 'Even more mature than above',                            'wp-user-avatars' )
-	) );
+	return apply_filters(
+		'wp_user_avatars_get_ratings',
+		array(
+			'G'  => esc_html__( 'Suitable for all audiences', 'wp-user-avatars' ),
+			'PG' => esc_html__( 'Possibly offensive, usually for audiences 13 and above', 'wp-user-avatars' ),
+			'R'  => esc_html__( 'Intended for adult audiences above 17', 'wp-user-avatars' ),
+			'X'  => esc_html__( 'Even more mature than above', 'wp-user-avatars' ),
+		)
+	);
 }
 
 /**
@@ -259,7 +267,7 @@ function wp_user_avatars_get_user_id( $id_or_email ) {
 	if ( is_numeric( $id_or_email ) ) {
 		$retval = $id_or_email;
 
-	// Maybe email or login
+		// Maybe email or login
 	} elseif ( is_string( $id_or_email ) ) {
 
 		// User by
@@ -275,15 +283,15 @@ function wp_user_avatars_get_user_id( $id_or_email ) {
 			$retval = $user->ID;
 		}
 
-	// User Object
+		// User Object
 	} elseif ( $id_or_email instanceof WP_User ) {
 		$retval = $id_or_email->ID;
 
-	// Post Object
+		// Post Object
 	} elseif ( $id_or_email instanceof WP_Post ) {
 		$retval = $id_or_email->post_author;
 
-	// Comment
+		// Comment
 	} elseif ( $id_or_email instanceof WP_Comment ) {
 		if ( ! empty( $id_or_email->user_id ) ) {
 			$retval = $id_or_email->user_id;
@@ -330,7 +338,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 		// Calculate rating weights
 		$ratings              = wp_user_avatars_get_ratings();
 		$ratings_key          = array_keys( $ratings );
-		$site_rating_weight   = array_search( $site_rating,   $ratings_key );
+		$site_rating_weight   = array_search( $site_rating, $ratings_key );
 		$avatar_rating_weight = array_search( $avatar_rating, $ratings_key );
 
 		// Too risky
@@ -347,7 +355,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 			return $user_avatars['full'];
 		}
 		return $user_avatars[ $size ];
-    }
+	}
 
 	// Maybe switch to blog
 	if ( isset( $user_avatars['site_id'] ) && is_multisite() ) {
@@ -452,7 +460,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
  * @since 1.0.0
  *
  * @param string $url
- * @param mixed $id_or_email
+ * @param mixed  $id_or_email
  * @param array  $args
  *
  * @phpstan-param array<string, mixed> $args
@@ -524,7 +532,7 @@ function wp_user_avatars_delete_avatar( $user_id = 0 ) {
 	}
 
 	// Remove metadata
-	delete_user_meta( $user_id, 'wp_user_avatars'        );
+	delete_user_meta( $user_id, 'wp_user_avatars' );
 	delete_user_meta( $user_id, 'wp_user_avatars_rating' );
 }
 
@@ -585,7 +593,7 @@ function wp_user_avatars_avatar_defaults( $avatar_defaults = array() ) {
 	if ( get_option( 'wp_user_avatars_block_gravatar' ) ) {
 		$new_avatar_defaults = array(
 			wp_user_avatars_get_mystery_url() => esc_html__( 'Mystery Person', 'wp-user-avatars' ),
-			'blank'                           => esc_html__( 'Blank',          'wp-user-avatars' )
+			'blank'                           => esc_html__( 'Blank', 'wp-user-avatars' ),
 		);
 	}
 
@@ -702,8 +710,8 @@ function wp_user_avatars_user_rating_form_field( WP_User $user ) {
 		</label>
 		<br>
 
-	<?php endforeach;
-
+		<?php
+	endforeach;
 }
 
 /**

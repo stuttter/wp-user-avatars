@@ -26,8 +26,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @return void
  */
-// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy loader retained for backward compatibility.
-function _wp_user_avatars() {
+function _wp_user_avatars() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy loader retained for backward compatibility.
 
 	// Get the plugin path
 	$plugin_path = plugin_dir_path( __FILE__ ) . 'wp-user-avatars/';
@@ -42,7 +41,6 @@ function _wp_user_avatars() {
 	require_once $plugin_path . 'includes/sponsor.php';
 	require_once $plugin_path . 'includes/uninstall.php';
 	require_once $plugin_path . 'includes/hooks.php';
-
 }
 add_action( 'plugins_loaded', '_wp_user_avatars' );
 
