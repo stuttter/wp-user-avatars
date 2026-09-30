@@ -15,6 +15,35 @@ final class CapabilitiesTest extends TestCase {
 	}
 
 	/**
+	 * Missing and malformed targets must fail closed without WordPress calls.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_capabilities_reject_invalid_targets(): void {
+		foreach ( array( 'select_avatar', 'upload_avatar', 'edit_avatar', 'edit_avatar_rating', 'remove_avatar', 'delete_avatar' ) as $cap ) {
+			foreach ( array( array(), array( null ), array( 0 ), array( -1 ), array( '' ), array( 'invalid' ), array( true ), array( 1.5 ), array( array() ), array( new stdClass() ) ) as $args ) {
+				$this->assertSame( array( 'do_not_allow' ), wp_user_avatars_meta_caps( array( $cap ), $cap, 3, $args ) );
+			}
+		}
+		$this->assertArrayNotHasKey( 'user_can', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * Valid numeric IDs keep the existing self and other-user permission check.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_capabilities_preserve_target_checks(): void {
+		$GLOBALS['wpua_test']['callbacks']['user_can'] = static function ( $actor, $cap, $target = null ) {
+			return 'upload_files' === $cap || $actor === $target;
+		};
+		foreach ( array( 'select_avatar', 'upload_avatar', 'edit_avatar', 'edit_avatar_rating', 'remove_avatar', 'delete_avatar' ) as $cap ) {
+			$this->assertSame( array(), wp_user_avatars_meta_caps( array( $cap ), $cap, 3, array( '3' ) ) );
+			$this->assertSame( array( $cap ), wp_user_avatars_meta_caps( array( $cap ), $cap, 3, array( 7 ) ) );
+		}
+	}
+
+	/**
 	 * Verify avatar capability is granted when user can edit target.
 	 *
 	 * @return void
