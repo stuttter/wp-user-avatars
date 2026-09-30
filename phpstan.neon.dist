@@ -1,0 +1,15 @@
+parameters:
+    level: 7
+    phpVersion: 70400
+    paths:
+        - wp-user-avatars.php
+        - wp-user-avatars
+    scanFiles:
+        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+    stubFiles:
+        - phpstan-wordpress-compat.stub
+    universalObjectCratesClasses:
+        - WP_User
+    tmpDir: build/phpstan
+    parallel:
+        maximumNumberOfProcesses: 1

@@ -13,6 +13,8 @@ defined( 'ABSPATH' ) || exit;
  * Hokey uninstall routine to remove all avatars
  *
  * @since 0.1.0
+ *
+ * @return void
  */
 function wp_user_avatars_uninstall() {
 
