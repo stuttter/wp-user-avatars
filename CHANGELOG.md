@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1
+
+- Avoid warnings and deny avatar capability checks without a valid target user.
+- Use HTTPS for stored avatars hosted on the owning site's HTTPS origin.
+- Preserve external avatar URLs and local resizing after an HTTPS migration.
+
 ## 2.0.0
 
 - Require PHP 7.4 and WordPress 6.4 or newer.
