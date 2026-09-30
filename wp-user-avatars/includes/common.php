@@ -351,10 +351,9 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 
 	// Return early if there's no media to check and we either have an avatar of the correct size or don't dynamically resize
 	if ( empty( $user_avatars['media_id'] ) && ( ! empty( $user_avatars[ $size ] ) || $dynamic_resize === false ) ) {
-		if ( empty( $user_avatars[ $size ] ) ) {
-			return $user_avatars['full'];
-		}
-		return $user_avatars[ $size ];
+		$avatar_url = empty( $user_avatars[ $size ] ) ? $user_avatars['full'] : $user_avatars[ $size ];
+		$site_id    = isset( $user_avatars['site_id'] ) ? (int) $user_avatars['site_id'] : null;
+		return wp_user_avatars_maybe_secure_url( $avatar_url, $site_id );
 	}
 
 	// Maybe switch to blog
@@ -393,6 +392,10 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 				$avatar_url = wp_get_attachment_url( $user_avatars['media_id'] );
 			}
 
+			if ( ! empty( $avatar_url ) ) {
+				$avatar_url = wp_user_avatars_maybe_secure_url( $avatar_url );
+			}
+
 			if ( true === $switched ) {
 				restore_current_blog();
 			}
@@ -415,7 +418,9 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 
 			// Get path for image by converting URL
 			if ( ! isset( $avatar_full_path ) ) {
-				$avatar_full_path = str_replace( $upload_path['baseurl'], $upload_path['basedir'], $user_avatars['full'] );
+				$full_url         = wp_user_avatars_maybe_secure_url( $user_avatars['full'] );
+				$upload_url       = wp_user_avatars_maybe_secure_url( $upload_path['baseurl'] );
+				$avatar_full_path = str_replace( $upload_url, $upload_path['basedir'], $full_url );
 			}
 
 			// Load image editor (for resizing)
@@ -444,6 +449,7 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 	if ( 'http' !== substr( $user_avatars[ $size ], 0, 4 ) ) {
 		$user_avatars[ $size ] = home_url( $user_avatars[ $size ] );
 	}
+	$avatar_url = wp_user_avatars_maybe_secure_url( $user_avatars[ $size ] );
 
 	// Maybe switch back
 	if ( true === $switched ) {
@@ -451,7 +457,32 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 	}
 
 	// Return the url
-	return $user_avatars[ $size ];
+	return $avatar_url;
+}
+
+/**
+ * Upgrade an HTTP avatar only when its owning site uses HTTPS on that host.
+ *
+ * @since 2.0.1
+ *
+ * @param string   $url     Stored or resolved avatar URL.
+ * @param int|null $site_id Owning site, or null for the current site.
+ * @return string Avatar URL without changing stored metadata.
+ */
+function wp_user_avatars_maybe_secure_url( $url, $site_id = null ) {
+	$avatar = wp_parse_url( $url );
+	if ( ! is_array( $avatar ) || empty( $avatar['host'] ) || empty( $avatar['scheme'] ) || 'http' !== strtolower( $avatar['scheme'] ) ) {
+		return $url;
+	}
+
+	foreach ( array( get_home_url( $site_id ), get_site_url( $site_id ) ) as $site_url ) {
+		$site = wp_parse_url( $site_url );
+		if ( is_array( $site ) && ! empty( $site['host'] ) && ! empty( $site['scheme'] ) && 'https' === strtolower( $site['scheme'] ) && strtolower( $avatar['host'] ) === strtolower( $site['host'] ) && ( $avatar['port'] ?? null ) === ( $site['port'] ?? null ) ) {
+			return 'https:' . substr( $url, strpos( $url, ':' ) + 1 );
+		}
+	}
+
+	return $url;
 }
 
 /**
