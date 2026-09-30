@@ -25,6 +25,29 @@ final class CapabilitiesTest extends TestCase {
 		);
 	}
 
+	public function test_media_selection_requires_editing_and_media_capabilities(): void {
+		$GLOBALS['wpua_test']['callbacks']['user_can'] = static function ( $user_id, $capability ) {
+			return in_array( $capability, array( 'edit_user', 'upload_files' ), true );
+		};
+
+		$this->assertSame( array(), wp_user_avatars_meta_caps( array( 'do_not_allow' ), 'select_avatar', 3, array( 7 ) ) );
+		$this->assertSame(
+			array( array( 3, 'edit_user', 7 ), array( 3, 'upload_files' ) ),
+			$GLOBALS['wpua_test']['calls']['user_can']
+		);
+	}
+
+	public function test_media_selection_is_denied_without_media_capability(): void {
+		$GLOBALS['wpua_test']['callbacks']['user_can'] = static function ( $user_id, $capability ) {
+			return 'edit_user' === $capability;
+		};
+
+		$this->assertSame(
+			array( 'do_not_allow' ),
+			wp_user_avatars_meta_caps( array( 'do_not_allow' ), 'select_avatar', 3, array( 7 ) )
+		);
+	}
+
 	public function test_unrelated_capability_is_not_remapped(): void {
 		$this->assertSame( array( 'read' ), wp_user_avatars_meta_caps( array( 'read' ), 'read', 3, array() ) );
 		$this->assertArrayNotHasKey( 'user_can', $GLOBALS['wpua_test']['calls'] ?? array() );

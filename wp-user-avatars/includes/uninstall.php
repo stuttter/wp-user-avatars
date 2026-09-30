@@ -2,7 +2,7 @@
 
 /**
  * User Profile Avatar Uninstall
- * 
+ *
  * @package Plugins/User/Avatars/Uninstall
  */
 
@@ -20,6 +20,7 @@ function wp_user_avatars_uninstall() {
 
 	// Get users of blog
 	$users = get_users( array(
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- An uninstall must find every user whose plugin metadata needs deletion.
 		'meta_key' => 'wp_user_avatars',
 		'fields'   => 'ids'
 	) );

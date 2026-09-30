@@ -33,12 +33,23 @@ class WP_Comment {
 
 class WP_Error {
 	public $errors = array();
+	public function __construct( $code = '', $message = '' ) {
+		if ( $code ) {
+			$this->add( $code, $message );
+		}
+	}
 	public function add( $code, $message ) { $this->errors[ $code ][] = $message; }
+	public function get_error_code() { return key( $this->errors ); }
+	public function get_error_message() {
+		$code = $this->get_error_code();
+		return $code ? $this->errors[ $code ][0] : '';
+	}
 }
 
 function add_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 function add_filter( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 function remove_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
+function remove_filter( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 function plugin_dir_path( $file ) { return dirname( $file ) . '/'; }
 function plugin_dir_url() { return 'https://example.test/wp-content/plugins/wp-user-avatars/'; }
 function load_plugin_textdomain( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
@@ -62,17 +73,37 @@ function is_user_logged_in() { return (bool) wpua_test_call( __FUNCTION__, array
 function wp_upload_dir() { return wpua_test_call( __FUNCTION__, array() ); }
 function wp_delete_file( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function wp_get_image_editor( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
+function wp_handle_upload( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function is_wp_error( $value ) { return $value instanceof WP_Error; }
+function wp_parse_url( $url, $component = -1 ) { return parse_url( $url, $component ); }
+function wp_is_stream( $path ) { return false !== strpos( $path, '://' ); }
 function home_url( $path = '' ) { return 'https://example.test' . $path; }
 function get_current_blog_id() { return (int) ( wpua_test_call( __FUNCTION__, array() ) ?? 1 ); }
 function wp_get_attachment_url( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
+function wp_get_attachment_image_url( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function esc_url_raw( $value ) { return (string) $value; }
+function wp_kses_post( $value ) { return $value; }
 function user_can( ...$arguments ) { return (bool) wpua_test_call( __FUNCTION__, $arguments ); }
 function get_editable_roles() { return wpua_test_call( __FUNCTION__, array() ) ?? array(); }
 function sanitize_file_name( $value ) { return preg_replace( '/[^A-Za-z0-9._-]/', '-', $value ); }
+function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( $value ) ); }
+function sanitize_text_field( $value ) { return trim( (string) $value ); }
+function wp_unslash( $value ) { return stripslashes( (string) $value ); }
+function current_user_can( ...$arguments ) { return (bool) wpua_test_call( __FUNCTION__, $arguments ); }
+function bbp_is_single_user_edit() { return (bool) wpua_test_call( __FUNCTION__, array() ); }
+function bbp_get_displayed_user_id() { return (int) wpua_test_call( __FUNCTION__, array() ); }
+function wp_enqueue_media() { return wpua_test_call( __FUNCTION__, array() ); }
+function wp_enqueue_script( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
+function wp_enqueue_style( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
+function wp_localize_script( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
+function wp_create_nonce( $action ) { return $action . '-nonce'; }
+function admin_url( $path = '' ) { return 'https://example.test/wp-admin/' . $path; }
+function get_current_user_id() { return 1; }
+function is_rtl() { return false; }
 
 require_once dirname( __DIR__ ) . '/wp-user-avatars.php';
 require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/common.php';
 require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/capabilities.php';
 require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/admin.php';
+require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/ajax.php';
 require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/hooks.php';
