@@ -116,15 +116,12 @@ function wp_user_avatars_unique_filename_callback( $dir, $name, $ext ) {
 
 	// Get user
 	$user = get_user_by( 'id', $GLOBALS['wp_user_avatars_user_id'] );
-	if ( false === $user ) {
-		return sanitize_file_name( $name ) . $ext;
-	}
-
-	// File suffix
-	$suffix = time();
 
 	// Override names
-	$_name = $base_name = sanitize_file_name( 'avatar_user_' . $user->ID . '_' . $suffix );
+	$base_name = false === $user
+		? sanitize_file_name( $name )
+		: sanitize_file_name( 'avatar_user_' . $user->ID . '_' . time() );
+	$_name     = $base_name;
 
 	// Ensure no conflicts with existing file names
 	$number = 1;

@@ -27,9 +27,25 @@ final class CommonFunctionsTest extends TestCase {
 		$GLOBALS['wpua_test']['returns']['get_user_by'] = false;
 
 		$this->assertSame(
-			'avatar.jpg',
-			wp_user_avatars_unique_filename_callback( '/tmp', 'avatar', '.jpg' )
+			'CommonFunctionsTest_1.php',
+			wp_user_avatars_unique_filename_callback( __DIR__, 'CommonFunctionsTest', '.php' )
 		);
+	}
+
+	/**
+	 * An invalid profile value should not make the display callback fatal.
+	 */
+	public function test_profile_field_ignores_invalid_user_value(): void {
+		ob_start();
+
+		try {
+			wp_user_avatars_edit_user_profile( 0 );
+		} finally {
+			$output = ob_get_clean();
+		}
+
+		$this->assertSame( '', $output );
+		$this->assertSame( array(), $GLOBALS['wpua_test'] );
 	}
 
 	public function test_local_avatar_uses_cached_size_without_resizing(): void {
