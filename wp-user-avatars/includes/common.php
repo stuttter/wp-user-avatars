@@ -63,7 +63,7 @@ function wp_user_avatars_edit_user_profile_update( $user_id = 0 ) {
 	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 	if ( current_user_can( 'edit_avatar_rating', $user_id ) && ( $avatar_updated || get_user_meta( $user_id, 'wp_user_avatars', true ) ) ) {
 		$rating = isset( $_POST['wp_user_avatars_rating'] )
-			? sanitize_key( wp_unslash( $_POST['wp_user_avatars_rating'] ) )
+			? sanitize_text_field( wp_unslash( $_POST['wp_user_avatars_rating'] ) )
 			: '';
 
 		wp_user_avatars_update_rating( $user_id, $rating );
@@ -621,6 +621,13 @@ function wp_user_avatars_maybe_use_local_mystery_person( $url = '' ) {
 	$host = wp_parse_url( $url, PHP_URL_HOST );
 	if ( ! is_string( $host ) || ( 'gravatar.com' !== $host && '.gravatar.com' !== substr( $host, -13 ) ) ) {
 		return $url;
+	}
+
+	// Preserve Blank without making a remote Gravatar request.
+	$query = array();
+	parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+	if ( isset( $query['d'] ) && 'blank' === $query['d'] ) {
+		return wp_user_avatars_get_plugin_url() . 'assets/images/blank.svg';
 	}
 
 	// Return the local mystery person

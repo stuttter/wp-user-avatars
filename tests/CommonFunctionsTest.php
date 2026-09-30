@@ -328,7 +328,18 @@ final class CommonFunctionsTest extends TestCase {
 		);
 		$this->assertSame(
 			wp_user_avatars_get_mystery_url(),
-			wp_user_avatars_maybe_use_local_mystery_person( 'https://0.gravatar.com/avatar/hash?s=32&d=blank' )
+			wp_user_avatars_maybe_use_local_mystery_person( 'https://0.gravatar.com/avatar/hash?s=32&d=mystery' )
+		);
+	}
+
+	/**
+	 * Blocking Gravatar must preserve the advertised Blank default locally.
+	 */
+	public function test_blocking_gravatar_preserves_blank_default_locally(): void {
+		$GLOBALS['wpua_test']['returns']['get_option'] = true;
+		$this->assertSame(
+			wp_user_avatars_get_plugin_url() . 'assets/images/blank.svg',
+			wp_user_avatars_maybe_use_local_mystery_person( 'https://0.gravatar.com/avatar/hash?s=32&d=blank&f=y' )
 		);
 	}
 

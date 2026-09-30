@@ -123,8 +123,11 @@ function wp_user_avatars_ajax_upload() {
 		wp_send_json_error( array( 'message' => $avatar->get_error_message() ), 400 );
 	}
 
-	$rating = isset( $_POST['rating'] ) ? sanitize_key( wp_unslash( $_POST['rating'] ) ) : '';
-	wp_user_avatars_update_rating( $user_id, $rating );
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
+	if ( current_user_can( 'edit_avatar_rating', $user_id ) ) {
+		$rating = isset( $_POST['rating'] ) ? sanitize_text_field( wp_unslash( $_POST['rating'] ) ) : '';
+		wp_user_avatars_update_rating( $user_id, $rating );
+	}
 
 	wp_send_json_success(
 		array(
