@@ -10,7 +10,7 @@ Tags:              user, profile, avatar, media, local
 Requires PHP:      7.4
 Requires at least: 6.4
 Tested up to:      7.1
-Stable tag:        2.0.0
+Stable tag:        2.0.1
 
 Allow registered users to upload and select their own avatars.
 
@@ -64,6 +64,11 @@ It works OK, but you'll want to consider exactly what level of privacy is best f
 * Development: https://github.com/stuttter/wp-user-avatars/discussions
 
 == Changelog ==
+
+= 2.0.1 =
+* Avoid warnings and deny avatar capability checks without a valid target user.
+* Use HTTPS for stored avatars hosted on the owning site's HTTPS origin.
+* Preserve external avatar URLs and local resizing after an HTTPS migration.
 
 = 2.0.0 =
 * Require PHP 7.4 and WordPress 6.4 or newer.
