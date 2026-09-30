@@ -1,11 +1,19 @@
 # Changelog
 
-## Unreleased
+## 2.0.0
 
 - Require PHP 7.4 and WordPress 6.4 or newer.
 - Declare compatibility with WordPress 7.1.
+- Add WebP avatar uploads.
 - Allow Composer Installers 1.x or 2.x.
 - Add automated regression tests and contributor tooling.
+- Use WordPress's just-in-time translation loading.
+- Prevent the Block Gravatar option from leaking requests from the Comments screen.
+- Support avatars stored by remote-media plugins such as WP Offload Media.
+- Display the profile avatar preview when public avatar display is disabled.
+- Require Media Library access before allowing an existing attachment to be selected.
+- Support avatar uploads and removal from bbPress profile screens.
+- Upload and preview selected avatar files without requiring a separate profile update.
 
 ## 1.4.1
 

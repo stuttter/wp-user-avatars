@@ -5,10 +5,20 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 final class CommonFunctionsTest extends TestCase {
+	/**
+	 * Reset the recorded WordPress calls.
+	 *
+	 * @return void
+	 */
 	protected function setUp(): void {
 		$GLOBALS['wpua_test'] = array();
 	}
 
+	/**
+	 * Verify user id resolves supported identity types.
+	 *
+	 * @return void
+	 */
 	public function test_user_id_resolves_supported_identity_types(): void {
 		$GLOBALS['wpua_test']['returns']['get_user_by'] = new WP_User( 17 );
 
@@ -33,6 +43,54 @@ final class CommonFunctionsTest extends TestCase {
 	}
 
 	/**
+	 * Verify avatar upload is assigned and cleans up temporary state.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_upload_is_assigned_and_cleans_up_temporary_state(): void {
+		$GLOBALS['wpua_test']['returns']['wp_handle_upload'] = array(
+			'file' => '/tmp/avatar.jpg',
+			'url'  => 'https://example.test/uploads/avatar.jpg',
+		);
+
+		$this->assertSame(
+			'https://example.test/uploads/avatar.jpg',
+			wp_user_avatars_handle_upload( 7, array( 'name' => 'avatar.jpg' ) )
+		);
+		$this->assertArrayNotHasKey( 'wp_user_avatars_user_id', $GLOBALS );
+		$this->assertSame(
+			array( 'upload_size_limit', 'wp_user_avatars_upload_size_limit' ),
+			$GLOBALS['wpua_test']['calls']['remove_filter'][0]
+		);
+	}
+
+	/**
+	 * Verify avatar upload rejects executable file names.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_upload_rejects_executable_file_names(): void {
+		$result = wp_user_avatars_handle_upload( 7, array( 'name' => 'avatar.php.jpg' ) );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'invalid_file_type', $result->get_error_code() );
+		$this->assertArrayNotHasKey( 'wp_handle_upload', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * Verify avatar rating falls back to the safest value.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_rating_falls_back_to_the_safest_value(): void {
+		$this->assertSame( 'G', wp_user_avatars_update_rating( 7, 'invalid' ) );
+		$this->assertSame(
+			array( 7, 'wp_user_avatars_rating', 'G' ),
+			$GLOBALS['wpua_test']['calls']['update_user_meta'][0]
+		);
+	}
+
+	/**
 	 * An invalid profile value should not make the display callback fatal.
 	 */
 	public function test_profile_field_ignores_invalid_user_value(): void {
@@ -48,50 +106,143 @@ final class CommonFunctionsTest extends TestCase {
 		$this->assertSame( array(), $GLOBALS['wpua_test'] );
 	}
 
+	/**
+	 * Verify local avatar uses cached size without resizing.
+	 *
+	 * @return void
+	 */
 	public function test_local_avatar_uses_cached_size_without_resizing(): void {
 		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
 			return 'wp_user_avatars' === $key
-				? array( 'full' => 'https://example.test/full.jpg', 96 => 'https://example.test/96.jpg' )
+				? array(
+					'full' => 'https://example.test/full.jpg',
+					96     => 'https://example.test/96.jpg',
+				)
 				: 'G';
 		};
-		$GLOBALS['wpua_test']['returns']['get_option'] = 'G';
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
 
 		$this->assertSame( 'https://example.test/96.jpg', wp_user_avatars_get_local_avatar_url( 7, 96 ) );
 		$this->assertArrayNotHasKey( 'wp_get_image_editor', $GLOBALS['wpua_test']['calls'] ?? array() );
 	}
 
+	/**
+	 * Verify local avatar respects site rating.
+	 *
+	 * @return void
+	 */
 	public function test_local_avatar_respects_site_rating(): void {
 		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
 			return 'wp_user_avatars' === $key
 				? array( 'full' => 'https://example.test/full.jpg' )
 				: 'R';
 		};
-		$GLOBALS['wpua_test']['returns']['get_option'] = 'PG';
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'PG';
 
 		$this->assertNull( wp_user_avatars_get_local_avatar_url( 7, 96 ) );
 	}
 
+	/**
+	 * Verify avatar filter preserves forced default.
+	 *
+	 * @return void
+	 */
 	public function test_avatar_filter_preserves_forced_default(): void {
 		$this->assertSame(
 			'https://secure.gravatar.com/avatar/hash',
 			wp_user_avatars_filter_get_avatar_url(
 				'https://secure.gravatar.com/avatar/hash',
 				7,
-				array( 'force_default' => true, 'size' => 96 )
+				array(
+					'force_default' => true,
+					'size'          => 96,
+				)
 			)
 		);
 		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
 	}
 
+	/**
+	 * Verify avatar preview displays when public avatars are hidden.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_preview_displays_when_public_avatars_are_hidden(): void {
+		$GLOBALS['wpua_test']['returns']['get_avatar'] = '<img src="avatar.jpg">';
+
+		$this->assertSame( '<img src="avatar.jpg">', wp_user_avatars_get_avatar_preview( 7, 250 ) );
+		$this->assertSame(
+			array( 7, 250, '', '', array( 'force_display' => true ) ),
+			$GLOBALS['wpua_test']['calls']['get_avatar'][0]
+		);
+	}
+
+	/**
+	 * Verify avatar preview normalizes failure to empty markup.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_preview_normalizes_failure_to_empty_markup(): void {
+		$GLOBALS['wpua_test']['returns']['get_avatar'] = false;
+
+		$this->assertSame( '', wp_user_avatars_get_avatar_preview( 7, 250 ) );
+	}
+
+	/**
+	 * Verify streamed attachment uses WordPress image url.
+	 *
+	 * @return void
+	 */
+	public function test_streamed_attachment_uses_wordpress_image_url(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta']             = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full'     => 'https://example.test/avatar.jpg',
+					'media_id' => 42,
+					'site_id'  => 4,
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']                  = 'G';
+		$GLOBALS['wpua_test']['returns']['is_multisite']                = true;
+		$GLOBALS['wpua_test']['returns']['get_attached_file']           = 's3sfo2://bucket/avatar.jpg';
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_image_url'] = 'https://cdn.example.test/avatar-96x96.jpg';
+
+		$this->assertSame(
+			'https://cdn.example.test/avatar-96x96.jpg',
+			wp_user_avatars_get_local_avatar_url( 7, 96 )
+		);
+		$this->assertSame(
+			array( 42, array( 96, 96 ) ),
+			$GLOBALS['wpua_test']['calls']['wp_get_attachment_image_url'][0]
+		);
+		$this->assertSame( array( array( 4 ) ), $GLOBALS['wpua_test']['calls']['switch_to_blog'] );
+		$this->assertArrayHasKey( 'restore_current_blog', $GLOBALS['wpua_test']['calls'] );
+		$this->assertArrayNotHasKey( 'wp_get_image_editor', $GLOBALS['wpua_test']['calls'] );
+	}
+
+	/**
+	 * Verify attachment avatar preserves media and site identity.
+	 *
+	 * @return void
+	 */
 	public function test_attachment_avatar_preserves_media_and_site_identity(): void {
-		$GLOBALS['wpua_test']['returns']['get_user_meta']          = array();
-		$GLOBALS['wpua_test']['returns']['get_current_blog_id']    = 4;
+		$GLOBALS['wpua_test']['returns']['get_user_meta']         = array();
+		$GLOBALS['wpua_test']['returns']['get_current_blog_id']   = 4;
 		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url'] = 'https://example.test/avatar.jpg';
 
 		wp_user_avatars_update_avatar( 7, 42 );
 
 		$this->assertSame(
-			array( 7, 'wp_user_avatars', array( 'media_id' => 42, 'site_id' => 4, 'full' => 'https://example.test/avatar.jpg' ) ),
+			array(
+				7,
+				'wp_user_avatars',
+				array(
+					'media_id' => 42,
+					'site_id'  => 4,
+					'full'     => 'https://example.test/avatar.jpg',
+				),
+			),
 			$GLOBALS['wpua_test']['calls']['update_user_meta'][0]
 		);
 	}
@@ -109,6 +260,11 @@ final class CommonFunctionsTest extends TestCase {
 		$this->assertArrayNotHasKey( 'update_user_meta', $GLOBALS['wpua_test']['calls'] );
 	}
 
+	/**
+	 * Verify generated avatar is deleted through WordPress api.
+	 *
+	 * @return void
+	 */
 	public function test_generated_avatar_is_deleted_through_wordpress_api(): void {
 		$file = tempnam( sys_get_temp_dir(), 'wpua-' );
 		$this->assertNotFalse( $file );
@@ -134,11 +290,68 @@ final class CommonFunctionsTest extends TestCase {
 		}
 	}
 
+	/**
+	 * Verify blocking gravatar replaces remote defaults.
+	 *
+	 * @return void
+	 */
 	public function test_blocking_gravatar_replaces_remote_defaults(): void {
 		$GLOBALS['wpua_test']['returns']['get_option'] = true;
 
-		$defaults = wp_user_avatars_avatar_defaults( array( 'mystery' => 'Mystery Person', 'retro' => 'Retro' ) );
+		$defaults = wp_user_avatars_avatar_defaults(
+			array(
+				'mystery' => 'Mystery Person',
+				'retro'   => 'Retro',
+			)
+		);
 
-		$this->assertSame( array( wp_user_avatars_get_mystery_url() => 'Mystery Person', 'blank' => 'Blank' ), $defaults );
+		$this->assertSame(
+			array(
+				wp_user_avatars_get_mystery_url() => 'Mystery Person',
+				'blank'                           => 'Blank',
+			),
+			$defaults
+		);
+	}
+
+	/**
+	 * Verify blocking gravatar replaces gravatar urls with local mystery person.
+	 *
+	 * @return void
+	 */
+	public function test_blocking_gravatar_replaces_gravatar_urls_with_local_mystery_person(): void {
+		$GLOBALS['wpua_test']['returns']['get_option'] = true;
+
+		$this->assertSame(
+			wp_user_avatars_get_mystery_url(),
+			wp_user_avatars_maybe_use_local_mystery_person( 'https://secure.gravatar.com/avatar/hash?s=32&d=mystery' )
+		);
+		$this->assertSame(
+			wp_user_avatars_get_mystery_url(),
+			wp_user_avatars_maybe_use_local_mystery_person( 'https://0.gravatar.com/avatar/hash?s=32&d=mystery' )
+		);
+	}
+
+	/**
+	 * Blocking Gravatar must preserve the advertised Blank default locally.
+	 */
+	public function test_blocking_gravatar_preserves_blank_default_locally(): void {
+		$GLOBALS['wpua_test']['returns']['get_option'] = true;
+		$this->assertSame(
+			wp_user_avatars_get_plugin_url() . 'assets/images/blank.svg',
+			wp_user_avatars_maybe_use_local_mystery_person( 'https://0.gravatar.com/avatar/hash?s=32&d=blank&f=y' )
+		);
+	}
+
+	/**
+	 * Verify blocking gravatar preserves non gravatar urls.
+	 *
+	 * @return void
+	 */
+	public function test_blocking_gravatar_preserves_non_gravatar_urls(): void {
+		$GLOBALS['wpua_test']['returns']['get_option'] = true;
+		$url = 'https://example.test/avatar.jpg';
+
+		$this->assertSame( $url, wp_user_avatars_maybe_use_local_mystery_person( $url ) );
 	}
 }

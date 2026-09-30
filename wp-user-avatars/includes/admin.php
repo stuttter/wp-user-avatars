@@ -124,17 +124,27 @@ function wp_user_avatars_sanitize_block_gravatar( $input ) {
 function wp_user_avatars_admin_enqueue_scripts() {
 
 	// Bail if not editing a user
-	if ( ! defined( 'IS_PROFILE_PAGE' ) ) {
+	$is_bbpress_edit = function_exists( 'bbp_is_single_user_edit' ) && bbp_is_single_user_edit();
+	if ( ! defined( 'IS_PROFILE_PAGE' ) && ! $is_bbpress_edit ) {
 		return;
 	}
 
-	// Enqueue media
-	wp_enqueue_media();
-
 	// User ID
-	$user_id = ! empty( $_GET['user_id'] )
-		? (int) $_GET['user_id']
-		: get_current_user_id();
+	if ( $is_bbpress_edit && function_exists( 'bbp_get_displayed_user_id' ) ) {
+		$user_id = (int) bbp_get_displayed_user_id();
+	} else {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only screen context; no state is changed from this value.
+		$user_id = ! empty( $_GET['user_id'] )
+			? (int) $_GET['user_id']
+			: get_current_user_id();
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+	}
+
+	// Only users with Media Library access should load or browse it.
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
+	if ( current_user_can( 'select_avatar', $user_id ) ) {
+		wp_enqueue_media();
+	}
 
 	// URL & Version
 	$url = wp_user_avatars_get_plugin_url();
@@ -153,6 +163,9 @@ function wp_user_avatars_admin_enqueue_scripts() {
 		'insertIntoPost'   => esc_html__( 'Set as avatar',    'wp-user-avatars' ),
 		'deleteNonce'      => wp_create_nonce( 'remove_wp_user_avatars_nonce' ),
 		'mediaNonce'       => wp_create_nonce( 'assign_wp_user_avatars_nonce' ),
+		'uploadNonce'      => wp_create_nonce( 'upload_wp_user_avatars_nonce' ),
+		'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
+		'uploadError'      => esc_html__( 'The avatar could not be uploaded. Please try again.', 'wp-user-avatars' ),
 		'user_id'          => $user_id,
 	) );
 }
@@ -213,7 +226,7 @@ function wp_user_avatars_section_content( $user = null ) {
 			<tr>
 				<th scope="row"><label for="wp-user-avatars"><?php esc_html_e( 'Upload', 'wp-user-avatars' ); ?></label></th>
 				<td id="wp-user-avatars-photo"><?php
-					echo get_avatar( $user->ID, 250 );
+					echo wp_kses_post( wp_user_avatars_get_avatar_preview( $user->ID, 250 ) );
 				?></td>
 				<td id="wp-user-avatars-actions"><?php
 
@@ -230,8 +243,9 @@ function wp_user_avatars_section_content( $user = null ) {
 
 						<?php
 
-						// Prevent errors if not enqueued successfully
-						if ( did_action( 'wp_enqueue_media' ) ) : ?>
+						// Only expose the Media Library to users who can browse it
+						// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
+						if ( current_user_can( 'select_avatar', $user->ID ) ) : ?>
 
 							<a href="#" class="button hide-if-no-js" id="wp-user-avatars-media">
 								<?php esc_html_e( 'Choose from Media', 'wp-user-avatars' ); ?>
@@ -259,6 +273,7 @@ function wp_user_avatars_section_content( $user = null ) {
 					</div>
 
 					<?php wp_nonce_field( 'wp_user_avatars_nonce', '_wp_user_avatars_nonce', false ); ?>
+					<p id="wp-user-avatars-feedback" class="description" aria-live="polite"></p>
 
 				</td>
 			</tr>

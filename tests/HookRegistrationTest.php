@@ -20,6 +20,14 @@ final class HookRegistrationTest extends TestCase {
 			array( 'wp_user_profiles_do_admin_head', 'wp_user_avatars_admin_enqueue_scripts' ),
 			$GLOBALS['wpua_test']['calls']['add_action']
 		);
+		$this->assertContains(
+			array( 'wp_enqueue_scripts', 'wp_user_avatars_admin_enqueue_scripts' ),
+			$GLOBALS['wpua_test']['calls']['add_action']
+		);
+		$this->assertContains(
+			array( 'wp_ajax_upload_wp_user_avatars', 'wp_user_avatars_ajax_upload' ),
+			$GLOBALS['wpua_test']['calls']['add_action']
+		);
 	}
 
 	public function test_native_profile_fields_remain_registered(): void {

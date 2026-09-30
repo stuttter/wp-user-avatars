@@ -5,10 +5,20 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 final class CapabilitiesTest extends TestCase {
+	/**
+	 * Reset the recorded WordPress calls.
+	 *
+	 * @return void
+	 */
 	protected function setUp(): void {
 		$GLOBALS['wpua_test'] = array();
 	}
 
+	/**
+	 * Verify avatar capability is granted when user can edit target.
+	 *
+	 * @return void
+	 */
 	public function test_avatar_capability_is_granted_when_user_can_edit_target(): void {
 		$GLOBALS['wpua_test']['returns']['user_can'] = true;
 
@@ -16,6 +26,11 @@ final class CapabilitiesTest extends TestCase {
 		$this->assertSame( array( 3, 'edit_user', 7 ), $GLOBALS['wpua_test']['calls']['user_can'][0] );
 	}
 
+	/**
+	 * Verify avatar capability is preserved when user cannot edit target.
+	 *
+	 * @return void
+	 */
 	public function test_avatar_capability_is_preserved_when_user_cannot_edit_target(): void {
 		$GLOBALS['wpua_test']['returns']['user_can'] = false;
 
@@ -25,6 +40,44 @@ final class CapabilitiesTest extends TestCase {
 		);
 	}
 
+	/**
+	 * Verify media selection requires editing and media capabilities.
+	 *
+	 * @return void
+	 */
+	public function test_media_selection_requires_editing_and_media_capabilities(): void {
+		$GLOBALS['wpua_test']['callbacks']['user_can'] = static function ( $user_id, $capability ) {
+			return in_array( $capability, array( 'edit_user', 'upload_files' ), true );
+		};
+
+		$this->assertSame( array(), wp_user_avatars_meta_caps( array( 'do_not_allow' ), 'select_avatar', 3, array( 7 ) ) );
+		$this->assertSame(
+			array( array( 3, 'edit_user', 7 ), array( 3, 'upload_files' ) ),
+			$GLOBALS['wpua_test']['calls']['user_can']
+		);
+	}
+
+	/**
+	 * Verify media selection is denied without media capability.
+	 *
+	 * @return void
+	 */
+	public function test_media_selection_is_denied_without_media_capability(): void {
+		$GLOBALS['wpua_test']['callbacks']['user_can'] = static function ( $user_id, $capability ) {
+			return 'edit_user' === $capability;
+		};
+
+		$this->assertSame(
+			array( 'do_not_allow' ),
+			wp_user_avatars_meta_caps( array( 'do_not_allow' ), 'select_avatar', 3, array( 7 ) )
+		);
+	}
+
+	/**
+	 * Verify unrelated capability is not remapped.
+	 *
+	 * @return void
+	 */
 	public function test_unrelated_capability_is_not_remapped(): void {
 		$this->assertSame( array( 'read' ), wp_user_avatars_meta_caps( array( 'read' ), 'read', 3, array() ) );
 		$this->assertArrayNotHasKey( 'user_can', $GLOBALS['wpua_test']['calls'] ?? array() );
