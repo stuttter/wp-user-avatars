@@ -25,24 +25,19 @@ function wp_user_avatars_meta_caps( $caps = array(), $cap = '', $user_id = 0, $a
 
 	// What capability is being checked?
 	switch ( $cap ) {
-		// Select an existing Media Library attachment.
+		// Select, upload, edit, or delete an avatar for a specific user.
 		case 'select_avatar':
-			if ( user_can( $user_id, 'edit_user', $args[0] ) && user_can( $user_id, 'upload_files' ) ) {
-				$caps = array();
-			}
-			break;
-
-		// Upload
 		case 'upload_avatar' :
-
-		// Edit
 		case 'edit_avatar' :
 		case 'edit_avatar_rating' :
-
-		// Delete
 		case 'remove_avatar' :
 		case 'delete_avatar' :
-			if ( user_can( $user_id, 'edit_user', $args[0] ) ) {
+			if ( ! isset( $args[0] ) || ( ! is_int( $args[0] ) && ( ! is_string( $args[0] ) || ! ctype_digit( $args[0] ) ) ) || (int) $args[0] < 1 ) {
+				$caps = array( 'do_not_allow' );
+				break;
+			}
+
+			if ( user_can( $user_id, 'edit_user', (int) $args[0] ) && ( 'select_avatar' !== $cap || user_can( $user_id, 'upload_files' ) ) ) {
 				$caps = array();
 			}
 			break;
