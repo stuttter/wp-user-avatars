@@ -127,6 +127,44 @@ final class CommonFunctionsTest extends TestCase {
 	}
 
 	/**
+	 * Verify local avatar generation honors the caller's requested size.
+	 *
+	 * @return void
+	 */
+	public function test_local_avatar_generation_uses_the_requested_size(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array( 'full' => 'https://example.test/uploads/full.jpg' )
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option'] = 'G';
+
+		$GLOBALS['wpua_test']['returns']['wp_upload_dir'] = array(
+			'baseurl' => 'https://example.test/uploads',
+			'basedir' => '/tmp/uploads',
+		);
+
+		$editor = $this->getMockBuilder( stdClass::class )
+			->addMethods( array( 'resize', 'generate_filename', 'save' ) )
+			->getMock();
+		$editor->expects( $this->once() )
+			->method( 'resize' )
+			->with( 256, 256, true )
+			->willReturn( true );
+		$editor->expects( $this->once() )
+			->method( 'generate_filename' )
+			->willReturn( '/tmp/uploads/full-256x256.jpg' );
+		$editor->expects( $this->once() )
+			->method( 'save' )
+			->with( '/tmp/uploads/full-256x256.jpg' )
+			->willReturn( array( 'path' => '/tmp/uploads/full-256x256.jpg' ) );
+
+		$GLOBALS['wpua_test']['returns']['wp_get_image_editor'] = $editor;
+
+		$this->assertSame( 'https://example.test/uploads/full-256x256.jpg', wp_user_avatars_get_local_avatar_url( 7, 256 ) );
+	}
+
+	/**
 	 * Verify local avatar respects site rating.
 	 *
 	 * @return void
