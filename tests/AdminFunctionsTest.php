@@ -63,6 +63,7 @@ final class AdminFunctionsTest extends TestCase {
 	 * @return void
 	 */
 	public function test_avatar_script_does_not_move_the_profile_save_action(): void {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
 		$script = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/assets/js/user-avatars.js' );
 
 		$this->assertNotFalse( $script );
