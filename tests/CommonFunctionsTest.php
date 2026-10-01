@@ -236,6 +236,41 @@ final class CommonFunctionsTest extends TestCase {
 	}
 
 	/**
+	 * A matching early-provider URL should still be recognized as a local avatar.
+	 *
+	 * @return void
+	 */
+	public function test_early_provider_matching_local_url_marks_avatar_found(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full' => 'https://example.test/full.jpg',
+					144    => 'https://example.test/144.jpg',
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
+
+		$this->assertSame(
+			array(
+				'url'           => 'https://example.test/144.jpg',
+				'size'          => 144,
+				'force_default' => false,
+				'found_avatar'  => true,
+			),
+			wp_user_avatars_filter_pre_get_avatar_data(
+				array(
+					'url'           => 'https://example.test/144.jpg',
+					'size'          => 144,
+					'force_default' => false,
+					'found_avatar'  => false,
+				),
+				7
+			)
+		);
+	}
+
+	/**
 	 * Normal avatar resolution should continue through get_avatar_url.
 	 *
 	 * @return void
