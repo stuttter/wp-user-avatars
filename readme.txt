@@ -58,6 +58,18 @@ If you like this plugin, you'll probably like these!
 
 It works OK, but you'll want to consider exactly what level of privacy is best for your installation.
 
+= How do I display a larger or sharper avatar? =
+
+WP User Avatars uses the image size requested by WordPress. Ask for the intended display size instead of enlarging the default 96-pixel image with CSS:
+
+`echo get_avatar( get_the_author_meta( 'ID' ), 256 );`
+
+When you only need the URL, pass the size explicitly:
+
+`$url = get_avatar_url( $user_id, array( 'size' => 256 ) );`
+
+WordPress requests a 2x source for `get_avatar()`, so the first example can also provide a sharper image on high-density displays when the uploaded source is large enough. Theme builders need to expose or pass the intended avatar size; CSS alone cannot recover detail from a 96-pixel URL.
+
 = Where can I get support? =
 
 * Community: https://wordpress.org/support/plugin/wp-user-avatars

@@ -127,6 +127,44 @@ final class CommonFunctionsTest extends TestCase {
 	}
 
 	/**
+	 * Verify local avatar generation honors the caller's requested size.
+	 *
+	 * @return void
+	 */
+	public function test_local_avatar_generation_uses_the_requested_size(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array( 'full' => 'https://example.test/uploads/full.jpg' )
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option'] = 'G';
+
+		$GLOBALS['wpua_test']['returns']['wp_upload_dir'] = array(
+			'baseurl' => 'https://example.test/uploads',
+			'basedir' => '/tmp/uploads',
+		);
+
+		$editor = $this->getMockBuilder( stdClass::class )
+			->addMethods( array( 'resize', 'generate_filename', 'save' ) )
+			->getMock();
+		$editor->expects( $this->once() )
+			->method( 'resize' )
+			->with( 256, 256, true )
+			->willReturn( true );
+		$editor->expects( $this->once() )
+			->method( 'generate_filename' )
+			->willReturn( '/tmp/uploads/full-256x256.jpg' );
+		$editor->expects( $this->once() )
+			->method( 'save' )
+			->with( '/tmp/uploads/full-256x256.jpg' )
+			->willReturn( array( 'path' => '/tmp/uploads/full-256x256.jpg' ) );
+
+		$GLOBALS['wpua_test']['returns']['wp_get_image_editor'] = $editor;
+
+		$this->assertSame( 'https://example.test/uploads/full-256x256.jpg', wp_user_avatars_get_local_avatar_url( 7, 256 ) );
+	}
+
+	/**
 	 * Verify local avatar respects site rating.
 	 *
 	 * @return void
@@ -159,6 +197,72 @@ final class CommonFunctionsTest extends TestCase {
 				)
 			)
 		);
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * An early provider should not hide an explicitly assigned local avatar.
+	 *
+	 * @return void
+	 */
+	public function test_early_avatar_provider_preserves_local_avatar_precedence(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full' => 'https://example.test/full.jpg',
+					144    => 'https://example.test/144.jpg',
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option'] = 'G';
+
+		$this->assertSame(
+			array(
+				'url'           => 'https://example.test/144.jpg',
+				'size'          => 144,
+				'force_default' => false,
+				'found_avatar'  => true,
+			),
+			wp_user_avatars_filter_pre_get_avatar_data(
+				array(
+					'url'           => 'https://provider.example/avatar.jpg',
+					'size'          => 144,
+					'force_default' => false,
+					'found_avatar'  => false,
+				),
+				7
+			)
+		);
+	}
+
+	/**
+	 * Normal avatar resolution should continue through get_avatar_url.
+	 *
+	 * @return void
+	 */
+	public function test_pre_avatar_filter_ignores_requests_without_an_early_url(): void {
+		$args = array(
+			'size'          => 96,
+			'force_default' => false,
+		);
+
+		$this->assertSame( $args, wp_user_avatars_filter_pre_get_avatar_data( $args, 7 ) );
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * Forced defaults should retain an earlier provider's URL.
+	 *
+	 * @return void
+	 */
+	public function test_pre_avatar_filter_preserves_forced_default(): void {
+		$args = array(
+			'url'           => 'https://provider.example/avatar.jpg',
+			'size'          => 96,
+			'force_default' => true,
+		);
+
+		$this->assertSame( $args, wp_user_avatars_filter_pre_get_avatar_data( $args, 7 ) );
 		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
 	}
 
