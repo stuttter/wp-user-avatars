@@ -42,11 +42,17 @@ try {
 	);
 
 	$disable_resize = static function () { return false; };
+	$early_provider = static function ( $args ) {
+		$args['url'] = 'https://provider.example/avatar.jpg';
+		return $args;
+	};
+	add_filter( 'pre_get_avatar_data', $early_provider, 10 );
 	add_filter( 'wp_user_avatars_dynamic_resize', $disable_resize );
 	try {
-		$assert( $avatar_url === get_avatar_url( $user_id, array( 'size' => 96 ) ), 'The local avatar did not filter get_avatar_url().' );
+		$assert( $avatar_url === get_avatar_url( $user_id, array( 'size' => 96 ) ), 'An early avatar provider hid the local avatar.' );
 	} finally {
 		remove_filter( 'wp_user_avatars_dynamic_resize', $disable_resize );
+		remove_filter( 'pre_get_avatar_data', $early_provider, 10 );
 	}
 
 	wp_user_avatars_delete_avatar( $user_id );

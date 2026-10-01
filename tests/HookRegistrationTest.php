@@ -30,6 +30,15 @@ final class HookRegistrationTest extends TestCase {
 		);
 	}
 
+	public function test_early_avatar_provider_compatibility_hook_is_registered(): void {
+		require dirname( __DIR__ ) . '/wp-user-avatars/includes/hooks.php';
+
+		$this->assertContains(
+			array( 'pre_get_avatar_data', 'wp_user_avatars_filter_pre_get_avatar_data', 99, 2 ),
+			$GLOBALS['wpua_test']['calls']['add_filter']
+		);
+	}
+
 	public function test_native_profile_fields_remain_registered(): void {
 		require dirname( __DIR__ ) . '/wp-user-avatars/includes/hooks.php';
 

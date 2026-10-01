@@ -524,6 +524,41 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 }
 
 /**
+ * Restore local-avatar precedence when another provider returns early.
+ *
+ * Normal requests continue through get_avatar_url so existing filters retain
+ * their established order. This callback only handles requests that another
+ * pre_get_avatar_data provider has already short-circuited.
+ *
+ * @since 2.1.0
+ *
+ * @param array $args        Processed avatar arguments.
+ * @param mixed $id_or_email Avatar identity.
+ *
+ * @phpstan-param array<string, mixed> $args
+ * @phpstan-return array<string, mixed>
+ *
+ * @return array
+ */
+function wp_user_avatars_filter_pre_get_avatar_data( $args, $id_or_email ) {
+
+	// Preserve the normal get_avatar_url path when no provider returned early
+	if ( ! isset( $args['url'] ) ) {
+		return $args;
+	}
+
+	$avatar_url = wp_user_avatars_filter_get_avatar_url( $args['url'], $id_or_email, $args );
+
+	// Mark a resolved local avatar as found
+	if ( $avatar_url !== $args['url'] ) {
+		$args['url']          = $avatar_url;
+		$args['found_avatar'] = true;
+	}
+
+	return $args;
+}
+
+/**
  * Delete an avatar
  *
  * @since 0.1.0
