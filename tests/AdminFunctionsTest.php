@@ -56,4 +56,17 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertArrayNotHasKey( 'wp_enqueue_media', $GLOBALS['wpua_test']['calls'] );
 		$this->assertArrayHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] );
 	}
+
+	/**
+	 * Verify the avatar script leaves the profile form's save action in place.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_script_does_not_move_the_profile_save_action(): void {
+		$script = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/assets/js/user-avatars.js' );
+
+		$this->assertNotFalse( $script );
+		$this->assertStringNotContainsString( '$( \'#your-profile p.submit\' )', $script );
+		$this->assertStringNotContainsString( '$( \'#wp-user-avatars-user-settings p.submit\' )', $script );
+	}
 }
