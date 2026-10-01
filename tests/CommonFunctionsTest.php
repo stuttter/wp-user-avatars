@@ -163,6 +163,72 @@ final class CommonFunctionsTest extends TestCase {
 	}
 
 	/**
+	 * An early provider should not hide an explicitly assigned local avatar.
+	 *
+	 * @return void
+	 */
+	public function test_early_avatar_provider_preserves_local_avatar_precedence(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full' => 'https://example.test/full.jpg',
+					144    => 'https://example.test/144.jpg',
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option'] = 'G';
+
+		$this->assertSame(
+			array(
+				'url'           => 'https://example.test/144.jpg',
+				'size'          => 144,
+				'force_default' => false,
+				'found_avatar'  => true,
+			),
+			wp_user_avatars_filter_pre_get_avatar_data(
+				array(
+					'url'           => 'https://provider.example/avatar.jpg',
+					'size'          => 144,
+					'force_default' => false,
+					'found_avatar'  => false,
+				),
+				7
+			)
+		);
+	}
+
+	/**
+	 * Normal avatar resolution should continue through get_avatar_url.
+	 *
+	 * @return void
+	 */
+	public function test_pre_avatar_filter_ignores_requests_without_an_early_url(): void {
+		$args = array(
+			'size'          => 96,
+			'force_default' => false,
+		);
+
+		$this->assertSame( $args, wp_user_avatars_filter_pre_get_avatar_data( $args, 7 ) );
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * Forced defaults should retain an earlier provider's URL.
+	 *
+	 * @return void
+	 */
+	public function test_pre_avatar_filter_preserves_forced_default(): void {
+		$args = array(
+			'url'           => 'https://provider.example/avatar.jpg',
+			'size'          => 96,
+			'force_default' => true,
+		);
+
+		$this->assertSame( $args, wp_user_avatars_filter_pre_get_avatar_data( $args, 7 ) );
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
 	 * Verify avatar preview displays when public avatars are hidden.
 	 *
 	 * @return void
