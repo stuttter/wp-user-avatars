@@ -30,6 +30,11 @@ final class HookRegistrationTest extends TestCase {
 		);
 	}
 
+	/**
+	 * Verify the early avatar provider compatibility hook is registered.
+	 *
+	 * @return void
+	 */
 	public function test_early_avatar_provider_compatibility_hook_is_registered(): void {
 		require dirname( __DIR__ ) . '/wp-user-avatars/includes/hooks.php';
 

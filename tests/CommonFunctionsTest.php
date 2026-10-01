@@ -180,10 +180,10 @@ final class CommonFunctionsTest extends TestCase {
 
 		$this->assertSame(
 			array(
-				'url'          => 'https://example.test/144.jpg',
-				'size'         => 144,
+				'url'           => 'https://example.test/144.jpg',
+				'size'          => 144,
 				'force_default' => false,
-				'found_avatar' => true,
+				'found_avatar'  => true,
 			),
 			wp_user_avatars_filter_pre_get_avatar_data(
 				array(
