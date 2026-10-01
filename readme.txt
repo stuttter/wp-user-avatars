@@ -70,6 +70,27 @@ When you only need the URL, pass the size explicitly:
 
 WordPress requests a 2x source for `get_avatar()`, so the first example can also provide a sharper image on high-density displays when the uploaded source is large enough. Theme builders need to expose or pass the intended avatar size; CSS alone cannot recover detail from a 96-pixel URL.
 
+= How do I limit generated avatar sizes? =
+
+WP User Avatars creates a square derivative the first time WordPress requests an uncached size for a directly uploaded avatar. To disable future plugin-owned dynamic resizing, add this to a site plugin, must-use plugin, or your theme's `functions.php` file:
+
+    add_filter( 'wp_user_avatars_dynamic_resize', '__return_false' );
+
+To allow only selected sizes, inspect the requested size with the same filter:
+
+    add_filter(
+        'wp_user_avatars_dynamic_resize',
+        function ( $resize, $user_id, $size ) {
+            $allowed_sizes = array( 96, 192, 256, 512 );
+
+            return $resize && in_array( (int) $size, $allowed_sizes, true );
+        },
+        10,
+        3
+    );
+
+For a directly uploaded avatar or a locally stored Media Library attachment, a disallowed uncached request falls back to the original full-size URL. A derivative that was already cached remains available. Disallowing a size does not delete existing files or change stored avatar data. Remotely stored Media Library attachments continue to use WordPress image-size resolution.
+
 = Where can I get support? =
 
 * Community: https://wordpress.org/support/plugin/wp-user-avatars
