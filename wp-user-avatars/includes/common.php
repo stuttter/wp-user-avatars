@@ -558,10 +558,12 @@ function wp_user_avatars_filter_pre_get_avatar_data( $args, $id_or_email ) {
 		return $args;
 	}
 
-	$avatar_url = wp_user_avatars_filter_get_avatar_url( $args['url'], $id_or_email, $args );
+	// Resolve against an empty sentinel so matching provider and local URLs are
+	// still recognized as a successfully resolved local avatar.
+	$avatar_url = wp_user_avatars_filter_get_avatar_url( '', $id_or_email, $args );
 
 	// Mark a resolved local avatar as found
-	if ( $avatar_url !== $args['url'] ) {
+	if ( ! empty( $avatar_url ) ) {
 		$args['url']          = $avatar_url;
 		$args['found_avatar'] = true;
 	}
