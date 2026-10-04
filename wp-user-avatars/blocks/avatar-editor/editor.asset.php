@@ -1,4 +1,11 @@
 <?php
+// phpcs:ignoreFile WordPress.Files.FileName.NotHyphenatedLowercase -- WordPress block asset metadata requires this filename.
+
+/**
+ * Avatar editor block asset metadata.
+ *
+ * @package WP_User_Avatars
+ */
 
 return array(
 	'dependencies' => array(

@@ -12,6 +12,7 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/profile-rating-functions.php';
+require_once __DIR__ . '/frontend-editor-functions.php';
 
 /**
  * Verify the shortcode and non-JavaScript form preserve permission boundaries.
@@ -255,7 +256,9 @@ final class FrontendEditorTest extends TestCase {
 		$post               = new WP_Post();
 		$post->post_content = '<!-- wp:wp-user-avatars/avatar-editor /-->';
 		$GLOBALS['post']    = $post;
+
 		$GLOBALS['wpua_test']['returns']['has_block'] = true;
+
 		$GLOBALS['wpua_test']['returns']['is_user_logged_in'] = false;
 
 		wp_user_avatars_frontend_enqueue_assets();
@@ -274,7 +277,9 @@ final class FrontendEditorTest extends TestCase {
 		$post               = new WP_Post();
 		$post->post_content = '<!-- wp:wp-user-avatars/avatar-editor /-->';
 		$GLOBALS['post']    = $post;
+
 		$GLOBALS['wpua_test']['returns']['has_block'] = true;
+
 		$GLOBALS['wpua_test']['returns']['current_user_can'] = false;
 
 		wp_user_avatars_frontend_enqueue_assets();
