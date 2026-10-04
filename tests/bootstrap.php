@@ -18,13 +18,28 @@ function wpua_test_call( $name, $arguments ) {
 
 class WP_User {
 	public $ID;
+	/**
+	 * Local avatar data.
+	 *
+	 * @var array<string, string>
+	 */
 	public $wp_user_avatars;
+	/**
+	 * Local avatar rating.
+	 *
+	 * @var string
+	 */
 	public $wp_user_avatars_rating;
 	public function __construct( $id = 0 ) { $this->ID = (int) $id; }
 }
 
 class WP_Post {
 	public $post_author;
+	/**
+	 * Post content.
+	 *
+	 * @var string
+	 */
 	public $post_content = '';
 	public function __construct( $author = 0 ) { $this->post_author = (int) $author; }
 }
@@ -71,8 +86,27 @@ class WP_Error {
 
 function add_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 function add_filter( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
-function add_shortcode( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
-function has_shortcode( $content, $tag ) { return false !== strpos( $content, '[' . $tag ); }
+/**
+ * Provide the add_shortcode test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return void
+ */
+function add_shortcode( ...$arguments ) {
+	wpua_test_call( __FUNCTION__, $arguments );
+}
+/**
+ * Provide the has_shortcode test double.
+ *
+ * @param string $content Content to inspect.
+ * @param string $tag     Shortcode tag.
+ *
+ * @return bool
+ */
+function has_shortcode( $content, $tag ) {
+	return false !== strpos( $content, '[' . $tag );
+}
 function remove_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 /**
  * Provide the remove_filter test double.
@@ -92,28 +126,104 @@ function apply_filters( $hook, $value, ...$arguments ) {
 	return null === $result ? $value : $result;
 }
 function esc_html__( $text ) { return $text; }
-function esc_html( $text ) { return (string) $text; }
-function esc_attr( $text ) { return (string) $text; }
-function esc_url( $text ) { return (string) $text; }
-function esc_html_e( $text ) { echo esc_html( $text ); }
-function __( $text ) { return $text; }
+/**
+ * Provide the esc_html test double.
+ *
+ * @param mixed $text Test input.
+ *
+ * @return string
+ */
+function esc_html( $text ) {
+	return (string) $text;
+}
+/**
+ * Provide the esc_attr test double.
+ *
+ * @param mixed $text Test input.
+ *
+ * @return string
+ */
+function esc_attr( $text ) {
+	return (string) $text;
+}
+/**
+ * Provide the esc_url test double.
+ *
+ * @param mixed $text Test input.
+ *
+ * @return string
+ */
+function esc_url( $text ) {
+	return (string) $text;
+}
+/**
+ * Provide the esc_html_e test double.
+ *
+ * @param mixed $text Test input.
+ *
+ * @return void
+ */
+function esc_html_e( $text ) {
+	echo esc_html( $text );
+}
+/**
+ * Provide the translation test double.
+ *
+ * @param mixed $text Test input.
+ *
+ * @return mixed
+ */
+function __( $text ) {
+	return $text;
+}
+/**
+ * Provide the checked test double.
+ *
+ * @param mixed $checked Compared value.
+ * @param mixed $current Expected value.
+ * @param bool  $display Whether to output the result.
+ *
+ * @return string
+ */
 function checked( $checked, $current = true, $display = true ) {
+	// phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual -- Match WordPress checked() coercion.
 	$result = $checked == $current ? 'checked="checked"' : '';
 	if ( $display ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The test double emits fixed markup.
 		echo $result;
 	}
 	return $result;
 }
+/**
+ * Provide the disabled test double.
+ *
+ * @param mixed $disabled Compared value.
+ * @param mixed $current  Expected value.
+ * @param bool  $display  Whether to output the result.
+ *
+ * @return string
+ */
 function disabled( $disabled, $current = true, $display = true ) {
+	// phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual -- Match WordPress disabled() coercion.
 	$result = $disabled == $current ? 'disabled="disabled"' : '';
 	if ( $display ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The test double emits fixed markup.
 		echo $result;
 	}
 	return $result;
 }
 function is_email( $value ) { return false !== filter_var( $value, FILTER_VALIDATE_EMAIL ); }
 function get_user_by( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
-function get_userdata( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
+/**
+ * Provide the get_userdata test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function get_userdata( ...$arguments ) {
+	return wpua_test_call( __FUNCTION__, $arguments );
+}
 function get_avatar( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function get_user_meta( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function update_user_meta( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
@@ -309,9 +419,20 @@ function admin_url( $path = '' ) {
 function get_current_user_id() {
 	return (int) ( wpua_test_call( __FUNCTION__, array() ) ?? 1 );
 }
+/**
+ * Provide the wp_nonce_field test double.
+ *
+ * @param string $action  Nonce action.
+ * @param string $name    Field name.
+ * @param bool   $referer Whether to include the referer field.
+ * @param bool   $display Whether to output the field.
+ *
+ * @return string
+ */
 function wp_nonce_field( $action, $name, $referer = true, $display = true ) {
 	$field = '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( wp_create_nonce( $action ) ) . '" />';
 	if ( $display ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The test double builds escaped fixed markup.
 		echo $field;
 	}
 	return $field;

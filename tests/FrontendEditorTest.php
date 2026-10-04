@@ -44,17 +44,17 @@ final class FrontendEditorTest extends TestCase {
 	 * @return void
 	 */
 	protected function setUp(): void {
-		$this->saved_post        = $_POST;
-		$this->saved_files       = $_FILES;
-		$this->saved_post_object = $GLOBALS['post'] ?? null;
-		$_POST                   = array();
-		$_FILES                  = array();
-		$user                    = new WP_User( 7 );
-		$user->wp_user_avatars = array( 'full' => 'https://example.test/avatar.jpg' );
+		$this->saved_post             = $_POST;
+		$this->saved_files            = $_FILES;
+		$this->saved_post_object      = $GLOBALS['post'] ?? null;
+		$_POST                        = array();
+		$_FILES                       = array();
+		$user                         = new WP_User( 7 );
+		$user->wp_user_avatars        = array( 'full' => 'https://example.test/avatar.jpg' );
 		$user->wp_user_avatars_rating = 'G';
-		$GLOBALS['wpua_test'] = array(
+		$GLOBALS['wpua_test']         = array(
 			'returns' => array(
-				'is_user_logged_in'  => true,
+				'is_user_logged_in'   => true,
 				'get_current_user_id' => 7,
 				'get_userdata'        => $user,
 				'current_user_can'    => true,
@@ -143,7 +143,7 @@ final class FrontendEditorTest extends TestCase {
 	public function test_frontend_asset_preflight_requires_shortcode(): void {
 		$post               = new WP_Post();
 		$post->post_content = 'Plain page content.';
-		$GLOBALS['post']     = $post;
+		$GLOBALS['post']    = $post;
 
 		wp_user_avatars_frontend_enqueue_assets();
 		$this->assertArrayNotHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] ?? array() );
@@ -159,7 +159,7 @@ final class FrontendEditorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_frontend_upload_targets_current_user(): void {
-		$_POST = array(
+		$_POST  = array(
 			'wp_user_avatars_frontend_action' => 'update',
 			'_wp_user_avatars_frontend_nonce' => 'valid',
 			'wp_user_avatars_rating'          => 'PG',
@@ -222,7 +222,7 @@ final class FrontendEditorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_frontend_upload_error_is_rendered_without_javascript(): void {
-		$_POST = array(
+		$_POST  = array(
 			'wp_user_avatars_frontend_action' => 'update',
 			'_wp_user_avatars_frontend_nonce' => 'valid',
 		);

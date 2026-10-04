@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Front-end avatar editor.
  *
@@ -8,7 +7,7 @@
  * @package Plugins/Users/Avatars/Frontend
  */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -40,6 +39,7 @@ function wp_user_avatars_get_editor() {
 		return '';
 	}
 
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capabilities mapped by wp_user_avatars_meta_caps().
 	if ( ! current_user_can( 'edit_avatar', $user->ID ) && ! current_user_can( 'edit_avatar_rating', $user->ID ) ) {
 		return '<p class="wp-user-avatars-forbidden">' . esc_html__( 'You do not have permission to edit this avatar.', 'wp-user-avatars' ) . '</p>';
 	}
@@ -86,6 +86,7 @@ function wp_user_avatars_frontend_enqueue_assets() {
 	}
 
 	$user_id = get_current_user_id();
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capabilities mapped by wp_user_avatars_meta_caps().
 	if ( ! current_user_can( 'edit_avatar', $user_id ) && ! current_user_can( 'edit_avatar_rating', $user_id ) ) {
 		return;
 	}
@@ -117,6 +118,7 @@ function wp_user_avatars_process_frontend_form() {
 	$action  = sanitize_key( wp_unslash( $_POST['wp_user_avatars_frontend_action'] ) );
 
 	if ( 'remove' === $action ) {
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 		if ( ! current_user_can( 'remove_avatar', $user_id ) ) {
 			return new WP_Error( 'forbidden', esc_html__( 'You do not have permission to edit this avatar.', 'wp-user-avatars' ) );
 		}
@@ -130,16 +132,17 @@ function wp_user_avatars_process_frontend_form() {
 	}
 
 	$avatar_updated = false;
-	$avatar_file    = isset( $_FILES['wp-user-avatars'] ) && is_array( $_FILES['wp-user-avatars'] )
-		? $_FILES['wp-user-avatars']
-		: array();
+	$avatar_file    = array();
+	if ( isset( $_FILES['wp-user-avatars'] ) && is_array( $_FILES['wp-user-avatars'] ) ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The upload API requires the original file array and validates it against the avatar MIME allowlist.
+		$avatar_file = $_FILES['wp-user-avatars'];
+	}
 	if ( ! empty( $avatar_file['name'] ) && is_string( $avatar_file['name'] ) ) {
 		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 		if ( ! current_user_can( 'upload_avatar', $user_id ) ) {
 			return new WP_Error( 'forbidden', esc_html__( 'You do not have permission to edit this avatar.', 'wp-user-avatars' ) );
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The upload API requires the original file array and validates it against the avatar MIME allowlist.
 		$avatar = wp_user_avatars_handle_upload( $user_id, $avatar_file );
 		if ( is_wp_error( $avatar ) ) {
 			return $avatar;
@@ -148,6 +151,7 @@ function wp_user_avatars_process_frontend_form() {
 		$avatar_updated = true;
 	}
 
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps().
 	if ( current_user_can( 'edit_avatar_rating', $user_id ) && ( $avatar_updated || get_user_meta( $user_id, 'wp_user_avatars', true ) ) ) {
 		$rating = isset( $_POST['wp_user_avatars_rating'] ) && is_string( $_POST['wp_user_avatars_rating'] )
 			? sanitize_text_field( wp_unslash( $_POST['wp_user_avatars_rating'] ) )

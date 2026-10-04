@@ -216,7 +216,7 @@ function wp_user_avatars_edit_user_profile( $user = 0 ) {
  *
  * @since 0.1.0
  *
- * @param WP_User|null       $user User object.
+ * @param WP_User|null        $user User object.
  * @param array<string, bool> $args Rendering options.
  *
  * @return void
@@ -264,8 +264,8 @@ function wp_user_avatars_section_content( $user = null, $args = array() ) {
 				?></td>
 				<td id="<?php echo esc_attr( $actions_id ); ?>" class="wp-user-avatars-actions"><?php
 
-					// User needs additional caps to upload avatars
-					if ( current_user_can( 'upload_avatar', $user->ID ) ) : ?>
+				// User needs additional caps to upload avatars
+				if ( current_user_can( 'upload_avatar', $user->ID ) ) : ?>
 
 						<div>
 							<input type="file" name="wp-user-avatars" id="<?php echo esc_attr( $file_id ); ?>" class="standard-text wp-user-avatars-upload" accept="image/jpeg,image/gif,image/png,image/webp" />
@@ -294,7 +294,11 @@ function wp_user_avatars_section_content( $user = null, $args = array() ) {
 
 							<?php if ( $is_frontend ) : ?>
 
-								<button type="submit" name="wp_user_avatars_frontend_action" value="remove" class="button item-delete submitdelete deletion wp-user-avatars-remove" id="<?php echo esc_attr( $remove_id ); ?>"<?php if ( empty( $user->wp_user_avatars ) ) echo ' style="display:none;"'; ?>>
+								<button type="submit" name="wp_user_avatars_frontend_action" value="remove" class="button item-delete submitdelete deletion wp-user-avatars-remove" id="<?php echo esc_attr( $remove_id ); ?>"
+									<?php if ( empty( $user->wp_user_avatars ) ) : ?>
+										style="display:none;"
+									<?php endif; ?>
+								>
 									<?php esc_html_e( 'Remove', 'wp-user-avatars' ); ?>
 								</button>
 
@@ -306,7 +310,11 @@ function wp_user_avatars_section_content( $user = null, $args = array() ) {
 									'_wpnonce' => false,
 								) ); ?>
 
-								<a href="<?php echo esc_url( $remove_url ); ?>" class="button item-delete submitdelete deletion wp-user-avatars-remove" id="<?php echo esc_attr( $remove_id ); ?>"<?php if ( empty( $user->wp_user_avatars ) ) echo ' style="display:none;"'; ?>>
+								<a href="<?php echo esc_url( $remove_url ); ?>" class="button item-delete submitdelete deletion wp-user-avatars-remove" id="<?php echo esc_attr( $remove_id ); ?>"
+									<?php if ( empty( $user->wp_user_avatars ) ) : ?>
+										style="display:none;"
+									<?php endif; ?>
+								>
 									<?php esc_html_e( 'Remove', 'wp-user-avatars' ); ?>
 								</a>
 
@@ -331,7 +339,11 @@ function wp_user_avatars_section_content( $user = null, $args = array() ) {
 
 			<tr>
 				<th scope="row"><?php esc_html_e( 'Rating', 'wp-user-avatars' ); ?></th>
-				<td id="<?php echo esc_attr( $ratings_id ); ?>" colspan="2" class="wp-user-avatars-ratings<?php if ( empty( $user->wp_user_avatars ) ) echo ' fancy-hidden'; ?>">
+			<td
+				id="<?php echo esc_attr( $ratings_id ); ?>"
+				colspan="2"
+				class="wp-user-avatars-ratings<?php echo empty( $user->wp_user_avatars ) ? ' fancy-hidden' : ''; ?>"
+			>
 					<fieldset <?php disabled( empty( $user->wp_user_avatars ) ); ?>>
 						<legend class="screen-reader-text"><span><?php esc_html_e( 'Rating', 'wp-user-avatars' ); ?></span></legend>
 						<?php
