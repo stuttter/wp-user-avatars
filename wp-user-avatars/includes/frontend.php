@@ -70,9 +70,12 @@ function wp_user_avatars_get_editor() {
 }
 
 /**
- * Enqueue front-end assets before page output when the page contains the shortcode.
+ * Enqueue front-end assets before page output.
  *
- * The shortcode callback also enqueues as a fallback for programmatic rendering.
+ * Styles load for eligible signed-in users so the documented PHP renderer also
+ * remains styled when called after wp_head. Scripts and Media Library assets
+ * remain limited to pages whose stored content contains the shortcode. The
+ * renderer enqueues those assets as a fallback for programmatic rendering.
  *
  * @since 2.1.0
  *
@@ -81,13 +84,19 @@ function wp_user_avatars_get_editor() {
 function wp_user_avatars_frontend_enqueue_assets() {
 	global $post;
 
-	if ( ! $post instanceof WP_Post || empty( $post->post_content ) || ! has_shortcode( $post->post_content, 'wp_user_avatars' ) || ! is_user_logged_in() ) {
+	if ( ! is_user_logged_in() ) {
 		return;
 	}
 
 	$user_id = get_current_user_id();
 	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capabilities mapped by wp_user_avatars_meta_caps().
 	if ( ! current_user_can( 'edit_avatar', $user_id ) && ! current_user_can( 'edit_avatar_rating', $user_id ) ) {
+		return;
+	}
+
+	wp_user_avatars_enqueue_styles();
+
+	if ( ! $post instanceof WP_Post || empty( $post->post_content ) || ! has_shortcode( $post->post_content, 'wp_user_avatars' ) ) {
 		return;
 	}
 

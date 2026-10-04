@@ -136,21 +136,59 @@ final class FrontendEditorTest extends TestCase {
 	}
 
 	/**
-	 * The normal page preflight enqueues assets only when the shortcode is present.
+	 * The page preflight keeps renderer styles available without loading scripts early.
 	 *
 	 * @return void
 	 */
-	public function test_frontend_asset_preflight_requires_shortcode(): void {
+	public function test_frontend_asset_preflight_keeps_renderer_styles_available(): void {
 		$post               = new WP_Post();
 		$post->post_content = 'Plain page content.';
 		$GLOBALS['post']    = $post;
 
 		wp_user_avatars_frontend_enqueue_assets();
 		$this->assertArrayNotHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'wp_enqueue_media', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayHasKey( 'wp_enqueue_style', $GLOBALS['wpua_test']['calls'] );
 
 		$post->post_content = 'Before [wp_user_avatars] after.';
 		wp_user_avatars_frontend_enqueue_assets();
 		$this->assertArrayHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] );
+	}
+
+	/**
+	 * Logged-out visitors do not receive editor assets during the page preflight.
+	 *
+	 * @return void
+	 */
+	public function test_frontend_asset_preflight_skips_logged_out_visitors(): void {
+		$post               = new WP_Post();
+		$post->post_content = '[wp_user_avatars]';
+		$GLOBALS['post']    = $post;
+		$GLOBALS['wpua_test']['returns']['is_user_logged_in'] = false;
+
+		wp_user_avatars_frontend_enqueue_assets();
+
+		$this->assertArrayNotHasKey( 'wp_enqueue_style', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'wp_enqueue_media', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * Users without either editor capability do not receive preflight assets.
+	 *
+	 * @return void
+	 */
+	public function test_frontend_asset_preflight_skips_users_without_editor_capabilities(): void {
+		$post               = new WP_Post();
+		$post->post_content = '[wp_user_avatars]';
+		$GLOBALS['post']    = $post;
+		$GLOBALS['wpua_test']['returns']['current_user_can'] = false;
+
+		wp_user_avatars_frontend_enqueue_assets();
+
+		$this->assertArrayNotHasKey( 'wp_enqueue_style', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'wp_enqueue_media', $GLOBALS['wpua_test']['calls'] ?? array() );
 	}
 
 	/**

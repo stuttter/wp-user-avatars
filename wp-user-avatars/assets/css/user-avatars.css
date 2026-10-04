@@ -31,12 +31,12 @@
 .wp-user-avatars-frontend-form .form-table th,
 .wp-user-avatars-frontend-form .form-table td {
 	padding: 10px;
-	text-align: left;
+	text-align: start;
 	vertical-align: top;
 }
 
 .wp-user-avatars-frontend-form .form-table th {
-	padding-left: 0;
+	padding-inline-start: 0;
 }
 
 .wp-user-avatars-frontend-form .wp-user-avatars-photo img {
@@ -113,7 +113,7 @@
 		display: none;
 	}
 
-	#wp-user-avatars-ratings fieldset {
+	#wp-user-avatars-user-settings #wp-user-avatars-ratings fieldset {
 		padding-left: 110px;
 	}
 

@@ -159,16 +159,14 @@ function wp_user_avatars_enqueue_assets( $user_id ) {
 		wp_enqueue_media();
 	}
 
+	wp_user_avatars_enqueue_styles();
+
 	// URL & Version
 	$url = wp_user_avatars_get_plugin_url();
 	$ver = wp_user_avatars_get_asset_version();
 
 	// Enqueue
 	wp_enqueue_script( 'wp-user-avatars', $url . 'assets/js/user-avatars.js',   array( 'jquery' ), $ver, true  );
-	wp_enqueue_style( 'wp-user-avatars',  $url . 'assets/css/user-avatars.css', array(),           $ver );
-	if ( is_rtl() ) {
-		wp_enqueue_style( 'wp-user-avatars-rtl', $url . 'assets/css/user-avatars-rtl.css', array( 'wp-user-avatars' ), $ver );
-	}
 
 	// Localize
 	wp_localize_script( 'wp-user-avatars', 'i10n_WPUserAvatars', array(
@@ -179,6 +177,23 @@ function wp_user_avatars_enqueue_assets( $user_id ) {
 		'removeError'      => esc_html__( 'The avatar could not be removed. Please try again.', 'wp-user-avatars' ),
 		'uploadError'      => esc_html__( 'The avatar could not be uploaded. Please try again.', 'wp-user-avatars' ),
 	) );
+}
+
+/**
+ * Enqueue the shared avatar editor styles.
+ *
+ * @since 2.1.0
+ *
+ * @return void
+ */
+function wp_user_avatars_enqueue_styles() {
+	$url = wp_user_avatars_get_plugin_url();
+	$ver = wp_user_avatars_get_asset_version();
+
+	wp_enqueue_style( 'wp-user-avatars',  $url . 'assets/css/user-avatars.css', array(),           $ver );
+	if ( is_rtl() ) {
+		wp_enqueue_style( 'wp-user-avatars-rtl', $url . 'assets/css/user-avatars-rtl.css', array( 'wp-user-avatars' ), $ver );
+	}
 }
 
 /**
