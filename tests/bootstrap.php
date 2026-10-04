@@ -97,6 +97,27 @@ function add_shortcode( ...$arguments ) {
 	wpua_test_call( __FUNCTION__, $arguments );
 }
 /**
+ * Provide the register_block_type test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function register_block_type( ...$arguments ) {
+	return wpua_test_call( __FUNCTION__, $arguments );
+}
+/**
+ * Provide the get_block_wrapper_attributes test double.
+ *
+ * @param array<string, string> $attributes Extra wrapper attributes.
+ *
+ * @return string
+ */
+function get_block_wrapper_attributes( $attributes = array() ) {
+	wpua_test_call( __FUNCTION__, array( $attributes ) );
+	return 'class="wp-block-wp-user-avatars-avatar-editor ' . esc_attr( $attributes['class'] ?? '' ) . '"';
+}
+/**
  * Provide the has_shortcode test double.
  *
  * @param string $content Content to inspect.
@@ -106,6 +127,24 @@ function add_shortcode( ...$arguments ) {
  */
 function has_shortcode( $content, $tag ) {
 	return false !== strpos( $content, '[' . $tag );
+}
+/**
+ * Provide the has_block test double.
+ *
+ * @param string  $block_name Full block name.
+ * @param WP_Post $post       Post to inspect.
+ *
+ * @return bool
+ */
+function has_block( $block_name, $post ) {
+	$override = $GLOBALS['wpua_test']['returns']['has_block'] ?? null;
+
+	if ( null !== $override ) {
+		wpua_test_call( __FUNCTION__, array( $block_name, $post ) );
+		return (bool) $override;
+	}
+
+	return false !== strpos( $post->post_content, '<!-- wp:' . $block_name );
 }
 function remove_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 /**

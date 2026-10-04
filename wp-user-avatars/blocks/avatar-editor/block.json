@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wp-user-avatars/avatar-editor",
+	"title": "User Avatar Editor",
+	"category": "widgets",
+	"icon": "admin-users",
+	"description": "Let the signed-in user update their avatar.",
+	"keywords": [ "avatar", "profile", "user" ],
+	"textdomain": "wp-user-avatars",
+	"editorScript": "file:./editor.js",
+	"editorStyle": "file:./editor.css",
+	"supports": {
+		"html": false
+	}
+}

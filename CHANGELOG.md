@@ -2,7 +2,7 @@
 
 ## 2.1.0
 
-- Add a standalone `[wp_user_avatars]` editor for normal pages.
+- Add a standalone User Avatar Editor block and `[wp_user_avatars]` shortcode for normal pages.
 
 ## 2.0.1
 

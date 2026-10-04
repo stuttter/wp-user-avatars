@@ -20,10 +20,10 @@ I decided to create this plugin because no existing solutions integrated into Wo
 
 ## Front-end editor
 
-The `[wp_user_avatars]` shortcode displays the avatar editor for the signed-in
-user. It does not create a profile page, registration flow, or membership
-system. Add it to an existing page and control access to that page with the
-tools already used by your site.
+The User Avatar Editor block and `[wp_user_avatars]` shortcode display the
+avatar editor for the signed-in user. Neither creates a profile page,
+registration flow, or membership system. Add either one to an existing page
+and control access to that page with the tools already used by your site.
 
 The editor uses the same avatar capabilities, upload restrictions, ratings,
 and Media Library permissions as the WordPress profile and bbPress profile

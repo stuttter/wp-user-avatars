@@ -104,8 +104,8 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertNotFalse( $script );
 		$this->assertNotFalse( $style );
 		$this->assertNotFalse( $rtl_style );
-		$this->assertSame( '2e5b8b306afb22d0a15f05fd72f03932cc7493e994a9579168e9273fbde872bc', hash( 'sha256', $script ) );
-		$this->assertSame( '7710b916d507e11ddb65fd7e650cb6f4e45312889039b37f57b238d9e36aef54', hash( 'sha256', $style ) );
+		$this->assertSame( '5497a87bdf34c1dcf9075f4822279caf830720b6cc860323d3a19a8437a2c05f', hash( 'sha256', $script ) );
+		$this->assertSame( '10325a4f3ae3e6afa44c96b167e030a4b22af8d8586b0536f02580b1ceecaf61', hash( 'sha256', $style ) );
 		$this->assertSame( '6776d64ca275d70460c691144a0afd7a716c07c5d48e464664175b1ea5eac833', hash( 'sha256', $rtl_style ) );
 		$this->assertStringContainsString( 'text-align: start;', $style );
 		$this->assertStringContainsString( 'padding-inline-start: 0;', $style );
@@ -113,6 +113,43 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertStringContainsString( '#wp-user-avatars-user-settings #wp-user-avatars-ratings fieldset', $rtl_style );
 		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $style );
 		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $rtl_style );
-		$this->assertSame( 202610040002, wp_user_avatars_get_asset_version() );
+		$this->assertSame( 202610040004, wp_user_avatars_get_asset_version() );
+	}
+
+	/**
+	 * Verify the block metadata and editor assets remain bound to the reviewed files.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_editor_block_assets_match_reviewed_files(): void {
+		$block_path = dirname( __DIR__ ) . '/wp-user-avatars/blocks/avatar-editor/';
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$metadata_source = file_get_contents( $block_path . 'block.json' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$editor_script = file_get_contents( $block_path . 'editor.js' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$editor_style = file_get_contents( $block_path . 'editor.css' );
+		$editor_asset = require $block_path . 'editor.asset.php';
+
+		$this->assertNotFalse( $metadata_source );
+		$this->assertNotFalse( $editor_script );
+		$this->assertNotFalse( $editor_style );
+
+		$metadata = json_decode( $metadata_source, true, 512, JSON_THROW_ON_ERROR );
+
+		$this->assertSame( 'wp-user-avatars/avatar-editor', $metadata['name'] );
+		$this->assertSame( 3, $metadata['apiVersion'] );
+		$this->assertSame( 'file:./editor.js', $metadata['editorScript'] );
+		$this->assertSame( 'file:./editor.css', $metadata['editorStyle'] );
+		$this->assertStringContainsString( "registerBlockType( 'wp-user-avatars/avatar-editor'", $editor_script );
+		$this->assertStringContainsString( 'wp-user-avatars-block-preview', $editor_style );
+		$this->assertSame( 'e9e7c5eccfc3dcfdb8338f82bd6689c77990ac58fda5831d8e4f07e884bacafc', hash( 'sha256', $editor_script ) );
+		$this->assertSame( 'f83516df37ddaf452531df2bf9a420263b9aef97f6b14452e35008a432cbc1aa', hash( 'sha256', $editor_style ) );
+		$this->assertSame( '37b27dc919216c69417b8beab91200db62d9e825155412a940a14918efa92d3b', hash( 'sha256', $metadata_source ) );
+		$this->assertSame( '202610040004', $editor_asset['version'] );
+		$this->assertSame(
+			array( 'wp-block-editor', 'wp-blocks', 'wp-components', 'wp-element', 'wp-i18n' ),
+			$editor_asset['dependencies']
+		);
 	}
 }

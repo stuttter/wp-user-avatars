@@ -352,7 +352,7 @@ function wp_user_avatars_section_content( $user = null, $args = array() ) {
 		// User needs additional caps to edit ratings
 		if ( current_user_can( 'edit_avatar_rating', $user->ID ) ) : ?>
 
-			<tr>
+			<tr class="wp-user-avatars-rating-row<?php echo $is_frontend && empty( $user->wp_user_avatars ) ? ' fancy-hidden' : ''; ?>">
 				<th scope="row"><?php esc_html_e( 'Rating', 'wp-user-avatars' ); ?></th>
 			<td
 				id="<?php echo esc_attr( $ratings_id ); ?>"

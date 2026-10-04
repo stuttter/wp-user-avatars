@@ -22,6 +22,45 @@ function wp_user_avatars_shortcode() {
 }
 
 /**
+ * Register the dynamic avatar editor block.
+ *
+ * @since 2.1.0
+ *
+ * @return void
+ */
+function wp_user_avatars_register_block() {
+	register_block_type(
+		dirname( __DIR__ ) . '/blocks/avatar-editor',
+		array(
+			'render_callback' => 'wp_user_avatars_render_block',
+		)
+	);
+}
+
+/**
+ * Render the current user's avatar editor block.
+ *
+ * @since 2.1.0
+ *
+ * @return string Block markup.
+ */
+function wp_user_avatars_render_block() {
+	$editor = wp_user_avatars_get_editor();
+
+	if ( '' === $editor ) {
+		return '';
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => 'wp-user-avatars-avatar-editor-block',
+		)
+	);
+
+	return '<div ' . $wrapper_attributes . '>' . $editor . '</div>';
+}
+
+/**
  * Return a reusable avatar editor for the current user.
  *
  * @since 2.1.0
@@ -73,9 +112,11 @@ function wp_user_avatars_get_editor() {
  * Enqueue front-end assets before page output.
  *
  * Styles load for eligible signed-in users so the documented PHP renderer also
- * remains styled when called after wp_head. Scripts and Media Library assets
- * remain limited to pages whose stored content contains the shortcode. The
- * renderer enqueues those assets as a fallback for programmatic rendering.
+ * remains styled when called after wp_head. Stored blocks retain their prompt
+ * styling for visitors who cannot use the editor. Scripts and Media Library
+ * assets remain limited to eligible users on pages whose stored content
+ * contains the shortcode or block. The renderer enqueues those assets as a
+ * fallback for programmatic rendering.
  *
  * @since 2.1.0
  *
@@ -83,6 +124,14 @@ function wp_user_avatars_get_editor() {
  */
 function wp_user_avatars_frontend_enqueue_assets() {
 	global $post;
+
+	$has_block = $post instanceof WP_Post
+		&& ! empty( $post->post_content )
+		&& has_block( 'wp-user-avatars/avatar-editor', $post );
+
+	if ( $has_block ) {
+		wp_user_avatars_enqueue_styles();
+	}
 
 	if ( ! is_user_logged_in() ) {
 		return;
@@ -96,7 +145,13 @@ function wp_user_avatars_frontend_enqueue_assets() {
 
 	wp_user_avatars_enqueue_styles();
 
-	if ( ! $post instanceof WP_Post || empty( $post->post_content ) || ! has_shortcode( $post->post_content, 'wp_user_avatars' ) ) {
+	if ( ! $post instanceof WP_Post || empty( $post->post_content ) ) {
+		return;
+	}
+
+	$has_shortcode = has_shortcode( $post->post_content, 'wp_user_avatars' );
+
+	if ( ! $has_shortcode && ! $has_block ) {
 		return;
 	}
 

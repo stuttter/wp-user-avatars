@@ -1,0 +1,31 @@
+.wp-user-avatars-block-preview .components-placeholder__fieldset {
+	align-items: center;
+	gap: 16px;
+}
+
+.wp-user-avatars-block-preview__content {
+	align-items: center;
+	display: flex;
+	flex: 1 1 320px;
+	gap: 16px;
+}
+
+.wp-user-avatars-block-preview__content .dashicons {
+	align-items: center;
+	aspect-ratio: 1;
+	background: #3858e9;
+	border-radius: 50%;
+	color: #fff;
+	display: flex;
+	flex: 0 0 64px;
+	font-size: 30px;
+	height: 64px;
+	justify-content: center;
+	min-width: 64px;
+	width: 64px;
+}
+
+.wp-user-avatars-block-preview__content p {
+	margin: 4px 0 0;
+	max-width: 440px;
+}

@@ -119,6 +119,80 @@ final class FrontendEditorTest extends TestCase {
 	}
 
 	/**
+	 * The block uses the same current-user editor inside block wrapper markup.
+	 *
+	 * @return void
+	 */
+	public function test_block_reuses_the_current_user_editor(): void {
+		$output = wp_user_avatars_render_block();
+
+		$this->assertStringContainsString( 'wp-block-wp-user-avatars-avatar-editor', $output );
+		$this->assertStringContainsString( 'wp-user-avatars-avatar-editor-block', $output );
+		$this->assertStringContainsString( 'class="wp-user-avatars-editor"', $output );
+		$this->assertStringContainsString( 'data-user-id="7"', $output );
+	}
+
+	/**
+	 * The block keeps its wrapper around the logged-out prompt.
+	 *
+	 * @return void
+	 */
+	public function test_logged_out_block_retains_styled_wrapper(): void {
+		$GLOBALS['wpua_test']['returns']['is_user_logged_in'] = false;
+
+		$output = wp_user_avatars_render_block();
+
+		$this->assertStringContainsString( 'wp-user-avatars-avatar-editor-block', $output );
+		$this->assertStringContainsString( 'log in', strtolower( $output ) );
+	}
+
+	/**
+	 * The block keeps its wrapper around the capability-denied prompt.
+	 *
+	 * @return void
+	 */
+	public function test_forbidden_block_retains_styled_wrapper(): void {
+		$GLOBALS['wpua_test']['returns']['current_user_can'] = false;
+
+		$output = wp_user_avatars_render_block();
+
+		$this->assertStringContainsString( 'wp-user-avatars-avatar-editor-block', $output );
+		$this->assertStringContainsString( 'permission', strtolower( $output ) );
+	}
+
+	/**
+	 * The empty avatar state hides the complete rating row without selector support.
+	 *
+	 * @return void
+	 */
+	public function test_block_hides_empty_avatar_rating_row_in_markup(): void {
+		$user                  = $GLOBALS['wpua_test']['returns']['get_userdata'];
+		$user->wp_user_avatars = array();
+
+		$output = wp_user_avatars_render_block();
+
+		$this->assertStringContainsString( 'class="wp-user-avatars-rating-row fancy-hidden"', $output );
+	}
+
+	/**
+	 * The block metadata registers the shared dynamic renderer.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_editor_block_registration_uses_metadata_and_dynamic_renderer(): void {
+		wp_user_avatars_register_block();
+
+		$this->assertSame(
+			dirname( __DIR__ ) . '/wp-user-avatars/blocks/avatar-editor',
+			$GLOBALS['wpua_test']['calls']['register_block_type'][0][0]
+		);
+		$this->assertSame(
+			'wp_user_avatars_render_block',
+			$GLOBALS['wpua_test']['calls']['register_block_type'][0][1]['render_callback']
+		);
+	}
+
+	/**
 	 * Subscribers may upload their own avatar without receiving Media Library access.
 	 *
 	 * @return void
@@ -153,6 +227,61 @@ final class FrontendEditorTest extends TestCase {
 		$post->post_content = 'Before [wp_user_avatars] after.';
 		wp_user_avatars_frontend_enqueue_assets();
 		$this->assertArrayHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] );
+	}
+
+	/**
+	 * Stored block content loads the interactive editor assets before page output.
+	 *
+	 * @return void
+	 */
+	public function test_frontend_asset_preflight_recognizes_the_avatar_editor_block(): void {
+		$post               = new WP_Post();
+		$post->post_content = '<!-- wp:wp-user-avatars/avatar-editor /-->';
+		$GLOBALS['post']    = $post;
+		$GLOBALS['wpua_test']['returns']['has_block'] = true;
+
+		wp_user_avatars_frontend_enqueue_assets();
+
+		$this->assertArrayHasKey( 'wp_enqueue_style', $GLOBALS['wpua_test']['calls'] );
+		$this->assertArrayHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] );
+	}
+
+	/**
+	 * Stored blocks retain card styles for logged-out visitors without editor scripts.
+	 *
+	 * @return void
+	 */
+	public function test_frontend_asset_preflight_styles_logged_out_block_prompt(): void {
+		$post               = new WP_Post();
+		$post->post_content = '<!-- wp:wp-user-avatars/avatar-editor /-->';
+		$GLOBALS['post']    = $post;
+		$GLOBALS['wpua_test']['returns']['has_block'] = true;
+		$GLOBALS['wpua_test']['returns']['is_user_logged_in'] = false;
+
+		wp_user_avatars_frontend_enqueue_assets();
+
+		$this->assertArrayHasKey( 'wp_enqueue_style', $GLOBALS['wpua_test']['calls'] );
+		$this->assertArrayNotHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'wp_enqueue_media', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * Stored blocks retain card styles for denied users without editor scripts.
+	 *
+	 * @return void
+	 */
+	public function test_frontend_asset_preflight_styles_forbidden_block_prompt(): void {
+		$post               = new WP_Post();
+		$post->post_content = '<!-- wp:wp-user-avatars/avatar-editor /-->';
+		$GLOBALS['post']    = $post;
+		$GLOBALS['wpua_test']['returns']['has_block'] = true;
+		$GLOBALS['wpua_test']['returns']['current_user_can'] = false;
+
+		wp_user_avatars_frontend_enqueue_assets();
+
+		$this->assertArrayHasKey( 'wp_enqueue_style', $GLOBALS['wpua_test']['calls'] );
+		$this->assertArrayNotHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'wp_enqueue_media', $GLOBALS['wpua_test']['calls'] ?? array() );
 	}
 
 	/**

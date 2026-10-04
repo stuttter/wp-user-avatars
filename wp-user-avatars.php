@@ -66,5 +66,5 @@ function wp_user_avatars_get_plugin_url() {
 function wp_user_avatars_get_asset_version() {
 	return defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG
 		? time()
-		: 202610040002;
+		: 202610040004;
 }

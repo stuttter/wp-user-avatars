@@ -33,6 +33,10 @@ final class HookRegistrationTest extends TestCase {
 			$GLOBALS['wpua_test']['calls']['add_shortcode']
 		);
 		$this->assertContains(
+			array( 'init', 'wp_user_avatars_register_block' ),
+			$GLOBALS['wpua_test']['calls']['add_action']
+		);
+		$this->assertContains(
 			array( 'template_redirect', 'wp_user_avatars_frontend_form_handler' ),
 			$GLOBALS['wpua_test']['calls']['add_action']
 		);

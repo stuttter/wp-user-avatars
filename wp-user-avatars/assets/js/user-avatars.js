@@ -139,6 +139,7 @@ jQuery( document ).ready( function ( $ ) {
 				if ( '' !== data ) {
 					$editor.find( '.wp-user-avatars-photo' ).html( data );
 					$editor.find( '.wp-user-avatars-remove' ).hide();
+					$editor.find( '.wp-user-avatars-rating-row' ).addClass( 'fancy-hidden' );
 					$editor.find( '.wp-user-avatars-ratings' ).addClass( 'fancy-hidden' );
 					$editor.find( '.wp-user-avatars-ratings fieldset' ).prop( 'disabled', true );
 					return;
@@ -183,6 +184,7 @@ jQuery( document ).ready( function ( $ ) {
 	function avatar_updated( $editor, avatar ) {
 		$editor.find( '.wp-user-avatars-photo' ).html( avatar );
 		$editor.find( '.wp-user-avatars-remove' ).show();
+		$editor.find( '.wp-user-avatars-rating-row' ).removeClass( 'fancy-hidden' );
 		$editor.find( '.wp-user-avatars-ratings' ).removeClass( 'fancy-hidden' );
 		$editor.find( '.wp-user-avatars-ratings fieldset' ).prop( 'disabled', false );
 	}

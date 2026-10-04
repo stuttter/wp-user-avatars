@@ -23,6 +23,7 @@ add_action( 'wp_enqueue_scripts', 'wp_user_avatars_admin_enqueue_scripts' );
 
 // Front-end editor.
 add_shortcode( 'wp_user_avatars', 'wp_user_avatars_shortcode' );
+add_action( 'init', 'wp_user_avatars_register_block' );
 add_action( 'template_redirect', 'wp_user_avatars_frontend_form_handler' );
 add_action( 'wp_enqueue_scripts', 'wp_user_avatars_frontend_enqueue_assets', 20 );
 
