@@ -87,4 +87,22 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertStringNotContainsString( "$( '#wp-user-avatars-remove' )", $script );
 		$this->assertStringNotContainsString( "$( '#wp-user-avatars' )", $script );
 	}
+
+	/**
+	 * Verify changes to the editor assets also invalidate production caches.
+	 *
+	 * @return void
+	 */
+	public function test_editor_asset_version_matches_reviewed_files(): void {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$script = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/assets/js/user-avatars.js' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$style = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/assets/css/user-avatars.css' );
+
+		$this->assertNotFalse( $script );
+		$this->assertNotFalse( $style );
+		$this->assertSame( '2e5b8b306afb22d0a15f05fd72f03932cc7493e994a9579168e9273fbde872bc', hash( 'sha256', $script ) );
+		$this->assertSame( '498a599c13b0825b059c4a5f784b19b9a6cc3c7ac12d8cea26085f8c7881de85', hash( 'sha256', $style ) );
+		$this->assertSame( 202610040001, wp_user_avatars_get_asset_version() );
+	}
 }
