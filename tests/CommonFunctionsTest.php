@@ -122,8 +122,11 @@ final class CommonFunctionsTest extends TestCase {
 		};
 		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
 
+		$GLOBALS['wpua_test']['returns']['apply_filters:wp_user_avatars_dynamic_resize'] = false;
+
 		$this->assertSame( 'https://example.test/96.jpg', wp_user_avatars_get_local_avatar_url( 7, 96 ) );
 		$this->assertArrayNotHasKey( 'wp_get_image_editor', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'update_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
 	}
 
 	/**
@@ -137,7 +140,11 @@ final class CommonFunctionsTest extends TestCase {
 				? array( 'full' => 'https://example.test/uploads/full.jpg' )
 				: 'G';
 		};
-		$GLOBALS['wpua_test']['returns']['get_option'] = 'G';
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
+
+		$GLOBALS['wpua_test']['callbacks']['apply_filters:wp_user_avatars_dynamic_resize'] = static function ( $resize, $user_id, $size ) {
+			return $resize && 7 === $user_id && in_array( $size, array( 96, 256 ), true );
+		};
 
 		$GLOBALS['wpua_test']['returns']['wp_upload_dir'] = array(
 			'baseurl' => 'https://example.test/uploads',
@@ -162,6 +169,171 @@ final class CommonFunctionsTest extends TestCase {
 		$GLOBALS['wpua_test']['returns']['wp_get_image_editor'] = $editor;
 
 		$this->assertSame( 'https://example.test/uploads/full-256x256.jpg', wp_user_avatars_get_local_avatar_url( 7, 256 ) );
+		$this->assertSame(
+			array( true, 7, 256, array( 'full' => 'https://example.test/uploads/full.jpg' ) ),
+			$GLOBALS['wpua_test']['calls']['apply_filters:wp_user_avatars_dynamic_resize'][0]
+		);
+	}
+
+	/**
+	 * Verify a size allowlist falls back without generating or changing metadata.
+	 *
+	 * @return void
+	 */
+	public function test_local_avatar_generation_falls_back_for_a_disallowed_size(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array( 'full' => 'https://example.test/uploads/full.jpg' )
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
+
+		$GLOBALS['wpua_test']['callbacks']['apply_filters:wp_user_avatars_dynamic_resize'] = static function ( $resize, $user_id, $size ) {
+			return $resize && 7 === $user_id && in_array( $size, array( 96, 256 ), true );
+		};
+
+		$this->assertSame( 'https://example.test/uploads/full.jpg', wp_user_avatars_get_local_avatar_url( 7, 512 ) );
+		$this->assertArrayNotHasKey( 'wp_get_image_editor', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'update_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * Verify repeated requests reuse the derivative stored by the first request.
+	 *
+	 * @return void
+	 */
+	public function test_repeated_local_avatar_requests_reuse_the_generated_size(): void {
+		$avatar = array( 'full' => 'https://example.test/uploads/full.jpg' );
+
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) use ( &$avatar ) {
+			return 'wp_user_avatars' === $key ? $avatar : 'G';
+		};
+
+		$GLOBALS['wpua_test']['callbacks']['update_user_meta'] = static function ( $user_id, $key, $value ) use ( &$avatar ) {
+			if ( 'wp_user_avatars' === $key ) {
+				$avatar = $value;
+			}
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']         = 'G';
+
+		$GLOBALS['wpua_test']['returns']['wp_upload_dir'] = array(
+			'baseurl' => 'https://example.test/uploads',
+			'basedir' => '/tmp/uploads',
+		);
+
+		$editor = $this->getMockBuilder( stdClass::class )
+			->addMethods( array( 'resize', 'generate_filename', 'save' ) )
+			->getMock();
+		$editor->expects( $this->once() )
+			->method( 'resize' )
+			->with( 256, 256, true )
+			->willReturn( true );
+		$editor->expects( $this->once() )
+			->method( 'generate_filename' )
+			->willReturn( '/tmp/uploads/full-256x256.jpg' );
+		$editor->expects( $this->once() )
+			->method( 'save' )
+			->willReturn( array( 'path' => '/tmp/uploads/full-256x256.jpg' ) );
+
+		$GLOBALS['wpua_test']['returns']['wp_get_image_editor'] = $editor;
+
+		$this->assertSame( 'https://example.test/uploads/full-256x256.jpg', wp_user_avatars_get_local_avatar_url( 7, 256 ) );
+		$this->assertSame( 'https://example.test/uploads/full-256x256.jpg', wp_user_avatars_get_local_avatar_url( 7, 256 ) );
+		$this->assertCount( 1, $GLOBALS['wpua_test']['calls']['wp_get_image_editor'] );
+		$this->assertCount( 1, $GLOBALS['wpua_test']['calls']['update_user_meta'] );
+	}
+
+	/**
+	 * Verify interleaved generation converges on one derivative URL.
+	 *
+	 * @return void
+	 */
+	public function test_interleaved_local_avatar_generation_converges_on_the_same_size(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array( 'full' => 'https://example.test/uploads/full.jpg' )
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
+
+		$GLOBALS['wpua_test']['returns']['wp_upload_dir'] = array(
+			'baseurl' => 'https://example.test/uploads',
+			'basedir' => '/tmp/uploads',
+		);
+
+		$nested_url   = null;
+		$first_editor = $this->getMockBuilder( stdClass::class )
+			->addMethods( array( 'resize', 'generate_filename', 'save' ) )
+			->getMock();
+		$first_editor->expects( $this->once() )
+			->method( 'resize' )
+			->with( 256, 256, true )
+			->willReturnCallback(
+				static function () use ( &$nested_url ) {
+					$nested_url = wp_user_avatars_get_local_avatar_url( 7, 256 );
+					return true;
+				}
+			);
+		$first_editor->expects( $this->once() )
+			->method( 'generate_filename' )
+			->willReturn( '/tmp/uploads/full-256x256.jpg' );
+		$first_editor->expects( $this->once() )
+			->method( 'save' )
+			->with( '/tmp/uploads/full-256x256.jpg' )
+			->willReturn( array( 'path' => '/tmp/uploads/full-256x256.jpg' ) );
+
+		$second_editor = $this->getMockBuilder( stdClass::class )
+			->addMethods( array( 'resize', 'generate_filename', 'save' ) )
+			->getMock();
+		$second_editor->expects( $this->once() )
+			->method( 'resize' )
+			->with( 256, 256, true )
+			->willReturn( true );
+		$second_editor->expects( $this->once() )
+			->method( 'generate_filename' )
+			->willReturn( '/tmp/uploads/full-256x256.jpg' );
+		$second_editor->expects( $this->once() )
+			->method( 'save' )
+			->with( '/tmp/uploads/full-256x256.jpg' )
+			->willReturn( array( 'path' => '/tmp/uploads/full-256x256.jpg' ) );
+
+		$editors = array( $first_editor, $second_editor );
+		$GLOBALS['wpua_test']['callbacks']['wp_get_image_editor'] = static function () use ( &$editors ) {
+			return array_shift( $editors );
+		};
+
+		$outer_url = wp_user_avatars_get_local_avatar_url( 7, 256 );
+
+		$this->assertSame( 'https://example.test/uploads/full-256x256.jpg', $nested_url );
+		$this->assertSame( $nested_url, $outer_url );
+		$this->assertSame(
+			$GLOBALS['wpua_test']['calls']['update_user_meta'][0],
+			$GLOBALS['wpua_test']['calls']['update_user_meta'][1]
+		);
+	}
+
+	/**
+	 * Verify a local attachment follows the same disallowed-size fallback policy.
+	 *
+	 * @return void
+	 */
+	public function test_local_attachment_falls_back_for_a_disallowed_size(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta']   = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full'     => 'https://example.test/uploads/full.jpg',
+					'media_id' => 42,
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']        = 'G';
+		$GLOBALS['wpua_test']['returns']['get_attached_file'] = '/tmp/uploads/full.jpg';
+
+		$GLOBALS['wpua_test']['returns']['apply_filters:wp_user_avatars_dynamic_resize'] = false;
+
+		$this->assertSame( 'https://example.test/uploads/full.jpg', wp_user_avatars_get_local_avatar_url( 7, 512 ) );
+		$this->assertArrayNotHasKey( 'wp_get_image_editor', $GLOBALS['wpua_test']['calls'] ?? array() );
+		$this->assertArrayNotHasKey( 'update_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
 	}
 
 	/**
@@ -214,7 +386,7 @@ final class CommonFunctionsTest extends TestCase {
 				)
 				: 'G';
 		};
-		$GLOBALS['wpua_test']['returns']['get_option'] = 'G';
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
 
 		$this->assertSame(
 			array(
@@ -347,6 +519,8 @@ final class CommonFunctionsTest extends TestCase {
 		$GLOBALS['wpua_test']['returns']['get_attached_file']           = 's3sfo2://bucket/avatar.jpg';
 		$GLOBALS['wpua_test']['returns']['wp_get_attachment_image_url'] = 'https://cdn.example.test/avatar-96x96.jpg';
 
+		$GLOBALS['wpua_test']['returns']['apply_filters:wp_user_avatars_dynamic_resize'] = false;
+
 		$this->assertSame(
 			'https://cdn.example.test/avatar-96x96.jpg',
 			wp_user_avatars_get_local_avatar_url( 7, 96 )
@@ -425,6 +599,48 @@ final class CommonFunctionsTest extends TestCase {
 		} finally {
 			if ( file_exists( $file ) ) {
 				unlink( $file );
+			}
+		}
+	}
+
+	/**
+	 * Attachment replacement removes plugin derivatives without deleting the original.
+	 *
+	 * @return void
+	 */
+	public function test_attachment_replacement_only_deletes_plugin_owned_derivatives(): void {
+		$original   = tempnam( sys_get_temp_dir(), 'wpua-original-' );
+		$derivative = tempnam( sys_get_temp_dir(), 'wpua-size-' );
+		$this->assertNotFalse( $original );
+		$this->assertNotFalse( $derivative );
+
+		$directory = dirname( $original );
+
+		$GLOBALS['wpua_test']['returns']['get_user_meta'] = array(
+			'media_id' => 42,
+			'site_id'  => 4,
+			'full'     => 'https://example.test/uploads/' . basename( $original ),
+			96         => 'https://example.test/uploads/' . basename( $derivative ),
+		);
+		$GLOBALS['wpua_test']['returns']['wp_upload_dir'] = array(
+			'baseurl' => 'https://example.test/uploads',
+			'basedir' => $directory,
+		);
+
+		try {
+			wp_user_avatars_update_avatar( 7, 'https://example.test/uploads/new.jpg' );
+
+			$this->assertSame( array( array( $derivative ) ), $GLOBALS['wpua_test']['calls']['wp_delete_file'] );
+			$this->assertSame(
+				array( 7, 'wp_user_avatars', array( 'full' => 'https://example.test/uploads/new.jpg' ) ),
+				$GLOBALS['wpua_test']['calls']['update_user_meta'][0]
+			);
+		} finally {
+			foreach ( array( $original, $derivative ) as $file ) {
+				if ( file_exists( $file ) ) {
+					// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink -- Test cleanup for a temporary file.
+					unlink( $file );
+				}
 			}
 		}
 	}

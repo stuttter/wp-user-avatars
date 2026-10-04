@@ -347,6 +347,17 @@ function wp_user_avatars_get_local_avatar_url( $user_id = false, $size = 250 ) {
 		}
 	}
 
+	/**
+	 * Filters whether WP User Avatars may generate the requested local size.
+	 *
+	 * @since 0.1.0
+	 * @since 1.4.1 Added the `$user_id`, `$size`, and `$user_avatars` parameters.
+	 *
+	 * @param bool  $dynamic_resize Whether to generate an uncached size.
+	 * @param int   $user_id        Avatar owner's user ID.
+	 * @param int   $size           Requested square size in pixels.
+	 * @param array $user_avatars   Stored avatar data.
+	 */
 	$dynamic_resize = apply_filters( 'wp_user_avatars_dynamic_resize', true, $user_id, $size, $user_avatars );
 
 	// Return early if there's no media to check and we either have an avatar of the correct size or don't dynamically resize
