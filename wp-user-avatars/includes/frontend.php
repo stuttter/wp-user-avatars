@@ -262,11 +262,24 @@ function wp_user_avatars_frontend_form_handler() {
 		return;
 	}
 
-	$redirect = wp_get_referer();
-	if ( empty( $redirect ) ) {
-		$redirect = home_url( '/' );
-	}
-
-	wp_safe_redirect( $redirect );
+	wp_safe_redirect( wp_user_avatars_get_frontend_redirect() );
 	exit;
+}
+
+/**
+ * Return the safe destination for a successful front-end editor submission.
+ *
+ * The form posts back to the page that contains it. wp_get_referer() rejects a
+ * referer matching the current request, so use the raw value before validating
+ * it against the site URL.
+ *
+ * @since 2.1.0
+ *
+ * @return string Redirect URL.
+ */
+function wp_user_avatars_get_frontend_redirect() {
+	$fallback = home_url( '/' );
+	$referer  = wp_get_raw_referer();
+
+	return wp_validate_redirect( $referer ? $referer : '', $fallback );
 }

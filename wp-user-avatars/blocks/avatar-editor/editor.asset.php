@@ -14,5 +14,5 @@ return array(
 		'wp-element',
 		'wp-i18n',
 	),
-	'version'      => '202610040008',
+	'version'      => '202610040009',
 );

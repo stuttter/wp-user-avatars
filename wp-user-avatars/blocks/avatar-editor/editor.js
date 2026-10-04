@@ -35,54 +35,74 @@
 		edit: function ( props ) {
 			return createElement(
 				'div',
-				useBlockProps( { className: 'wp-user-avatars-block-preview' } ),
+				useBlockProps( { className: 'wp-user-avatars-avatar-editor-block wp-user-avatars-block-preview' } ),
 				createElement(
 					'div',
-					{ className: 'components-placeholder wp-user-avatars-block-preview__editor' },
+					{ className: 'wp-user-avatars-block-preview__copy' },
+					createElement(
+						PlainText,
+						{
+							className: 'wp-user-avatars-block-preview__heading',
+							'aria-label': __( 'Avatar editor heading', 'wp-user-avatars' ),
+							placeholder: __( 'Add an optional heading…', 'wp-user-avatars' ),
+							value: props.attributes.heading,
+							onChange: function ( heading ) {
+								props.setAttributes( { heading: normalizeText( heading ) } );
+							}
+						}
+					),
+					createElement(
+						PlainText,
+						{
+							className: 'wp-user-avatars-block-preview__description',
+							'aria-label': __( 'Avatar editor description', 'wp-user-avatars' ),
+							placeholder: __( 'Add an optional description…', 'wp-user-avatars' ),
+							value: props.attributes.description,
+							onChange: function ( description ) {
+								props.setAttributes( { description: normalizeText( description ) } );
+							}
+						}
+					)
+				),
+				createElement(
+					'div',
+					{ className: 'wp-user-avatars-block-preview__form' },
+					createElement( 'strong', { className: 'wp-user-avatars-block-preview__label' }, __( 'Upload', 'wp-user-avatars' ) ),
 					createElement(
 						'div',
-						{ className: 'components-placeholder__fieldset' },
+						{ className: 'wp-user-avatars-block-preview__row' },
 						createElement( 'span', {
-							className: 'dashicons dashicons-admin-users',
+							className: 'dashicons dashicons-admin-users wp-user-avatars-block-preview__avatar',
 							'aria-hidden': 'true'
 						} ),
 						createElement(
 							'div',
-							{ className: 'wp-user-avatars-block-preview__copy' },
+							{ className: 'wp-user-avatars-block-preview__actions' },
 							createElement(
-								PlainText,
-								{
-									className: 'wp-user-avatars-block-preview__heading',
-									'aria-label': __( 'Avatar editor heading', 'wp-user-avatars' ),
-									placeholder: __( 'Add an optional heading…', 'wp-user-avatars' ),
-									value: props.attributes.heading,
-									onChange: function ( heading ) {
-										props.setAttributes( { heading: normalizeText( heading ) } );
-									}
-								}
+								'div',
+								{ className: 'wp-user-avatars-block-preview__file' },
+								createElement(
+									'button',
+									{ disabled: true, type: 'button' },
+									__( 'Choose File', 'wp-user-avatars' )
+								),
+								createElement( 'span', null, __( 'No file selected', 'wp-user-avatars' ) )
 							),
 							createElement(
-								PlainText,
-								{
-									className: 'wp-user-avatars-block-preview__description',
-									'aria-label': __( 'Avatar editor description', 'wp-user-avatars' ),
-									placeholder: __( 'Add an optional description…', 'wp-user-avatars' ),
-									value: props.attributes.description,
-									onChange: function ( description ) {
-										props.setAttributes( { description: normalizeText( description ) } );
-									}
-								}
+								'button',
+								{ disabled: true, type: 'button' },
+								__( 'Choose from Media', 'wp-user-avatars' )
 							)
-						),
-						createElement(
-							'button',
-							{
-								className: 'components-button is-primary is-disabled',
-								disabled: true,
-								type: 'button'
-							},
-							__( 'Choose an avatar', 'wp-user-avatars' )
 						)
+					),
+					createElement(
+						'button',
+						{
+							className: 'wp-user-avatars-block-preview__save',
+							disabled: true,
+							type: 'button'
+						},
+						__( 'Save avatar', 'wp-user-avatars' )
 					)
 				)
 			);

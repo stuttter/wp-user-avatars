@@ -386,6 +386,36 @@ final class FrontendEditorTest extends TestCase {
 	}
 
 	/**
+	 * Successful submissions return to the page containing the editor.
+	 *
+	 * @return void
+	 */
+	public function test_frontend_redirect_preserves_current_page_referer(): void {
+		$GLOBALS['wpua_test']['returns']['wp_get_raw_referer'] = 'https://example.test/avatar-editor/';
+
+		$this->assertSame( 'https://example.test/avatar-editor/', wp_user_avatars_get_frontend_redirect() );
+		$this->assertSame(
+			array( 'https://example.test/avatar-editor/', 'https://example.test/' ),
+			$GLOBALS['wpua_test']['calls']['wp_validate_redirect'][0]
+		);
+	}
+
+	/**
+	 * Submissions without a referer fall back to the site home URL.
+	 *
+	 * @return void
+	 */
+	public function test_frontend_redirect_falls_back_to_home_url(): void {
+		$GLOBALS['wpua_test']['returns']['wp_get_raw_referer'] = false;
+
+		$this->assertSame( 'https://example.test/', wp_user_avatars_get_frontend_redirect() );
+		$this->assertSame(
+			array( '', 'https://example.test/' ),
+			$GLOBALS['wpua_test']['calls']['wp_validate_redirect'][0]
+		);
+	}
+
+	/**
 	 * Removal remains subject to the existing per-user capability check.
 	 *
 	 * @return void

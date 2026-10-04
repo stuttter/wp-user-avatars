@@ -1,6 +1,17 @@
+.wp-user-avatars-block-preview {
+	background: var(--wp--preset--color--base, #fff);
+	border: 1px solid #dcdcde;
+	border-radius: 16px;
+	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+	box-sizing: border-box;
+	color: var(--wp--preset--color--contrast, #1d2327);
+	max-width: 720px;
+	padding: clamp(20px, 4vw, 36px);
+}
+
 .wp-user-avatars-block-preview__copy {
 	box-sizing: border-box;
-	flex: 1 1 240px;
+	margin-bottom: 24px;
 	min-width: 0;
 }
 
@@ -30,28 +41,70 @@
 	width: 100%;
 }
 
-.wp-user-avatars-block-preview__editor {
-	min-height: 112px;
+.wp-user-avatars-block-preview__label {
+	display: block;
+	font-size: 0.875rem;
+	margin-bottom: 12px;
 }
 
-.wp-user-avatars-block-preview__editor .components-placeholder__fieldset {
+.wp-user-avatars-block-preview__row {
+	align-items: center;
+	display: grid;
+	gap: 24px;
+	grid-template-columns: 112px minmax(0, 1fr);
+}
+
+.wp-user-avatars-block-preview__avatar {
+	align-items: center;
+	background: #c3c4c7;
+	border-radius: 50%;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+	color: #fff;
+	display: flex;
+	font-size: 48px;
+	height: 96px;
+	justify-content: center;
+	width: 96px;
+}
+
+.wp-user-avatars-block-preview__actions {
+	align-items: flex-start;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+}
+
+.wp-user-avatars-block-preview__file {
 	align-items: center;
 	display: flex;
 	flex-wrap: wrap;
-	gap: 16px;
+	gap: 10px;
 }
 
-.wp-user-avatars-block-preview__editor .dashicons {
-	align-items: center;
-	aspect-ratio: 1;
-	background: #3858e9;
-	border-radius: 50%;
+.wp-user-avatars-block-preview button {
+	background: #f6f7f7;
+	border: 1px solid #8c8f94;
+	border-radius: 999px;
+	box-sizing: border-box;
+	color: #1d2327;
+	font: inherit;
+	font-weight: 500;
+	line-height: 1.2;
+	min-height: 40px;
+	opacity: 1;
+	padding: 9px 18px;
+}
+
+.wp-user-avatars-block-preview .wp-user-avatars-block-preview__save {
+	background: #2271b1;
+	border-color: #2271b1;
 	color: #fff;
-	display: flex;
-	flex: 0 0 64px;
-	font-size: 30px;
-	height: 64px;
-	justify-content: center;
-	min-width: 64px;
-	width: 64px;
+	margin-top: 24px;
+}
+
+@media screen and ( max-width: 600px ) {
+	.wp-user-avatars-block-preview__row {
+		grid-template-columns: 1fr;
+	}
 }

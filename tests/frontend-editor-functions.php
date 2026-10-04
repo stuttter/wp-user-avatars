@@ -65,3 +65,25 @@ function wp_strip_all_tags( $value, $remove_breaks = false ) {
 
 	return trim( (string) $value );
 }
+
+/**
+ * Provide the wp_get_raw_referer test double.
+ *
+ * @return false|string
+ */
+function wp_get_raw_referer() {
+	return $GLOBALS['wpua_test']['returns']['wp_get_raw_referer'] ?? false;
+}
+
+/**
+ * Provide the wp_validate_redirect test double.
+ *
+ * @param string $location Redirect candidate.
+ * @param string $fallback Safe fallback URL.
+ *
+ * @return string
+ */
+function wp_validate_redirect( $location, $fallback = '' ) {
+	wpua_test_call( __FUNCTION__, array( $location, $fallback ) );
+	return '' !== $location ? $location : $fallback;
+}

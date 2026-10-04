@@ -135,6 +135,24 @@
 	display: none;
 }
 
+.wp-user-avatars-avatar-editor-block .wp-user-avatars-rating-row .wp-user-avatars-ratings {
+	grid-column: 1 / -1;
+}
+
+.wp-user-avatars-avatar-editor-block .wp-user-avatars-ratings fieldset {
+	border: 0;
+	margin: 0;
+	min-inline-size: 0;
+	padding: 0;
+}
+
+.wp-user-avatars-avatar-editor-block .wp-user-avatars-ratings label {
+	align-items: baseline;
+	display: inline-flex;
+	gap: 4px;
+	max-width: 100%;
+}
+
 .wp-user-avatars-avatar-editor-block .wp-user-avatars-submit {
 	margin: 24px 0 0;
 }
