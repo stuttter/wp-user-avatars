@@ -46,3 +46,22 @@ function has_block( $block_name, $post ) {
 
 	return false !== strpos( $post->post_content, '<!-- wp:' . $block_name );
 }
+
+/**
+ * Provide the wp_strip_all_tags test double.
+ *
+ * @param string $value         Text to sanitize.
+ * @param bool   $remove_breaks Whether to remove line breaks.
+ *
+ * @return string
+ */
+function wp_strip_all_tags( $value, $remove_breaks = false ) {
+	$value = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $value );
+	$value = preg_replace( '@<[^>]*?>@si', '', (string) $value );
+
+	if ( $remove_breaks ) {
+		$value = preg_replace( '/[\r\n\t ]+/', ' ', $value );
+	}
+
+	return trim( (string) $value );
+}

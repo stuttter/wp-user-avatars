@@ -105,7 +105,7 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertNotFalse( $style );
 		$this->assertNotFalse( $rtl_style );
 		$this->assertSame( '5497a87bdf34c1dcf9075f4822279caf830720b6cc860323d3a19a8437a2c05f', hash( 'sha256', $script ) );
-		$this->assertSame( '10325a4f3ae3e6afa44c96b167e030a4b22af8d8586b0536f02580b1ceecaf61', hash( 'sha256', $style ) );
+		$this->assertSame( '1c78e06ebbbb5213997a9b641b3a97c22b2452242ed68ada25b91b14ba6d49f5', hash( 'sha256', $style ) );
 		$this->assertSame( '6776d64ca275d70460c691144a0afd7a716c07c5d48e464664175b1ea5eac833', hash( 'sha256', $rtl_style ) );
 		$this->assertStringContainsString( 'text-align: start;', $style );
 		$this->assertStringContainsString( 'padding-inline-start: 0;', $style );
@@ -113,7 +113,7 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertStringContainsString( '#wp-user-avatars-user-settings #wp-user-avatars-ratings fieldset', $rtl_style );
 		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $style );
 		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $rtl_style );
-		$this->assertSame( 202610040004, wp_user_avatars_get_asset_version() );
+		$this->assertSame( 202610040007, wp_user_avatars_get_asset_version() );
 	}
 
 	/**
@@ -141,14 +141,21 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertSame( 3, $metadata['apiVersion'] );
 		$this->assertSame( 'file:./editor.js', $metadata['editorScript'] );
 		$this->assertSame( 'file:./editor.css', $metadata['editorStyle'] );
+		$this->assertSame( '', $metadata['attributes']['heading']['default'] );
+		$this->assertSame( '', $metadata['attributes']['description']['default'] );
 		$this->assertStringContainsString( "registerBlockType( 'wp-user-avatars/avatar-editor'", $editor_script );
+		$this->assertStringContainsString( "'aria-label': __( 'Avatar editor heading'", $editor_script );
+		$this->assertStringContainsString( "className: 'dashicons dashicons-admin-users'", $editor_script );
+		$this->assertStringContainsString( "'button',", $editor_script );
+		$this->assertStringContainsString( 'disabled: true', $editor_script );
+		$this->assertStringContainsString( "__( 'Choose an avatar'", $editor_script );
 		$this->assertStringContainsString( 'wp-user-avatars-block-preview', $editor_style );
-		$this->assertSame( 'e9e7c5eccfc3dcfdb8338f82bd6689c77990ac58fda5831d8e4f07e884bacafc', hash( 'sha256', $editor_script ) );
-		$this->assertSame( 'f83516df37ddaf452531df2bf9a420263b9aef97f6b14452e35008a432cbc1aa', hash( 'sha256', $editor_style ) );
-		$this->assertSame( '37b27dc919216c69417b8beab91200db62d9e825155412a940a14918efa92d3b', hash( 'sha256', $metadata_source ) );
-		$this->assertSame( '202610040004', $editor_asset['version'] );
+		$this->assertSame( '03a6f37d9fce2b62ca8ce7b189e7167252cc4e9891c2f09865c3efdbfd3fec43', hash( 'sha256', $editor_script ) );
+		$this->assertSame( 'adc7cf184a538599dffba4c0031bee0b6eff41117464b51db0b91766799cd997', hash( 'sha256', $editor_style ) );
+		$this->assertSame( '27e1d63a5cf2ea38dffae48c256cd1d6c90fa906b6712e4bff9902a9ca68aa2f', hash( 'sha256', $metadata_source ) );
+		$this->assertSame( '202610040008', $editor_asset['version'] );
 		$this->assertSame(
-			array( 'wp-block-editor', 'wp-blocks', 'wp-components', 'wp-element', 'wp-i18n' ),
+			array( 'wp-block-editor', 'wp-blocks', 'wp-element', 'wp-i18n' ),
 			$editor_asset['dependencies']
 		);
 	}

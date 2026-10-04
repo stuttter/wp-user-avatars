@@ -25,6 +25,9 @@ avatar editor for the signed-in user. Neither creates a profile page,
 registration flow, or membership system. Add either one to an existing page
 and control access to that page with the tools already used by your site.
 
+The block adds no heading or description by default. Add either inline in the
+editor when the surrounding page needs more context.
+
 The editor uses the same avatar capabilities, upload restrictions, ratings,
 and Media Library permissions as the WordPress profile and bbPress profile
 integrations. Users without Media Library access can still upload their own

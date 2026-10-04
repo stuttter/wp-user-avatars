@@ -8,6 +8,16 @@
 	"description": "Let the signed-in user update their avatar.",
 	"keywords": [ "avatar", "profile", "user" ],
 	"textdomain": "wp-user-avatars",
+	"attributes": {
+		"heading": {
+			"type": "string",
+			"default": ""
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		}
+	},
 	"editorScript": "file:./editor.js",
 	"editorStyle": "file:./editor.css",
 	"supports": {

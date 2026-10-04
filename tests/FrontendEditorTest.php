@@ -129,8 +129,47 @@ final class FrontendEditorTest extends TestCase {
 
 		$this->assertStringContainsString( 'wp-block-wp-user-avatars-avatar-editor', $output );
 		$this->assertStringContainsString( 'wp-user-avatars-avatar-editor-block', $output );
+		$this->assertStringNotContainsString( 'wp-user-avatars-block-heading', $output );
+		$this->assertStringNotContainsString( 'wp-user-avatars-block-description', $output );
 		$this->assertStringContainsString( 'class="wp-user-avatars-editor"', $output );
 		$this->assertStringContainsString( 'data-user-id="7"', $output );
+	}
+
+	/**
+	 * Optional block copy is rendered only when the author supplies it.
+	 *
+	 * @return void
+	 */
+	public function test_block_renders_optional_author_copy(): void {
+		$output = wp_user_avatars_render_block(
+			array(
+				'heading'     => 'Choose your avatar',
+				'description' => 'Use a square image that looks good at small sizes.',
+			)
+		);
+
+		$this->assertStringContainsString( '<h2 class="wp-user-avatars-block-heading">Choose your avatar</h2>', $output );
+		$this->assertStringContainsString( '<p class="wp-user-avatars-block-description">Use a square image that looks good at small sizes.</p>', $output );
+		$this->assertStringContainsString( 'class="wp-user-avatars-editor"', $output );
+	}
+
+	/**
+	 * Block copy remains plain text when stored attributes contain markup or breaks.
+	 *
+	 * @return void
+	 */
+	public function test_block_normalizes_optional_author_copy_to_plain_text(): void {
+		$output = wp_user_avatars_render_block(
+			array(
+				'heading'     => '<strong>Choose</strong> your avatar',
+				'description' => "Use a square image.\nIt works best at small sizes.",
+			)
+		);
+
+		$this->assertStringContainsString( '>Choose your avatar</h2>', $output );
+		$this->assertStringContainsString( '>Use a square image. It works best at small sizes.</p>', $output );
+		$this->assertStringNotContainsString( '<strong>', $output );
+		$this->assertStringNotContainsString( "image.\nIt", $output );
 	}
 
 	/**

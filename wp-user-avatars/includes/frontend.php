@@ -42,9 +42,11 @@ function wp_user_avatars_register_block() {
  *
  * @since 2.1.0
  *
+ * @param array<string, mixed> $attributes Block attributes.
+ *
  * @return string Block markup.
  */
-function wp_user_avatars_render_block() {
+function wp_user_avatars_render_block( $attributes = array() ) {
 	$editor = wp_user_avatars_get_editor();
 
 	if ( '' === $editor ) {
@@ -57,7 +59,23 @@ function wp_user_avatars_render_block() {
 		)
 	);
 
-	return '<div ' . $wrapper_attributes . '>' . $editor . '</div>';
+	$heading     = isset( $attributes['heading'] ) && is_string( $attributes['heading'] )
+		? trim( wp_strip_all_tags( $attributes['heading'], true ) )
+		: '';
+	$description = isset( $attributes['description'] ) && is_string( $attributes['description'] )
+		? trim( wp_strip_all_tags( $attributes['description'], true ) )
+		: '';
+	$copy        = '';
+
+	if ( '' !== $heading ) {
+		$copy .= '<h2 class="wp-user-avatars-block-heading">' . esc_html( $heading ) . '</h2>';
+	}
+
+	if ( '' !== $description ) {
+		$copy .= '<p class="wp-user-avatars-block-description">' . esc_html( $description ) . '</p>';
+	}
+
+	return '<div ' . $wrapper_attributes . '>' . $copy . $editor . '</div>';
 }
 
 /**

@@ -39,6 +39,18 @@
 	padding: clamp(20px, 4vw, 36px);
 }
 
+.wp-user-avatars-avatar-editor-block .wp-user-avatars-block-heading {
+	margin: 0 0 24px;
+}
+
+.wp-user-avatars-avatar-editor-block .wp-user-avatars-block-heading + .wp-user-avatars-block-description {
+	margin-top: -16px;
+}
+
+.wp-user-avatars-avatar-editor-block .wp-user-avatars-block-description {
+	margin-bottom: 24px;
+}
+
 .wp-user-avatars-avatar-editor-block .form-table tbody {
 	display: block;
 }
