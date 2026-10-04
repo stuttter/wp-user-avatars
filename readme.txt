@@ -58,6 +58,14 @@ If you like this plugin, you'll probably like these!
 
 It works OK, but you'll want to consider exactly what level of privacy is best for your installation.
 
+= How do I add the avatar editor to a normal page? =
+
+Add the `[wp_user_avatars]` shortcode to an existing page. It displays the avatar editor for the signed-in user and does not create a profile page, registration flow, or membership system.
+
+The shortcode uses the same avatar capabilities, upload restrictions, ratings, and Media Library permissions as the WordPress profile and bbPress profile integrations. Users without Media Library access can still upload their own avatar when the site's avatar permissions allow it. Upload and removal also work without JavaScript.
+
+Theme and plugin developers can render the same current-user editor with `wp_user_avatars_get_editor()`.
+
 = How do I display a larger or sharper avatar? =
 
 WP User Avatars uses the image size requested by WordPress. Ask for the intended display size instead of enlarging the default 96-pixel image with CSS:
@@ -97,6 +105,9 @@ For a directly uploaded avatar or a locally stored Media Library attachment, a d
 * Development: https://github.com/stuttter/wp-user-avatars/discussions
 
 == Changelog ==
+
+= 2.1.0 =
+* Add a standalone `[wp_user_avatars]` editor for normal pages.
 
 = 2.0.1 =
 * Avoid warnings and deny avatar capability checks without a valid target user.

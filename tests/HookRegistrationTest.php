@@ -25,6 +25,18 @@ final class HookRegistrationTest extends TestCase {
 			$GLOBALS['wpua_test']['calls']['add_action']
 		);
 		$this->assertContains(
+			array( 'wp_enqueue_scripts', 'wp_user_avatars_frontend_enqueue_assets', 20 ),
+			$GLOBALS['wpua_test']['calls']['add_action']
+		);
+		$this->assertContains(
+			array( 'wp_user_avatars', 'wp_user_avatars_shortcode' ),
+			$GLOBALS['wpua_test']['calls']['add_shortcode']
+		);
+		$this->assertContains(
+			array( 'template_redirect', 'wp_user_avatars_frontend_form_handler' ),
+			$GLOBALS['wpua_test']['calls']['add_action']
+		);
+		$this->assertContains(
 			array( 'wp_ajax_upload_wp_user_avatars', 'wp_user_avatars_ajax_upload' ),
 			$GLOBALS['wpua_test']['calls']['add_action']
 		);

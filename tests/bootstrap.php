@@ -18,11 +18,14 @@ function wpua_test_call( $name, $arguments ) {
 
 class WP_User {
 	public $ID;
+	public $wp_user_avatars;
+	public $wp_user_avatars_rating;
 	public function __construct( $id = 0 ) { $this->ID = (int) $id; }
 }
 
 class WP_Post {
 	public $post_author;
+	public $post_content = '';
 	public function __construct( $author = 0 ) { $this->post_author = (int) $author; }
 }
 
@@ -68,6 +71,8 @@ class WP_Error {
 
 function add_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 function add_filter( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
+function add_shortcode( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
+function has_shortcode( $content, $tag ) { return false !== strpos( $content, '[' . $tag ); }
 function remove_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 /**
  * Provide the remove_filter test double.
@@ -87,8 +92,28 @@ function apply_filters( $hook, $value, ...$arguments ) {
 	return null === $result ? $value : $result;
 }
 function esc_html__( $text ) { return $text; }
+function esc_html( $text ) { return (string) $text; }
+function esc_attr( $text ) { return (string) $text; }
+function esc_url( $text ) { return (string) $text; }
+function esc_html_e( $text ) { echo esc_html( $text ); }
+function __( $text ) { return $text; }
+function checked( $checked, $current = true, $display = true ) {
+	$result = $checked == $current ? 'checked="checked"' : '';
+	if ( $display ) {
+		echo $result;
+	}
+	return $result;
+}
+function disabled( $disabled, $current = true, $display = true ) {
+	$result = $disabled == $current ? 'disabled="disabled"' : '';
+	if ( $display ) {
+		echo $result;
+	}
+	return $result;
+}
 function is_email( $value ) { return false !== filter_var( $value, FILTER_VALIDATE_EMAIL ); }
 function get_user_by( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
+function get_userdata( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function get_avatar( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function get_user_meta( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
 function update_user_meta( ...$arguments ) { return wpua_test_call( __FUNCTION__, $arguments ); }
@@ -282,7 +307,14 @@ function admin_url( $path = '' ) {
  * @return mixed
  */
 function get_current_user_id() {
-	return 1;
+	return (int) ( wpua_test_call( __FUNCTION__, array() ) ?? 1 );
+}
+function wp_nonce_field( $action, $name, $referer = true, $display = true ) {
+	$field = '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( wp_create_nonce( $action ) ) . '" />';
+	if ( $display ) {
+		echo $field;
+	}
+	return $field;
 }
 /**
  * Provide the is_rtl test double.
@@ -298,4 +330,5 @@ require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/common.php';
 require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/capabilities.php';
 require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/admin.php';
 require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/ajax.php';
+require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/frontend.php';
 require_once dirname( __DIR__ ) . '/wp-user-avatars/includes/hooks.php';

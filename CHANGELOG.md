@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0
+
+- Add a standalone `[wp_user_avatars]` editor for normal pages.
+
 ## 2.0.1
 
 - Avoid warnings and deny avatar capability checks without a valid target user.

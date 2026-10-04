@@ -37,6 +37,7 @@ function _wp_user_avatars() { // phpcs:ignore WordPress.NamingConventions.Prefix
 	require_once $plugin_path . 'includes/capabilities.php';
 	require_once $plugin_path . 'includes/common.php';
 	require_once $plugin_path . 'includes/errors.php';
+	require_once $plugin_path . 'includes/frontend.php';
 	require_once $plugin_path . 'includes/metabox.php';
 	require_once $plugin_path . 'includes/sponsor.php';
 	require_once $plugin_path . 'includes/uninstall.php';

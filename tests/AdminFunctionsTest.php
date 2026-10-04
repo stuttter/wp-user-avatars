@@ -70,4 +70,21 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertStringNotContainsString( '$( \'#your-profile p.submit\' )', $script );
 		$this->assertStringNotContainsString( '$( \'#wp-user-avatars-user-settings p.submit\' )', $script );
 	}
+
+	/**
+	 * Verify each script action stays inside the editor that triggered it.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_script_scopes_actions_to_each_editor(): void {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$script = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/assets/js/user-avatars.js' );
+
+		$this->assertNotFalse( $script );
+		$this->assertStringContainsString( "$( '.wp-user-avatars-editor' ).each", $script );
+		$this->assertStringContainsString( '$editor.find( \'.wp-user-avatars-upload\' )', $script );
+		$this->assertStringNotContainsString( "$( '#wp-user-avatars-media' )", $script );
+		$this->assertStringNotContainsString( "$( '#wp-user-avatars-remove' )", $script );
+		$this->assertStringNotContainsString( "$( '#wp-user-avatars' )", $script );
+	}
 }

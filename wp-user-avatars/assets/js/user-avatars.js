@@ -1,183 +1,199 @@
-/* global i10n_WPUserAvatars */
+/* global i10n_WPUserAvatars, wp */
 jQuery( document ).ready( function ( $ ) {
 
-	/* Globals */
-	var wp_user_avatars_modal,
-		avatar_working;
+	$( '.wp-user-avatars-editor' ).each( function () {
+		var $editor = $( this );
 
-	/**
-	 * Invoke the media modal
-	 *
-	 * @param {object} event The event
-	 */
-	$( '#wp-user-avatars-media' ).on( 'click', function ( event ) {
-		event.preventDefault();
+		/**
+		 * Invoke the media modal.
+		 */
+		$editor.find( '.wp-user-avatars-media' ).on( 'click', function () {
+			var modal = $editor.data( 'wp-user-avatars-modal' );
 
-		// Already adding
-		if ( avatar_working ) {
-			return;
-		}
-
-		// Open the modal
-		if ( wp_user_avatars_modal ) {
-			wp_user_avatars_modal.open();
-			return;
-		}
-
-		// First time modal
-		wp_user_avatars_modal = wp.media.frames.wp_user_avatars_modal = wp.media( {
-			title:    i10n_WPUserAvatars.insertMediaTitle,
-			button:   { text: i10n_WPUserAvatars.insertIntoPost },
-			library:  { type: 'image' },
-			multiple: false
-		} );
-
-		// Picking an avatar
-		wp_user_avatars_modal.on( 'select', function () {
-
-			// Prevent doubles
-			avatar_lock( 'lock' );
-
-			// Get the avatar URL
-			var avatar_url = wp_user_avatars_modal.state().get( 'selection' ).first().toJSON().id;
-
-			// Post the new avatar
-			$.post( i10n_WPUserAvatars.ajaxUrl, {
-				action:   'assign_wp_user_avatars_media',
-				media_id: avatar_url,
-				user_id:  i10n_WPUserAvatars.user_id,
-				_wpnonce: i10n_WPUserAvatars.mediaNonce
-			}, function ( data ) {
-
-				// Update the UI
-				if ( '' !== data ) {
-					$( '#wp-user-avatars-photo' ).html( data );
-					$( '#wp-user-avatars-remove' ).show();
-					$( '#wp-user-avatars-ratings' ).removeClass( 'fancy-hidden' );
-					$( '#wp-user-avatars-ratings fieldset' ).prop( 'disabled', false );
-				}
-
-				avatar_lock( 'unlock' );
-			} );
-		} );
-
-		// Open the modal
-		wp_user_avatars_modal.open();
-	} );
-
-	/**
-	 * Upload an avatar as soon as a file is selected.
-	 */
-	$( '#wp-user-avatars' ).on( 'change', function () {
-		var file = this.files && this.files[ 0 ],
-			formData,
-			originalAvatar;
-
-		if ( ! file || avatar_working ) {
-			return;
-		}
-
-		avatar_lock( 'lock' );
-		avatar_feedback( '' );
-		originalAvatar = $( '#wp-user-avatars-photo' ).html();
-
-		if ( window.URL && window.URL.createObjectURL ) {
-			$( '#wp-user-avatars-photo img' )
-				.attr( 'src', window.URL.createObjectURL( file ) )
-				.removeAttr( 'srcset' );
-		}
-
-		formData = new window.FormData();
-		formData.append( 'action', 'upload_wp_user_avatars' );
-		formData.append( 'user_id', i10n_WPUserAvatars.user_id );
-		formData.append( '_wpnonce', i10n_WPUserAvatars.uploadNonce );
-		formData.append( 'wp-user-avatars', file );
-		formData.append( 'rating', $( 'input[name="wp_user_avatars_rating"]:checked' ).val() || 'G' );
-
-		$.ajax( {
-			url:         i10n_WPUserAvatars.ajaxUrl,
-			type:        'POST',
-			data:        formData,
-			contentType: false,
-			processData: false
-		} ).done( function ( response ) {
-			if ( response.success && response.data.avatar ) {
-				$( '#wp-user-avatars-photo' ).html( response.data.avatar );
-				$( '#wp-user-avatars-remove' ).show();
-				$( '#wp-user-avatars-ratings' ).removeClass( 'fancy-hidden' );
-				$( '#wp-user-avatars-ratings fieldset' ).prop( 'disabled', false );
-				$( '#wp-user-avatars' ).val( '' );
+			if ( avatar_is_working( $editor ) ) {
 				return;
 			}
 
-			$( '#wp-user-avatars-photo' ).html( originalAvatar );
-			avatar_feedback( response.data && response.data.message ? response.data.message : i10n_WPUserAvatars.uploadError );
-		} ).fail( function ( response ) {
-			var message = response.responseJSON && response.responseJSON.data && response.responseJSON.data.message;
-
-			$( '#wp-user-avatars-photo' ).html( originalAvatar );
-			avatar_feedback( message || i10n_WPUserAvatars.uploadError );
-		} ).always( function () {
-			avatar_lock( 'unlock' );
-		} );
-	} );
-
-	/**
-	 * Remove avatar
-	 *
-	 * @param {object} event The event
-	 */
-	$( '#wp-user-avatars-remove' ).on( 'click', function ( event ) {
-		event.preventDefault();
-
-		// Already removing
-		if ( avatar_working ) {
-			return;
-		}
-
-		// Prevent doubles
-		avatar_lock( 'lock' );
-
-		// Remove the URL
-		$.get( i10n_WPUserAvatars.ajaxUrl, {
-			action:   'remove_wp_user_avatars',
-			user_id:  i10n_WPUserAvatars.user_id,
-			_wpnonce: i10n_WPUserAvatars.deleteNonce
-		} ).done( function ( data ) {
-
-			// Update the UI
-			if ( '' !== data ) {
-				$( '#wp-user-avatars-photo' ).html( data );
-				$( '#wp-user-avatars-remove' ).hide();
-				$( '#wp-user-avatars-ratings' ).addClass( 'fancy-hidden' );
-				$( '#wp-user-avatars-ratings fieldset' ).prop( 'disabled', true );
+			if ( modal ) {
+				modal.open();
+				return;
 			}
 
-			avatar_lock( 'unlock' );
+			modal = wp.media( {
+				title:    i10n_WPUserAvatars.insertMediaTitle,
+				button:   { text: i10n_WPUserAvatars.insertIntoPost },
+				library:  { type: 'image' },
+				multiple: false
+			} );
+
+			modal.on( 'select', function () {
+				var mediaId = modal.state().get( 'selection' ).first().toJSON().id;
+
+				avatar_lock( $editor, true );
+				avatar_feedback( $editor, '' );
+
+				$.post( i10n_WPUserAvatars.ajaxUrl, {
+					action:   'assign_wp_user_avatars_media',
+					media_id: mediaId,
+					user_id:  $editor.data( 'user-id' ),
+					_wpnonce: $editor.data( 'media-nonce' )
+				} ).done( function ( data ) {
+					if ( '' !== data ) {
+						avatar_updated( $editor, data );
+						return;
+					}
+
+					avatar_feedback( $editor, i10n_WPUserAvatars.mediaError );
+				} ).fail( function () {
+					avatar_feedback( $editor, i10n_WPUserAvatars.mediaError );
+				} ).always( function () {
+					avatar_lock( $editor, false );
+				} );
+			} );
+
+			$editor.data( 'wp-user-avatars-modal', modal );
+			modal.open();
+		} );
+
+		/**
+		 * Upload an avatar as soon as a file is selected.
+		 */
+		$editor.find( '.wp-user-avatars-upload' ).on( 'change', function () {
+			var $upload = $( this ),
+				file = this.files && this.files[ 0 ],
+				formData,
+				originalAvatar,
+				previewUrl = '';
+
+			if ( ! file || avatar_is_working( $editor ) ) {
+				return;
+			}
+
+			avatar_lock( $editor, true );
+			avatar_feedback( $editor, '' );
+			originalAvatar = $editor.find( '.wp-user-avatars-photo' ).html();
+
+			if ( window.URL && window.URL.createObjectURL ) {
+				previewUrl = window.URL.createObjectURL( file );
+				$editor.find( '.wp-user-avatars-photo img' )
+					.attr( 'src', previewUrl )
+					.removeAttr( 'srcset' );
+			}
+
+			formData = new window.FormData();
+			formData.append( 'action', 'upload_wp_user_avatars' );
+			formData.append( 'user_id', $editor.data( 'user-id' ) );
+			formData.append( '_wpnonce', $editor.data( 'upload-nonce' ) );
+			formData.append( 'wp-user-avatars', file );
+			formData.append( 'rating', $editor.find( 'input[name="wp_user_avatars_rating"]:checked' ).val() || 'G' );
+
+			$.ajax( {
+				url:         i10n_WPUserAvatars.ajaxUrl,
+				type:        'POST',
+				data:        formData,
+				contentType: false,
+				processData: false
+			} ).done( function ( response ) {
+				if ( response.success && response.data.avatar ) {
+					avatar_updated( $editor, response.data.avatar );
+					$upload.val( '' );
+					return;
+				}
+
+				$editor.find( '.wp-user-avatars-photo' ).html( originalAvatar );
+				avatar_feedback( $editor, response.data && response.data.message ? response.data.message : i10n_WPUserAvatars.uploadError );
+			} ).fail( function ( response ) {
+				var message = response.responseJSON && response.responseJSON.data && response.responseJSON.data.message;
+
+				$editor.find( '.wp-user-avatars-photo' ).html( originalAvatar );
+				avatar_feedback( $editor, message || i10n_WPUserAvatars.uploadError );
+			} ).always( function () {
+				if ( previewUrl ) {
+					window.URL.revokeObjectURL( previewUrl );
+				}
+
+				avatar_lock( $editor, false );
+			} );
+		} );
+
+		/**
+		 * Remove an avatar with JavaScript while retaining the submit fallback.
+		 *
+		 * @param {object} event Click event.
+		 */
+		$editor.find( '.wp-user-avatars-remove' ).on( 'click', function ( event ) {
+			event.preventDefault();
+
+			if ( avatar_is_working( $editor ) ) {
+				return;
+			}
+
+			avatar_lock( $editor, true );
+			avatar_feedback( $editor, '' );
+
+			$.get( i10n_WPUserAvatars.ajaxUrl, {
+				action:   'remove_wp_user_avatars',
+				user_id:  $editor.data( 'user-id' ),
+				_wpnonce: $editor.data( 'delete-nonce' )
+			} ).done( function ( data ) {
+				if ( '' !== data ) {
+					$editor.find( '.wp-user-avatars-photo' ).html( data );
+					$editor.find( '.wp-user-avatars-remove' ).hide();
+					$editor.find( '.wp-user-avatars-ratings' ).addClass( 'fancy-hidden' );
+					$editor.find( '.wp-user-avatars-ratings fieldset' ).prop( 'disabled', true );
+					return;
+				}
+
+				avatar_feedback( $editor, i10n_WPUserAvatars.removeError );
+			} ).fail( function () {
+				avatar_feedback( $editor, i10n_WPUserAvatars.removeError );
+			} ).always( function () {
+				avatar_lock( $editor, false );
+			} );
 		} );
 	} );
 
 	/**
-	 * Lock the avatar fieldset
+	 * Return whether one editor is processing a request.
 	 *
-	 * @param {boolean} lock_or_unlock
+	 * @param {object} $editor Editor element.
+	 * @return {boolean} Whether the editor is locked.
 	 */
-	function avatar_lock( lock_or_unlock ) {
-		if ( lock_or_unlock === 'unlock' ) {
-			avatar_working = false;
-			$( '#wp-user-avatars-media, #wp-user-avatars-remove, #wp-user-avatars' ).prop( 'disabled', false );
-		} else {
-			avatar_working = true;
-			$( '#wp-user-avatars-media, #wp-user-avatars-remove, #wp-user-avatars' ).prop( 'disabled', true );
-		}
+	function avatar_is_working( $editor ) {
+		return true === $editor.data( 'wp-user-avatars-working' );
 	}
 
 	/**
-	 * Show upload feedback without interrupting the profile form.
+	 * Lock or unlock one avatar editor.
 	 *
+	 * @param {object}  $editor Editor element.
+	 * @param {boolean} locked  Whether controls should be locked.
+	 */
+	function avatar_lock( $editor, locked ) {
+		$editor.data( 'wp-user-avatars-working', locked );
+		$editor.find( '.wp-user-avatars-media, .wp-user-avatars-remove, .wp-user-avatars-upload' ).prop( 'disabled', locked );
+	}
+
+	/**
+	 * Update one editor after selecting or uploading an avatar.
+	 *
+	 * @param {object} $editor Editor element.
+	 * @param {string} avatar  Avatar HTML.
+	 */
+	function avatar_updated( $editor, avatar ) {
+		$editor.find( '.wp-user-avatars-photo' ).html( avatar );
+		$editor.find( '.wp-user-avatars-remove' ).show();
+		$editor.find( '.wp-user-avatars-ratings' ).removeClass( 'fancy-hidden' );
+		$editor.find( '.wp-user-avatars-ratings fieldset' ).prop( 'disabled', false );
+	}
+
+	/**
+	 * Show feedback without interrupting the surrounding form.
+	 *
+	 * @param {object} $editor Editor element.
 	 * @param {string} message Feedback message.
 	 */
-	function avatar_feedback( message ) {
-		$( '#wp-user-avatars-feedback' ).text( message );
+	function avatar_feedback( $editor, message ) {
+		$editor.find( '.wp-user-avatars-feedback' ).text( message );
 	}
 } );

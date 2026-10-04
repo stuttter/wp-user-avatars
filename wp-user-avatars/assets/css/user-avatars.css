@@ -1,4 +1,5 @@
-#wp-user-avatars-photo {
+#wp-user-avatars-photo,
+.wp-user-avatars-photo {
 	width: 90px;
 }
 
@@ -11,12 +12,72 @@
 }
 
 #wp-user-avatars-actions div,
-#wp-user-avatars-actions input[type=file] {
+#wp-user-avatars-actions input[type=file],
+.wp-user-avatars-actions div,
+.wp-user-avatars-actions input[type=file] {
 	text-overflow: ellipsis;
 	width: 100%;
 }
-#wp-user-avatars-actions input[type=file] {
+#wp-user-avatars-actions input[type=file],
+.wp-user-avatars-actions input[type=file] {
 	margin: 0 0 10px;
+}
+
+.wp-user-avatars-frontend-form .form-table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.wp-user-avatars-frontend-form .form-table th,
+.wp-user-avatars-frontend-form .form-table td {
+	padding: 10px;
+	text-align: left;
+	vertical-align: top;
+}
+
+.wp-user-avatars-frontend-form .form-table th {
+	padding-left: 0;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-photo img {
+	display: block;
+	height: auto;
+	max-width: 90px;
+}
+
+.wp-user-avatars-frontend-form .fancy-hidden {
+	display: none;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-notice-error,
+.wp-user-avatars-frontend-form .wp-user-avatars-feedback {
+	color: #b32d2e;
+}
+
+.wp-user-avatars-frontend-form .screen-reader-text {
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	width: 1px;
+}
+
+@media screen and ( max-width: 600px ) {
+	.wp-user-avatars-frontend-form .form-table,
+	.wp-user-avatars-frontend-form .form-table tbody,
+	.wp-user-avatars-frontend-form .form-table tr,
+	.wp-user-avatars-frontend-form .form-table th,
+	.wp-user-avatars-frontend-form .form-table td {
+		display: block;
+		width: auto;
+	}
+
+	.wp-user-avatars-frontend-form .form-table th,
+	.wp-user-avatars-frontend-form .form-table td {
+		padding-left: 0;
+		padding-right: 0;
+	}
 }
 
 /**

@@ -21,6 +21,11 @@ add_filter( 'map_meta_cap', 'wp_user_avatars_meta_caps', 10, 4 );
 add_action( 'admin_enqueue_scripts', 'wp_user_avatars_admin_enqueue_scripts' );
 add_action( 'wp_enqueue_scripts', 'wp_user_avatars_admin_enqueue_scripts' );
 
+// Front-end editor
+add_shortcode( 'wp_user_avatars', 'wp_user_avatars_shortcode' );
+add_action( 'template_redirect', 'wp_user_avatars_frontend_form_handler' );
+add_action( 'wp_enqueue_scripts', 'wp_user_avatars_frontend_enqueue_assets', 20 );
+
 // User profile
 add_action( 'show_user_profile',        'wp_user_avatars_edit_user_profile'        );
 add_action( 'edit_user_profile',        'wp_user_avatars_edit_user_profile'        );

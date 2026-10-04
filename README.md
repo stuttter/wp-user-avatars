@@ -14,7 +14,25 @@ I decided to create this plugin because no existing solutions integrated into Wo
 - Install through the WordPress plugin installer or Composer.
 - Activate WP User Avatars from the Plugins screen.
 - Edit a user profile to upload or select an avatar.
+- To provide the same editor on a normal page, add the `[wp_user_avatars]`
+  shortcode to that page.
 - Configure allowed roles and local-only avatars under Settings > Discussion.
+
+## Front-end editor
+
+The `[wp_user_avatars]` shortcode displays the avatar editor for the signed-in
+user. It does not create a profile page, registration flow, or membership
+system. Add it to an existing page and control access to that page with the
+tools already used by your site.
+
+The editor uses the same avatar capabilities, upload restrictions, ratings,
+and Media Library permissions as the WordPress profile and bbPress profile
+integrations. Users without Media Library access can still upload their own
+avatar when the site's avatar permissions allow it. The upload and remove
+controls also work when JavaScript is unavailable.
+
+Theme or plugin developers can render the same current-user editor with
+`wp_user_avatars_get_editor()`.
 
 ## Help
 
