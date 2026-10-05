@@ -26,7 +26,9 @@ registration flow, or membership system. Add either one to an existing page
 and control access to that page with the tools already used by your site.
 
 The block adds no heading or description by default. Add either inline in the
-editor when the surrounding page needs more context.
+editor when the surrounding page needs more context. It also supports the
+block editor's background, text, border, spacing, typography, and wide-alignment
+controls.
 
 The editor uses the same avatar capabilities, upload restrictions, ratings,
 and Media Library permissions as the WordPress profile and bbPress profile
@@ -36,6 +38,25 @@ controls also work when JavaScript is unavailable.
 
 Theme or plugin developers can render the same current-user editor with
 `wp_user_avatars_get_editor()`.
+
+The front-end editor uses semantic form groups instead of WordPress admin table
+markup. Themes can target the `wp-user-avatars-frontend-form` classes or set
+these custom properties on the block or one of the shortcode's ancestors:
+
+- `--wp-user-avatars-card-background`
+- `--wp-user-avatars-card-border-color`
+- `--wp-user-avatars-card-border-radius`
+- `--wp-user-avatars-card-shadow`
+- `--wp-user-avatars-button-background`
+- `--wp-user-avatars-button-border-color`
+- `--wp-user-avatars-button-color`
+- `--wp-user-avatars-button-hover-background`
+- `--wp-user-avatars-button-hover-border-color`
+- `--wp-user-avatars-button-hover-color`
+- `--wp-user-avatars-primary-background`
+- `--wp-user-avatars-primary-color`
+- `--wp-user-avatars-primary-hover-background`
+- `--wp-user-avatars-primary-hover-color`
 
 ## Help
 

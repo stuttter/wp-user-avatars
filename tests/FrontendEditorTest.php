@@ -115,8 +115,46 @@ final class FrontendEditorTest extends TestCase {
 		$this->assertStringContainsString( 'type="button"', $first );
 		$this->assertStringContainsString( 'data-user-id="7"', $first );
 		$this->assertStringContainsString( 'data-upload-nonce=', $first );
+		$this->assertStringContainsString( 'class="wp-user-avatars-upload-group"', $first );
+		$this->assertStringContainsString( 'class="wp-user-avatars-upload-layout"', $first );
+		$this->assertStringContainsString( 'class="wp-user-avatars-rating-options"', $first );
+		$this->assertStringContainsString( '<legend>Rating</legend>', $first );
+		$this->assertStringNotContainsString( '<table', $first );
 		$this->assertArrayHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] );
 		$this->assertArrayHasKey( 'wp_enqueue_style', $GLOBALS['wpua_test']['calls'] );
+	}
+
+	/**
+	 * The front-end renderer preserves the established safe rating default.
+	 *
+	 * @return void
+	 */
+	public function test_shortcode_defaults_an_invalid_rating_to_general_audiences(): void {
+		$user                         = $GLOBALS['wpua_test']['returns']['get_userdata'];
+		$user->wp_user_avatars_rating = 'invalid';
+
+		$output = wp_user_avatars_shortcode();
+
+		$this->assertStringContainsString( 'value="G" checked=', $output );
+		$this->assertSame( 'G', $user->wp_user_avatars_rating );
+	}
+
+	/**
+	 * Rendering without rating permission does not normalize rating state.
+	 *
+	 * @return void
+	 */
+	public function test_shortcode_does_not_change_rating_without_rating_permission(): void {
+		$user                         = $GLOBALS['wpua_test']['returns']['get_userdata'];
+		$user->wp_user_avatars_rating = 'invalid';
+		$GLOBALS['wpua_test']['callbacks']['current_user_can'] = static function ( $capability ) {
+			return 'edit_avatar_rating' !== $capability;
+		};
+
+		$output = wp_user_avatars_shortcode();
+
+		$this->assertStringNotContainsString( 'wp-user-avatars-rating-row', $output );
+		$this->assertSame( 'invalid', $user->wp_user_avatars_rating );
 	}
 
 	/**

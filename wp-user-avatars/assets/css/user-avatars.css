@@ -23,20 +23,33 @@
 	margin: 0 0 10px;
 }
 
-.wp-user-avatars-frontend-form .form-table {
-	border-collapse: collapse;
-	width: 100%;
-}
-
 .wp-user-avatars-avatar-editor-block {
-	background: var(--wp--preset--color--base, #fff);
-	border: 1px solid #dcdcde;
-	border-radius: 16px;
-	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+	--wp-user-avatars-card-background: var(--wp--preset--color--base, #fff);
+	--wp-user-avatars-card-border-color: #dcdcde;
+	--wp-user-avatars-card-border-radius: 16px;
+	--wp-user-avatars-card-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+	--wp-user-avatars-button-background: #f6f7f7;
+	--wp-user-avatars-button-border-color: #8c8f94;
+	--wp-user-avatars-button-color: #1d2327;
+	--wp-user-avatars-button-hover-background: #fff;
+	--wp-user-avatars-button-hover-border-color: #2271b1;
+	--wp-user-avatars-button-hover-color: #135e96;
+	--wp-user-avatars-primary-background: #2271b1;
+	--wp-user-avatars-primary-color: #fff;
+	--wp-user-avatars-primary-hover-background: #135e96;
+	--wp-user-avatars-primary-hover-color: #fff;
+	background: var(--wp-user-avatars-card-background);
+	border: 1px solid var(--wp-user-avatars-card-border-color);
+	border-radius: var(--wp-user-avatars-card-border-radius);
+	box-shadow: var(--wp-user-avatars-card-shadow);
 	box-sizing: border-box;
 	color: var(--wp--preset--color--contrast, #1d2327);
 	max-width: 720px;
 	padding: clamp(20px, 4vw, 36px);
+}
+
+.wp-user-avatars-avatar-editor-block.alignwide {
+	max-width: var(--wp--style--global--wide-size, 1200px);
 }
 
 .wp-user-avatars-avatar-editor-block .wp-user-avatars-block-heading {
@@ -51,54 +64,73 @@
 	margin-bottom: 24px;
 }
 
-.wp-user-avatars-avatar-editor-block .form-table tbody {
-	display: block;
+.wp-user-avatars-frontend-form {
+	margin: 0;
 }
 
-.wp-user-avatars-avatar-editor-block .form-table tr {
+.wp-user-avatars-frontend-form .wp-user-avatars-editor {
 	display: grid;
-	gap: 12px 24px;
+	gap: 24px;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-field-label,
+.wp-user-avatars-frontend-form .wp-user-avatars-ratings legend {
+	color: inherit;
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-field-label {
+	display: block;
+	margin: 0 0 12px;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-upload-layout {
+	align-items: center;
+	display: grid;
+	gap: 24px;
 	grid-template-columns: 112px minmax(0, 1fr);
 }
 
-.wp-user-avatars-avatar-editor-block .form-table th {
-	font-size: 0.875rem;
-	font-weight: 600;
-	grid-column: 1 / -1;
-	padding: 0;
-}
-
-.wp-user-avatars-avatar-editor-block .form-table td {
-	padding: 0;
-}
-
-.wp-user-avatars-avatar-editor-block .wp-user-avatars-photo {
+.wp-user-avatars-frontend-form .wp-user-avatars-photo {
 	align-self: start;
+	width: 96px;
 }
 
-.wp-user-avatars-avatar-editor-block .wp-user-avatars-photo img {
+.wp-user-avatars-frontend-form .wp-user-avatars-photo img {
 	border-radius: 50%;
 	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+	display: block;
 	height: 96px;
 	width: 96px;
 }
 
-.wp-user-avatars-avatar-editor-block .wp-user-avatars-actions {
-	align-self: center;
+.wp-user-avatars-frontend-form .wp-user-avatars-actions {
+	display: grid;
+	gap: 10px;
+	min-width: 0;
 }
 
-.wp-user-avatars-avatar-editor-block input[type="file"] {
+.wp-user-avatars-frontend-form .wp-user-avatars-action-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.wp-user-avatars-frontend-form input[type="file"] {
 	color: #50575e;
 	font: inherit;
+	max-width: 100%;
 }
 
-.wp-user-avatars-avatar-editor-block input[type="file"]::file-selector-button,
-.wp-user-avatars-avatar-editor-block .button {
-	background: #f6f7f7;
-	border: 1px solid #8c8f94;
+.wp-user-avatars-frontend-form input[type="file"]::file-selector-button,
+.wp-user-avatars-frontend-form .button {
+	background: var(--wp-user-avatars-button-background, #f6f7f7);
+	border: 1px solid var(--wp-user-avatars-button-border-color, #8c8f94);
 	border-radius: 999px;
 	box-sizing: border-box;
-	color: #1d2327;
+	color: var(--wp-user-avatars-button-color, #1d2327);
 	cursor: pointer;
 	font: inherit;
 	font-weight: 500;
@@ -108,74 +140,79 @@
 	text-decoration: none;
 }
 
-.wp-user-avatars-avatar-editor-block input[type="file"]::file-selector-button {
+.wp-user-avatars-frontend-form input[type="file"]::file-selector-button {
 	margin-inline-end: 10px;
 }
 
-.wp-user-avatars-avatar-editor-block .button:hover,
-.wp-user-avatars-avatar-editor-block input[type="file"]::file-selector-button:hover {
-	background: #fff;
-	border-color: #2271b1;
-	color: #135e96;
+.wp-user-avatars-frontend-form .button:hover,
+.wp-user-avatars-frontend-form input[type="file"]::file-selector-button:hover {
+	background: var(--wp-user-avatars-button-hover-background, #fff);
+	border-color: var(--wp-user-avatars-button-hover-border-color, #2271b1);
+	color: var(--wp-user-avatars-button-hover-color, #135e96);
 }
 
-.wp-user-avatars-avatar-editor-block .button-primary {
-	background: #2271b1;
-	border-color: #2271b1;
-	color: #fff;
+.wp-user-avatars-frontend-form .button:focus-visible,
+.wp-user-avatars-frontend-form input[type="file"]:focus-visible {
+	outline: 2px solid currentcolor;
+	outline-offset: 2px;
 }
 
-.wp-user-avatars-avatar-editor-block .button-primary:hover {
-	background: #135e96;
-	border-color: #135e96;
-	color: #fff;
+.wp-user-avatars-frontend-form .button:disabled {
+	cursor: not-allowed;
+	opacity: 0.65;
 }
 
-.wp-user-avatars-avatar-editor-block .wp-user-avatars-rating-row.fancy-hidden {
+.wp-user-avatars-frontend-form .button-primary {
+	background: var(--wp-user-avatars-primary-background, #2271b1);
+	border-color: var(--wp-user-avatars-primary-background, #2271b1);
+	color: var(--wp-user-avatars-primary-color, #fff);
+}
+
+.wp-user-avatars-frontend-form .button-primary:hover {
+	background: var(--wp-user-avatars-primary-hover-background, #135e96);
+	border-color: var(--wp-user-avatars-primary-hover-background, #135e96);
+	color: var(--wp-user-avatars-primary-hover-color, #fff);
+}
+
+.wp-user-avatars-frontend-form .fancy-hidden {
 	display: none;
 }
 
-.wp-user-avatars-avatar-editor-block .wp-user-avatars-rating-row .wp-user-avatars-ratings {
-	grid-column: 1 / -1;
+.wp-user-avatars-frontend-form .wp-user-avatars-rating-row {
+	border-top: 1px solid var(--wp-user-avatars-card-border-color, #dcdcde);
+	padding-top: 24px;
 }
 
-.wp-user-avatars-avatar-editor-block .wp-user-avatars-ratings fieldset {
+.wp-user-avatars-frontend-form .wp-user-avatars-ratings fieldset {
 	border: 0;
 	margin: 0;
 	min-inline-size: 0;
 	padding: 0;
 }
 
-.wp-user-avatars-avatar-editor-block .wp-user-avatars-ratings label {
+.wp-user-avatars-frontend-form .wp-user-avatars-ratings legend {
+	margin-bottom: 12px;
+	padding: 0;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-rating-options {
+	display: grid;
+	gap: 8px;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-rating-options br {
+	display: none;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-ratings label {
 	align-items: baseline;
-	display: inline-flex;
+	display: flex;
 	gap: 4px;
 	max-width: 100%;
 }
 
-.wp-user-avatars-avatar-editor-block .wp-user-avatars-submit {
+.wp-user-avatars-frontend-form .wp-user-avatars-submit {
 	margin: 24px 0 0;
-}
-
-.wp-user-avatars-frontend-form .form-table th,
-.wp-user-avatars-frontend-form .form-table td {
-	padding: 10px;
-	text-align: start;
-	vertical-align: top;
-}
-
-.wp-user-avatars-frontend-form .form-table th {
-	padding-inline-start: 0;
-}
-
-.wp-user-avatars-frontend-form .wp-user-avatars-photo img {
-	display: block;
-	height: auto;
-	max-width: 90px;
-}
-
-.wp-user-avatars-frontend-form .fancy-hidden {
-	display: none;
 }
 
 .wp-user-avatars-frontend-form .wp-user-avatars-notice-error,
@@ -183,33 +220,9 @@
 	color: #b32d2e;
 }
 
-.wp-user-avatars-frontend-form .screen-reader-text {
-	clip: rect(1px, 1px, 1px, 1px);
-	clip-path: inset(50%);
-	height: 1px;
-	overflow: hidden;
-	position: absolute;
-	width: 1px;
-}
-
 @media screen and ( max-width: 600px ) {
-	.wp-user-avatars-avatar-editor-block .form-table tr {
+	.wp-user-avatars-frontend-form .wp-user-avatars-upload-layout {
 		grid-template-columns: 1fr;
-	}
-
-	.wp-user-avatars-frontend-form .form-table,
-	.wp-user-avatars-frontend-form .form-table tbody,
-	.wp-user-avatars-frontend-form .form-table tr,
-	.wp-user-avatars-frontend-form .form-table th,
-	.wp-user-avatars-frontend-form .form-table td {
-		display: block;
-		width: auto;
-	}
-
-	.wp-user-avatars-frontend-form .form-table th,
-	.wp-user-avatars-frontend-form .form-table td {
-		padding-left: 0;
-		padding-right: 0;
 	}
 }
 

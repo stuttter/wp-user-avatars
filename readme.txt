@@ -62,11 +62,13 @@ It works OK, but you'll want to consider exactly what level of privacy is best f
 
 Add the User Avatar Editor block or `[wp_user_avatars]` shortcode to an existing page. Both display the avatar editor for the signed-in user and do not create a profile page, registration flow, or membership system.
 
-The block adds no heading or description by default. Add either inline in the editor when the surrounding page needs more context.
+The block adds no heading or description by default. Add either inline in the editor when the surrounding page needs more context. The block also supports background, text, border, spacing, typography, and wide-alignment controls.
 
 The shortcode uses the same avatar capabilities, upload restrictions, ratings, and Media Library permissions as the WordPress profile and bbPress profile integrations. Users without Media Library access can still upload their own avatar when the site's avatar permissions allow it. Upload and removal also work without JavaScript.
 
 Theme and plugin developers can render the same current-user editor with `wp_user_avatars_get_editor()`.
+
+The front-end editor uses semantic form groups instead of WordPress admin table markup. Themes can customize the `wp-user-avatars-frontend-form` classes. The block also exposes `--wp-user-avatars-card-*`, `--wp-user-avatars-button-*`, and `--wp-user-avatars-primary-*` CSS custom properties for its card and controls.
 
 = How do I display a larger or sharper avatar? =
 

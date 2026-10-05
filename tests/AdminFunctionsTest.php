@@ -105,17 +105,18 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertNotFalse( $style );
 		$this->assertNotFalse( $rtl_style );
 		$this->assertSame( '5497a87bdf34c1dcf9075f4822279caf830720b6cc860323d3a19a8437a2c05f', hash( 'sha256', $script ) );
-		$this->assertSame( 'a2a106e6a142fc13261002e0e097d4b54005a865d0c1e23b359ad9c54671c130', hash( 'sha256', $style ) );
+		$this->assertSame( '689bfa16528522d09cf029fd8497b3a67211e2d85e804800cf9dae16da139546', hash( 'sha256', $style ) );
 		$this->assertSame( '6776d64ca275d70460c691144a0afd7a716c07c5d48e464664175b1ea5eac833', hash( 'sha256', $rtl_style ) );
-		$this->assertStringContainsString( 'text-align: start;', $style );
-		$this->assertStringContainsString( 'padding-inline-start: 0;', $style );
+		$this->assertStringContainsString( 'margin-inline-end: 10px;', $style );
 		$this->assertStringContainsString( '#wp-user-avatars-user-settings #wp-user-avatars-ratings fieldset', $style );
 		$this->assertStringContainsString( '#wp-user-avatars-user-settings #wp-user-avatars-ratings fieldset', $rtl_style );
 		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $style );
 		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $rtl_style );
-		$this->assertStringContainsString( '.wp-user-avatars-rating-row .wp-user-avatars-ratings', $style );
-		$this->assertStringContainsString( 'grid-column: 1 / -1;', $style );
-		$this->assertSame( 202610040008, wp_user_avatars_get_asset_version() );
+		$this->assertStringContainsString( '.wp-user-avatars-frontend-form .wp-user-avatars-rating-row', $style );
+		$this->assertStringContainsString( '.wp-user-avatars-frontend-form .wp-user-avatars-upload-layout', $style );
+		$this->assertStringContainsString( '--wp-user-avatars-card-background:', $style );
+		$this->assertStringNotContainsString( '.wp-user-avatars-frontend-form .form-table', $style );
+		$this->assertSame( 202610040009, wp_user_avatars_get_asset_version() );
 	}
 
 	/**
@@ -145,6 +146,11 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertSame( 'file:./editor.css', $metadata['editorStyle'] );
 		$this->assertSame( '', $metadata['attributes']['heading']['default'] );
 		$this->assertSame( '', $metadata['attributes']['description']['default'] );
+		$this->assertSame( array( 'wide' ), $metadata['supports']['align'] );
+		$this->assertTrue( $metadata['supports']['border']['radius'] );
+		$this->assertTrue( $metadata['supports']['color']['background'] );
+		$this->assertTrue( $metadata['supports']['spacing']['padding'] );
+		$this->assertTrue( $metadata['supports']['typography']['fontSize'] );
 		$this->assertStringContainsString( "registerBlockType( 'wp-user-avatars/avatar-editor'", $editor_script );
 		$this->assertStringContainsString( "'aria-label': __( 'Avatar editor heading'", $editor_script );
 		$this->assertStringContainsString( 'wp-user-avatars-block-preview__avatar', $editor_script );
@@ -152,12 +158,15 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertStringContainsString( 'disabled: true', $editor_script );
 		$this->assertStringContainsString( "__( 'Choose File'", $editor_script );
 		$this->assertStringContainsString( "__( 'Choose from Media'", $editor_script );
+		$this->assertStringContainsString( "'fieldset',", $editor_script );
+		$this->assertStringContainsString( "'legend'", $editor_script );
+		$this->assertStringContainsString( "__( 'Rating'", $editor_script );
 		$this->assertStringContainsString( "__( 'Save avatar'", $editor_script );
 		$this->assertStringContainsString( 'wp-user-avatars-block-preview', $editor_style );
-		$this->assertSame( '05abe168a904fae7cd51ccc1011a9da73fe6240916f0f19097362d553c9b7d6e', hash( 'sha256', $editor_script ) );
-		$this->assertSame( 'c20ad8e78e9530abb52ea96a729a981f5c8047435055fef447fc9431e0258d3a', hash( 'sha256', $editor_style ) );
-		$this->assertSame( '27e1d63a5cf2ea38dffae48c256cd1d6c90fa906b6712e4bff9902a9ca68aa2f', hash( 'sha256', $metadata_source ) );
-		$this->assertSame( '202610040009', $editor_asset['version'] );
+		$this->assertSame( '48468b7d402b4ea79b9275334d1afeea57e6c8f3a3dbdfe18cbe547f1667c815', hash( 'sha256', $editor_script ) );
+		$this->assertSame( '9fd291da482c06530e772dd9e5677c4349929f32929778ee0dcd064941267085', hash( 'sha256', $editor_style ) );
+		$this->assertSame( 'b888294e3458d89872f9b961025127227492c1c81857b3de6e4f1bb51ab2a9db', hash( 'sha256', $metadata_source ) );
+		$this->assertSame( '202610040010', $editor_asset['version'] );
 		$this->assertSame(
 			array( 'wp-block-editor', 'wp-blocks', 'wp-element', 'wp-i18n' ),
 			$editor_asset['dependencies']

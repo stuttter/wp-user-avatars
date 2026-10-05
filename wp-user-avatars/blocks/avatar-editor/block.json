@@ -21,6 +21,24 @@
 	"editorScript": "file:./editor.js",
 	"editorStyle": "file:./editor.css",
 	"supports": {
-		"html": false
+		"align": [ "wide" ],
+		"border": {
+			"color": true,
+			"radius": true,
+			"width": true
+		},
+		"color": {
+			"background": true,
+			"text": true
+		},
+		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
 	}
 }

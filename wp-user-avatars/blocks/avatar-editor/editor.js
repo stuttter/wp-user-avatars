@@ -20,7 +20,25 @@
 			__( 'user', 'wp-user-avatars' )
 		],
 		supports: {
-			html: false
+			align: [ 'wide' ],
+			border: {
+				color: true,
+				radius: true,
+				width: true
+			},
+			color: {
+				background: true,
+				text: true
+			},
+			html: false,
+			spacing: {
+				margin: true,
+				padding: true
+			},
+			typography: {
+				fontSize: true,
+				lineHeight: true
+			}
 		},
 		attributes: {
 			heading: {
@@ -33,6 +51,13 @@
 			}
 		},
 		edit: function ( props ) {
+			var ratings = [
+				[ 'G', __( 'Suitable for all audiences', 'wp-user-avatars' ) ],
+				[ 'PG', __( 'Possibly offensive, usually for audiences 13 and above', 'wp-user-avatars' ) ],
+				[ 'R', __( 'Intended for adult audiences above 17', 'wp-user-avatars' ) ],
+				[ 'X', __( 'Even more mature than above', 'wp-user-avatars' ) ]
+			];
+
 			return createElement(
 				'div',
 				useBlockProps( { className: 'wp-user-avatars-avatar-editor-block wp-user-avatars-block-preview' } ),
@@ -93,6 +118,32 @@
 								{ disabled: true, type: 'button' },
 								__( 'Choose from Media', 'wp-user-avatars' )
 							)
+						)
+					),
+					createElement(
+						'fieldset',
+						{
+							className: 'wp-user-avatars-block-preview__ratings',
+							disabled: true
+						},
+						createElement( 'legend', { className: 'wp-user-avatars-block-preview__label' }, __( 'Rating', 'wp-user-avatars' ) ),
+						createElement(
+							'div',
+							{ className: 'wp-user-avatars-block-preview__rating-options' },
+							ratings.map( function ( rating, index ) {
+								return createElement(
+									'label',
+									{ key: rating[ 0 ] },
+									createElement( 'input', {
+										checked: 0 === index,
+										disabled: true,
+										name: 'wp-user-avatars-rating-preview',
+										readOnly: true,
+										type: 'radio'
+									} ),
+									createElement( 'span', null, rating[ 0 ] + ': ' + rating[ 1 ] )
+								);
+							} )
 						)
 					),
 					createElement(

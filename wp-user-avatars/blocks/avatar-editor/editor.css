@@ -1,12 +1,30 @@
 .wp-user-avatars-block-preview {
-	background: var(--wp--preset--color--base, #fff);
-	border: 1px solid #dcdcde;
-	border-radius: 16px;
-	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+	--wp-user-avatars-card-background: var(--wp--preset--color--base, #fff);
+	--wp-user-avatars-card-border-color: #dcdcde;
+	--wp-user-avatars-card-border-radius: 16px;
+	--wp-user-avatars-card-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+	--wp-user-avatars-button-background: #f6f7f7;
+	--wp-user-avatars-button-border-color: #8c8f94;
+	--wp-user-avatars-button-color: #1d2327;
+	--wp-user-avatars-button-hover-background: #fff;
+	--wp-user-avatars-button-hover-border-color: #2271b1;
+	--wp-user-avatars-button-hover-color: #135e96;
+	--wp-user-avatars-primary-background: #2271b1;
+	--wp-user-avatars-primary-color: #fff;
+	--wp-user-avatars-primary-hover-background: #135e96;
+	--wp-user-avatars-primary-hover-color: #fff;
+	background: var(--wp-user-avatars-card-background);
+	border: 1px solid var(--wp-user-avatars-card-border-color);
+	border-radius: var(--wp-user-avatars-card-border-radius);
+	box-shadow: var(--wp-user-avatars-card-shadow);
 	box-sizing: border-box;
 	color: var(--wp--preset--color--contrast, #1d2327);
 	max-width: 720px;
 	padding: clamp(20px, 4vw, 36px);
+}
+
+.wp-user-avatars-block-preview.alignwide {
+	max-width: var(--wp--style--global--wide-size, 1200px);
 }
 
 .wp-user-avatars-block-preview__copy {
@@ -83,11 +101,11 @@
 }
 
 .wp-user-avatars-block-preview button {
-	background: #f6f7f7;
-	border: 1px solid #8c8f94;
+	background: var(--wp-user-avatars-button-background);
+	border: 1px solid var(--wp-user-avatars-button-border-color);
 	border-radius: 999px;
 	box-sizing: border-box;
-	color: #1d2327;
+	color: var(--wp-user-avatars-button-color);
 	font: inherit;
 	font-weight: 500;
 	line-height: 1.2;
@@ -96,10 +114,34 @@
 	padding: 9px 18px;
 }
 
+.wp-user-avatars-block-preview__ratings {
+	border: 0;
+	border-top: 1px solid var(--wp-user-avatars-card-border-color);
+	margin-top: 24px;
+	min-inline-size: 0;
+	padding: 0;
+	padding-top: 24px;
+}
+
+.wp-user-avatars-block-preview__ratings legend {
+	padding: 0;
+}
+
+.wp-user-avatars-block-preview__rating-options {
+	display: grid;
+	gap: 8px;
+}
+
+.wp-user-avatars-block-preview__rating-options label {
+	align-items: baseline;
+	display: flex;
+	gap: 4px;
+}
+
 .wp-user-avatars-block-preview .wp-user-avatars-block-preview__save {
-	background: #2271b1;
-	border-color: #2271b1;
-	color: #fff;
+	background: var(--wp-user-avatars-primary-background);
+	border-color: var(--wp-user-avatars-primary-background);
+	color: var(--wp-user-avatars-primary-color);
 	margin-top: 24px;
 }
 
