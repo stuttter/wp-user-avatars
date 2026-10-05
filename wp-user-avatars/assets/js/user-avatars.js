@@ -4,6 +4,15 @@ jQuery( document ).ready( function ( $ ) {
 	$( '.wp-user-avatars-editor' ).each( function () {
 		var $editor = $( this );
 
+		if ( 'undefined' !== typeof wp && wp.media ) {
+			$editor.find( '.wp-user-avatars-media' ).prop( 'hidden', false );
+		}
+
+		if ( '0' === $editor.attr( 'data-has-avatar' ) ) {
+			$editor.find( '.wp-user-avatars-rating-row, .wp-user-avatars-ratings' ).addClass( 'fancy-hidden' );
+			$editor.find( '.wp-user-avatars-ratings fieldset' ).prop( 'disabled', true );
+		}
+
 		/**
 		 * Invoke the media modal.
 		 */
@@ -25,6 +34,10 @@ jQuery( document ).ready( function ( $ ) {
 				library:  { type: 'image' },
 				multiple: false
 			} );
+
+			if ( ! wp.media.frames.wp_user_avatars_modal ) {
+				wp.media.frames.wp_user_avatars_modal = modal;
+			}
 
 			modal.on( 'select', function () {
 				var mediaId = modal.state().get( 'selection' ).first().toJSON().id;
@@ -138,6 +151,7 @@ jQuery( document ).ready( function ( $ ) {
 			} ).done( function ( data ) {
 				if ( '' !== data ) {
 					$editor.find( '.wp-user-avatars-photo' ).html( data );
+					$editor.attr( 'data-has-avatar', '0' );
 					$editor.find( '.wp-user-avatars-remove' ).hide();
 					$editor.find( '.wp-user-avatars-rating-row' ).addClass( 'fancy-hidden' );
 					$editor.find( '.wp-user-avatars-ratings' ).addClass( 'fancy-hidden' );
@@ -183,6 +197,7 @@ jQuery( document ).ready( function ( $ ) {
 	 */
 	function avatar_updated( $editor, avatar ) {
 		$editor.find( '.wp-user-avatars-photo' ).html( avatar );
+		$editor.attr( 'data-has-avatar', '1' );
 		$editor.find( '.wp-user-avatars-remove' ).show();
 		$editor.find( '.wp-user-avatars-rating-row' ).removeClass( 'fancy-hidden' );
 		$editor.find( '.wp-user-avatars-ratings' ).removeClass( 'fancy-hidden' );

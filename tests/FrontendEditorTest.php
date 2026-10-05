@@ -106,12 +106,15 @@ final class FrontendEditorTest extends TestCase {
 	public function test_shortcode_renders_multiple_scoped_editor_instances(): void {
 		$first  = wp_user_avatars_shortcode();
 		$second = wp_user_avatars_shortcode();
+		preg_match( '/id="(wp-user-avatars(?:-\d+)?)" class="standard-text wp-user-avatars-upload"/', $first, $first_ids );
+		preg_match( '/id="(wp-user-avatars(?:-\d+)?)" class="standard-text wp-user-avatars-upload"/', $second, $second_ids );
 
 		$this->assertStringContainsString( 'class="wp-user-avatars-editor"', $first );
 		$this->assertStringContainsString( 'enctype="multipart/form-data"', $first );
 		$this->assertStringContainsString( 'name="wp_user_avatars_frontend_action"', $first );
-		$this->assertStringContainsString( 'id="wp-user-avatars"', $first );
-		$this->assertStringContainsString( 'id="wp-user-avatars-2"', $second );
+		$this->assertArrayHasKey( 1, $first_ids );
+		$this->assertArrayHasKey( 1, $second_ids );
+		$this->assertNotSame( $first_ids[1], $second_ids[1] );
 		$this->assertStringContainsString( 'type="button"', $first );
 		$this->assertStringContainsString( 'data-user-id="7"', $first );
 		$this->assertStringContainsString( 'data-upload-nonce=', $first );
@@ -122,6 +125,21 @@ final class FrontendEditorTest extends TestCase {
 		$this->assertStringNotContainsString( '<table', $first );
 		$this->assertArrayHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] );
 		$this->assertArrayHasKey( 'wp_enqueue_style', $GLOBALS['wpua_test']['calls'] );
+	}
+
+	/**
+	 * Implicit form submission updates instead of activating avatar removal.
+	 *
+	 * @return void
+	 */
+	public function test_shortcode_places_default_update_action_before_remove_action(): void {
+		$output = wp_user_avatars_shortcode();
+		$update = strpos( $output, 'value="update" class="wp-user-avatars-default-submit"' );
+		$remove = strpos( $output, 'value="remove"' );
+
+		$this->assertNotFalse( $update );
+		$this->assertNotFalse( $remove );
+		$this->assertLessThan( $remove, $update );
 	}
 
 	/**
@@ -222,6 +240,7 @@ final class FrontendEditorTest extends TestCase {
 
 		$this->assertStringContainsString( 'wp-user-avatars-avatar-editor-block', $output );
 		$this->assertStringContainsString( 'log in', strtolower( $output ) );
+		$this->assertArrayHasKey( 'wp_enqueue_style', $GLOBALS['wpua_test']['calls'] );
 	}
 
 	/**
@@ -239,17 +258,54 @@ final class FrontendEditorTest extends TestCase {
 	}
 
 	/**
-	 * The empty avatar state hides the complete rating row without selector support.
+	 * The empty avatar state keeps rating available to the non-JavaScript upload path.
 	 *
 	 * @return void
 	 */
-	public function test_block_hides_empty_avatar_rating_row_in_markup(): void {
+	public function test_block_keeps_empty_avatar_rating_available_in_markup(): void {
 		$user                  = $GLOBALS['wpua_test']['returns']['get_userdata'];
 		$user->wp_user_avatars = array();
 
 		$output = wp_user_avatars_render_block();
 
-		$this->assertStringContainsString( 'class="wp-user-avatars-rating-row fancy-hidden"', $output );
+		$this->assertStringContainsString( 'data-has-avatar="0"', $output );
+		$this->assertStringContainsString( 'class="wp-user-avatars-rating-row"', $output );
+		$this->assertStringNotContainsString( '<fieldset disabled=', $output );
+	}
+
+	/**
+	 * JavaScript-only Media Library selection stays hidden until the script runs.
+	 *
+	 * @return void
+	 */
+	public function test_shortcode_hides_media_library_control_without_javascript(): void {
+		$output = wp_user_avatars_shortcode();
+
+		$this->assertMatchesRegularExpression( '/<button[^>]+class="button wp-user-avatars-media"[^>]+hidden/', $output );
+		$this->assertStringNotContainsString( 'hide-if-no-js wp-user-avatars-media', $output );
+	}
+
+	/**
+	 * Admin and front-end editors share one ID namespace on mixed screens.
+	 *
+	 * @return void
+	 */
+	public function test_admin_and_frontend_editors_do_not_duplicate_ids(): void {
+		$user = $GLOBALS['wpua_test']['returns']['get_userdata'];
+		$GLOBALS['wpua_test']['callbacks']['current_user_can'] = static function ( $capability ) {
+			return 'remove_avatar' !== $capability;
+		};
+
+		ob_start();
+		wp_user_avatars_section_content( $user );
+		$admin  = (string) ob_get_clean();
+		$output = $admin . wp_user_avatars_shortcode() . wp_user_avatars_shortcode();
+
+		preg_match_all( '/\sid="([^"]+)"/', $output, $matches );
+
+		$this->assertNotEmpty( $matches[1] );
+		$this->assertSame( $matches[1], array_values( array_unique( $matches[1] ) ) );
+		$this->assertStringNotContainsString( 'name="_wp_user_avatars_nonce"', wp_user_avatars_shortcode() );
 	}
 
 	/**

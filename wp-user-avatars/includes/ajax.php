@@ -43,7 +43,7 @@ function wp_user_avatars_action_remove_avatars() {
 
 	// Output the default avatar
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-		echo wp_kses_post( wp_user_avatars_get_avatar_preview( $user_id, 90 ) );
+		echo wp_kses_post( wp_user_avatars_get_avatar_preview( $user_id, 250 ) );
 		die();
 	}
 }
@@ -89,7 +89,7 @@ function wp_user_avatars_ajax_assign_media() {
 
 	// Output the new avatar
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-		echo wp_kses_post( wp_user_avatars_get_avatar_preview( $user_id, 90 ) );
+		echo wp_kses_post( wp_user_avatars_get_avatar_preview( $user_id, 250 ) );
 		die();
 	}
 }
@@ -131,7 +131,7 @@ function wp_user_avatars_ajax_upload() {
 
 	wp_send_json_success(
 		array(
-			'avatar' => wp_user_avatars_get_avatar_preview( $user_id, 90 ),
+			'avatar' => wp_user_avatars_get_avatar_preview( $user_id, 250 ),
 		)
 	);
 }

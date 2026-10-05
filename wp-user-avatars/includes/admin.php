@@ -172,11 +172,32 @@ function wp_user_avatars_enqueue_assets( $user_id ) {
 	wp_localize_script( 'wp-user-avatars', 'i10n_WPUserAvatars', array(
 		'insertMediaTitle' => esc_html__( 'Choose an Avatar', 'wp-user-avatars' ),
 		'insertIntoPost'   => esc_html__( 'Set as avatar',    'wp-user-avatars' ),
+		'deleteNonce'      => wp_create_nonce( 'remove_wp_user_avatars_nonce' ),
+		'mediaNonce'       => wp_create_nonce( 'assign_wp_user_avatars_nonce' ),
+		'uploadNonce'      => wp_create_nonce( 'upload_wp_user_avatars_nonce' ),
 		'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
 		'mediaError'       => esc_html__( 'The avatar could not be selected. Please try again.', 'wp-user-avatars' ),
 		'removeError'      => esc_html__( 'The avatar could not be removed. Please try again.', 'wp-user-avatars' ),
 		'uploadError'      => esc_html__( 'The avatar could not be uploaded. Please try again.', 'wp-user-avatars' ),
+		'user_id'          => $user_id,
 	) );
+}
+
+/**
+ * Return a unique suffix for one avatar editor instance.
+ *
+ * The admin and front-end renderers share this counter because both can appear
+ * on the same request when another plugin embeds the current-user editor.
+ *
+ * @since 2.1.0
+ *
+ * @return string Empty for the first editor, or a numbered suffix.
+ */
+function wp_user_avatars_get_editor_id_suffix() {
+	static $instance = 0;
+	++$instance;
+
+	return 1 === $instance ? '' : '-' . $instance;
 }
 
 /**
@@ -231,23 +252,18 @@ function wp_user_avatars_edit_user_profile( $user = 0 ) {
  *
  * @since 0.1.0
  *
- * @param WP_User|null        $user User object.
- * @param array<string, bool> $args Rendering options.
+ * @param WP_User|null $user User object.
  *
  * @return void
  */
-function wp_user_avatars_section_content( $user = null, $args = array() ) {
+function wp_user_avatars_section_content( $user = null ) {
 
 	// Bail if no user
 	if ( empty( $user->ID ) ) {
 		return;
 	}
 
-	static $instance = 0;
-	++$instance;
-
-	$is_frontend = ! empty( $args['frontend'] );
-	$suffix      = 1 === $instance ? '' : '-' . $instance;
+	$suffix      = wp_user_avatars_get_editor_id_suffix();
 	$file_id     = 'wp-user-avatars' . $suffix;
 	$photo_id    = 'wp-user-avatars-photo' . $suffix;
 	$actions_id  = 'wp-user-avatars-actions' . $suffix;
@@ -307,33 +323,19 @@ function wp_user_avatars_section_content( $user = null, $args = array() ) {
 						// User needs additional caps to remove existing avatar
 						if ( current_user_can( 'remove_avatar', $user->ID ) ) : ?>
 
-							<?php if ( $is_frontend ) : ?>
+							<?php $remove_url = add_query_arg( array(
+								'action'   => 'remove-wp-user-avatars',
+								'user_id'  => $user->ID,
+								'_wpnonce' => false,
+							) ); ?>
 
-								<button type="submit" name="wp_user_avatars_frontend_action" value="remove" class="button item-delete submitdelete deletion wp-user-avatars-remove" id="<?php echo esc_attr( $remove_id ); ?>"
-									<?php if ( empty( $user->wp_user_avatars ) ) : ?>
-										style="display:none;"
-									<?php endif; ?>
-								>
-									<?php esc_html_e( 'Remove', 'wp-user-avatars' ); ?>
-								</button>
-
-							<?php else : ?>
-
-								<?php $remove_url = add_query_arg( array(
-									'action'   => 'remove-wp-user-avatars',
-									'user_id'  => $user->ID,
-									'_wpnonce' => false,
-								) ); ?>
-
-								<a href="<?php echo esc_url( $remove_url ); ?>" class="button item-delete submitdelete deletion wp-user-avatars-remove" id="<?php echo esc_attr( $remove_id ); ?>"
-									<?php if ( empty( $user->wp_user_avatars ) ) : ?>
-										style="display:none;"
-									<?php endif; ?>
-								>
-									<?php esc_html_e( 'Remove', 'wp-user-avatars' ); ?>
-								</a>
-
-							<?php endif; ?>
+							<a href="<?php echo esc_url( $remove_url ); ?>" class="button item-delete submitdelete deletion wp-user-avatars-remove" id="<?php echo esc_attr( $remove_id ); ?>"
+								<?php if ( empty( $user->wp_user_avatars ) ) : ?>
+									style="display:none;"
+								<?php endif; ?>
+							>
+								<?php esc_html_e( 'Remove', 'wp-user-avatars' ); ?>
+							</a>
 
 						<?php endif; ?>
 
@@ -352,7 +354,7 @@ function wp_user_avatars_section_content( $user = null, $args = array() ) {
 		// User needs additional caps to edit ratings
 		if ( current_user_can( 'edit_avatar_rating', $user->ID ) ) : ?>
 
-			<tr class="wp-user-avatars-rating-row<?php echo $is_frontend && empty( $user->wp_user_avatars ) ? ' fancy-hidden' : ''; ?>">
+			<tr class="wp-user-avatars-rating-row">
 				<th scope="row"><?php esc_html_e( 'Rating', 'wp-user-avatars' ); ?></th>
 			<td
 				id="<?php echo esc_attr( $ratings_id ); ?>"

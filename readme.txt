@@ -64,11 +64,11 @@ Add the User Avatar Editor block or `[wp_user_avatars]` shortcode to an existing
 
 The block adds no heading or description by default. Add either inline in the editor when the surrounding page needs more context. The block also supports background, text, border, spacing, typography, and wide-alignment controls.
 
-The shortcode uses the same avatar capabilities, upload restrictions, ratings, and Media Library permissions as the WordPress profile and bbPress profile integrations. Users without Media Library access can still upload their own avatar when the site's avatar permissions allow it. Upload and removal also work without JavaScript.
+The shortcode uses the same avatar capabilities, upload restrictions, ratings, and Media Library permissions as the WordPress profile and bbPress profile integrations. Users without Media Library access can still upload their own avatar when the site's avatar permissions allow it. Uploads can include a rating without JavaScript. Rating changes and removal also work without JavaScript when an avatar already exists. Choosing an existing Media Library image requires JavaScript.
 
 Theme and plugin developers can render the same current-user editor with `wp_user_avatars_get_editor()`.
 
-The front-end editor uses semantic form groups instead of WordPress admin table markup. Themes can customize the `wp-user-avatars-frontend-form` classes. The block also exposes `--wp-user-avatars-card-*`, `--wp-user-avatars-button-*`, and `--wp-user-avatars-primary-*` CSS custom properties for its card and controls.
+The front-end editor uses semantic form groups instead of WordPress admin table markup. Themes can customize the `wp-user-avatars-frontend-form` classes. The block exposes `--wp-user-avatars-card-*` CSS custom properties on its wrapper. The block controls and shortcode expose `--wp-user-avatars-button-*` and `--wp-user-avatars-primary-*` properties on the block wrapper or an ancestor of the shortcode.
 
 = How do I display a larger or sharper avatar? =
 
@@ -111,7 +111,7 @@ For a directly uploaded avatar or a locally stored Media Library attachment, a d
 == Changelog ==
 
 = 2.1.0 =
-* Add a standalone `[wp_user_avatars]` editor for normal pages.
+* Add a User Avatar Editor block and `[wp_user_avatars]` shortcode for normal pages.
 
 = 2.0.1 =
 * Avoid warnings and deny avatar capability checks without a valid target user.

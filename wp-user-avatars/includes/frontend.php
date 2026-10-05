@@ -47,6 +47,8 @@ function wp_user_avatars_register_block() {
  * @return string Block markup.
  */
 function wp_user_avatars_render_block( $attributes = array() ) {
+	wp_user_avatars_enqueue_styles();
+
 	$editor = wp_user_avatars_get_editor();
 
 	if ( '' === $editor ) {
@@ -109,7 +111,10 @@ function wp_user_avatars_get_editor() {
 	ob_start();
 	?>
 	<form class="wp-user-avatars-frontend-form" method="post" enctype="multipart/form-data">
-		<?php wp_nonce_field( 'wp_user_avatars_frontend_nonce', '_wp_user_avatars_frontend_nonce', false ); ?>
+		<input type="hidden" name="_wp_user_avatars_frontend_nonce" value="<?php echo esc_attr( wp_create_nonce( 'wp_user_avatars_frontend_nonce' ) ); ?>" />
+		<button type="submit" name="wp_user_avatars_frontend_action" value="update" class="wp-user-avatars-default-submit" tabindex="-1" aria-hidden="true">
+			<?php esc_html_e( 'Save avatar', 'wp-user-avatars' ); ?>
+		</button>
 		<?php if ( is_wp_error( $error ) ) : ?>
 			<p class="wp-user-avatars-notice wp-user-avatars-notice-error" role="alert">
 				<?php echo esc_html( $error->get_error_message() ); ?>
@@ -139,10 +144,7 @@ function wp_user_avatars_get_editor() {
  * @return void
  */
 function wp_user_avatars_frontend_editor_content( WP_User $user ) {
-	static $instance = 0;
-	++$instance;
-
-	$suffix      = 1 === $instance ? '' : '-' . $instance;
+	$suffix      = wp_user_avatars_get_editor_id_suffix();
 	$file_id     = 'wp-user-avatars' . $suffix;
 	$photo_id    = 'wp-user-avatars-photo' . $suffix;
 	$actions_id  = 'wp-user-avatars-actions' . $suffix;
@@ -159,6 +161,7 @@ function wp_user_avatars_frontend_editor_content( WP_User $user ) {
 		data-upload-nonce="<?php echo esc_attr( wp_create_nonce( 'upload_wp_user_avatars_nonce' ) ); ?>"
 		data-media-nonce="<?php echo esc_attr( wp_create_nonce( 'assign_wp_user_avatars_nonce' ) ); ?>"
 		data-delete-nonce="<?php echo esc_attr( wp_create_nonce( 'remove_wp_user_avatars_nonce' ) ); ?>"
+		data-has-avatar="<?php echo $has_avatar ? '1' : '0'; ?>"
 	>
 		<?php // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps(). ?>
 		<?php if ( current_user_can( 'edit_avatar', $user->ID ) ) : ?>
@@ -184,7 +187,7 @@ function wp_user_avatars_frontend_editor_content( WP_User $user ) {
 						<div class="wp-user-avatars-action-buttons">
 							<?php // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom avatar capability mapped by wp_user_avatars_meta_caps(). ?>
 							<?php if ( current_user_can( 'select_avatar', $user->ID ) ) : ?>
-								<button type="button" class="button hide-if-no-js wp-user-avatars-media" id="<?php echo esc_attr( $media_id ); ?>">
+								<button type="button" class="button wp-user-avatars-media" id="<?php echo esc_attr( $media_id ); ?>" hidden>
 									<?php esc_html_e( 'Choose from Media', 'wp-user-avatars' ); ?>
 								</button>
 							<?php endif; ?>
@@ -206,7 +209,6 @@ function wp_user_avatars_frontend_editor_content( WP_User $user ) {
 							<?php endif; ?>
 						</div>
 
-						<?php wp_nonce_field( 'wp_user_avatars_nonce', '_wp_user_avatars_nonce', false ); ?>
 						<p id="<?php echo esc_attr( $feedback_id ); ?>" class="description wp-user-avatars-feedback" aria-live="polite"></p>
 					</div>
 				</div>
@@ -220,9 +222,9 @@ function wp_user_avatars_frontend_editor_content( WP_User $user ) {
 				$user->wp_user_avatars_rating = 'G';
 			}
 			?>
-			<div class="wp-user-avatars-rating-row<?php echo $has_avatar ? '' : ' fancy-hidden'; ?>">
-				<div id="<?php echo esc_attr( $ratings_id ); ?>" class="wp-user-avatars-ratings<?php echo $has_avatar ? '' : ' fancy-hidden'; ?>">
-					<fieldset <?php disabled( ! $has_avatar ); ?>>
+			<div class="wp-user-avatars-rating-row">
+				<div id="<?php echo esc_attr( $ratings_id ); ?>" class="wp-user-avatars-ratings">
+					<fieldset>
 						<legend><?php esc_html_e( 'Rating', 'wp-user-avatars' ); ?></legend>
 						<div class="wp-user-avatars-rating-options">
 							<?php wp_user_avatars_user_rating_form_field( $user ); ?>

@@ -41,6 +41,10 @@ final class AdminFunctionsTest extends TestCase {
 			'https://example.test/wp-admin/admin-ajax.php',
 			$GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['ajaxUrl']
 		);
+		$this->assertSame( 7, $GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['user_id'] );
+		$this->assertSame( 'remove_wp_user_avatars_nonce-nonce', $GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['deleteNonce'] );
+		$this->assertSame( 'assign_wp_user_avatars_nonce-nonce', $GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['mediaNonce'] );
+		$this->assertSame( 'upload_wp_user_avatars_nonce-nonce', $GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['uploadNonce'] );
 	}
 
 	/**
@@ -83,6 +87,9 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertNotFalse( $script );
 		$this->assertStringContainsString( "$( '.wp-user-avatars-editor' ).each", $script );
 		$this->assertStringContainsString( '$editor.find( \'.wp-user-avatars-upload\' )', $script );
+		$this->assertStringContainsString( ".prop( 'hidden', false )", $script );
+		$this->assertStringContainsString( '\'0\' === $editor.attr( \'data-has-avatar\' )', $script );
+		$this->assertStringContainsString( 'wp.media.frames.wp_user_avatars_modal', $script );
 		$this->assertStringNotContainsString( "$( '#wp-user-avatars-media' )", $script );
 		$this->assertStringNotContainsString( "$( '#wp-user-avatars-remove' )", $script );
 		$this->assertStringNotContainsString( "$( '#wp-user-avatars' )", $script );
@@ -104,19 +111,33 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertNotFalse( $script );
 		$this->assertNotFalse( $style );
 		$this->assertNotFalse( $rtl_style );
-		$this->assertSame( '5497a87bdf34c1dcf9075f4822279caf830720b6cc860323d3a19a8437a2c05f', hash( 'sha256', $script ) );
-		$this->assertSame( '689bfa16528522d09cf029fd8497b3a67211e2d85e804800cf9dae16da139546', hash( 'sha256', $style ) );
-		$this->assertSame( '6776d64ca275d70460c691144a0afd7a716c07c5d48e464664175b1ea5eac833', hash( 'sha256', $rtl_style ) );
+		$this->assertSame( '04162079409c1af09a9fadf0e0f9f9589c0b36a722b0b0cb764d4a35bc450766', hash( 'sha256', $script ) );
+		$this->assertSame( 'e9b7150c36d70f56be1679686129e2dcd10d75d3f086aaacc830637bd72e250e', hash( 'sha256', $style ) );
+		$this->assertSame( '5e7855217c003a667b8b41f0f7fe0cba546e7e62160d9a43c81385f53a51d374', hash( 'sha256', $rtl_style ) );
 		$this->assertStringContainsString( 'margin-inline-end: 10px;', $style );
-		$this->assertStringContainsString( '#wp-user-avatars-user-settings #wp-user-avatars-ratings fieldset', $style );
-		$this->assertStringContainsString( '#wp-user-avatars-user-settings #wp-user-avatars-ratings fieldset', $rtl_style );
+		$this->assertStringContainsString( '#wp-user-avatars-user-settings .wp-user-avatars-ratings fieldset', $style );
+		$this->assertStringContainsString( '#wp-user-avatars-user-settings .wp-user-avatars-ratings fieldset', $rtl_style );
 		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $style );
 		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $rtl_style );
 		$this->assertStringContainsString( '.wp-user-avatars-frontend-form .wp-user-avatars-rating-row', $style );
 		$this->assertStringContainsString( '.wp-user-avatars-frontend-form .wp-user-avatars-upload-layout', $style );
 		$this->assertStringContainsString( '--wp-user-avatars-card-background:', $style );
 		$this->assertStringNotContainsString( '.wp-user-avatars-frontend-form .form-table', $style );
-		$this->assertSame( 202610040009, wp_user_avatars_get_asset_version() );
+		$this->assertSame( 202610040010, wp_user_avatars_get_asset_version() );
+	}
+
+	/**
+	 * Verify AJAX responses provide enough source pixels for the front-end preview.
+	 *
+	 * @return void
+	 */
+	public function test_ajax_avatar_previews_use_the_frontend_source_size(): void {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$ajax = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/includes/ajax.php' );
+
+		$this->assertNotFalse( $ajax );
+		$this->assertSame( 3, substr_count( $ajax, 'wp_user_avatars_get_avatar_preview( $user_id, 250 )' ) );
+		$this->assertStringNotContainsString( 'wp_user_avatars_get_avatar_preview( $user_id, 90 )', $ajax );
 	}
 
 	/**

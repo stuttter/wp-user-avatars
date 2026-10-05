@@ -1,5 +1,5 @@
-#wp-user-avatars-photo,
-.wp-user-avatars-photo {
+#wp-user-avatars-user-settings .wp-user-avatars-photo,
+#user-avatar .wp-user-avatars-photo {
 	width: 90px;
 }
 
@@ -11,15 +11,15 @@
 	width: 90px;
 }
 
-#wp-user-avatars-actions div,
-#wp-user-avatars-actions input[type=file],
-.wp-user-avatars-actions div,
-.wp-user-avatars-actions input[type=file] {
+#wp-user-avatars-user-settings .wp-user-avatars-actions div,
+#wp-user-avatars-user-settings .wp-user-avatars-actions input[type=file],
+#user-avatar .wp-user-avatars-actions div,
+#user-avatar .wp-user-avatars-actions input[type=file] {
 	text-overflow: ellipsis;
 	width: 100%;
 }
-#wp-user-avatars-actions input[type=file],
-.wp-user-avatars-actions input[type=file] {
+#wp-user-avatars-user-settings .wp-user-avatars-actions input[type=file],
+#user-avatar .wp-user-avatars-actions input[type=file] {
 	margin: 0 0 10px;
 }
 
@@ -66,6 +66,18 @@
 
 .wp-user-avatars-frontend-form {
 	margin: 0;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-default-submit {
+	border: 0;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
 }
 
 .wp-user-avatars-frontend-form .wp-user-avatars-editor {
@@ -116,6 +128,10 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
+}
+
+.wp-user-avatars-frontend-form .wp-user-avatars-media[hidden] {
+	display: none;
 }
 
 .wp-user-avatars-frontend-form input[type="file"] {
@@ -259,7 +275,7 @@
 		display: none;
 	}
 
-	#wp-user-avatars-user-settings #wp-user-avatars-ratings fieldset {
+	#wp-user-avatars-user-settings .wp-user-avatars-ratings fieldset {
 		padding-left: 110px;
 	}
 
@@ -309,8 +325,8 @@ tr.user-profile-picture,
 	display: none;
 }
 
-#normal-sortables #wp-user-avatars-ratings fieldset,
-#side-sortables #wp-user-avatars-ratings fieldset {
+#normal-sortables .wp-user-avatars-ratings fieldset,
+#side-sortables .wp-user-avatars-ratings fieldset {
 	padding-left: 0;
 }
 
@@ -346,13 +362,13 @@ tr.user-profile-picture,
 	margin-bottom: 0;
 }
 
-#side-sortables #wp-user-avatars-photo,
-#side-sortables #wp-user-avatars-actions {
+#side-sortables .wp-user-avatars-photo,
+#side-sortables .wp-user-avatars-actions {
 	float: left;
 	width: 100%;
 }
 
-#side-sortables #wp-user-avatars-photo {
+#side-sortables .wp-user-avatars-photo {
 	text-align: center;
 }
 

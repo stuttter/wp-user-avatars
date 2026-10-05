@@ -12,7 +12,7 @@
 		left: 0;
 	}
 
-	#wp-user-avatars-user-settings #wp-user-avatars-ratings fieldset {
+	#wp-user-avatars-user-settings .wp-user-avatars-ratings fieldset {
 		padding-left: 0;
 		padding-right: 110px;
 	}
@@ -27,8 +27,8 @@
 	}
 }
 
-#normal-sortables #wp-user-avatars-ratings fieldset,
-#side-sortables #wp-user-avatars-ratings fieldset {
+#normal-sortables .wp-user-avatars-ratings fieldset,
+#side-sortables .wp-user-avatars-ratings fieldset {
 	padding-left: auto;
 	padding-right: 0;
 }
@@ -38,8 +38,8 @@
 	margin-left: 20px;
 }
 
-#side-sortables #wp-user-avatars-photo,
-#side-sortables #wp-user-avatars-actions {
+#side-sortables .wp-user-avatars-photo,
+#side-sortables .wp-user-avatars-actions {
 	float: right;
 }
 

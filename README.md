@@ -33,20 +33,26 @@ controls.
 The editor uses the same avatar capabilities, upload restrictions, ratings,
 and Media Library permissions as the WordPress profile and bbPress profile
 integrations. Users without Media Library access can still upload their own
-avatar when the site's avatar permissions allow it. The upload and remove
-controls also work when JavaScript is unavailable.
+avatar when the site's avatar permissions allow it. Uploads can include a
+rating without JavaScript. Rating changes and removal also work without
+JavaScript when an avatar already exists. Choosing an existing Media Library
+image requires JavaScript.
 
 Theme or plugin developers can render the same current-user editor with
 `wp_user_avatars_get_editor()`.
 
 The front-end editor uses semantic form groups instead of WordPress admin table
-markup. Themes can target the `wp-user-avatars-frontend-form` classes or set
-these custom properties on the block or one of the shortcode's ancestors:
+markup. Themes can target the `wp-user-avatars-frontend-form` classes. The block
+card accepts these properties on its wrapper:
 
 - `--wp-user-avatars-card-background`
 - `--wp-user-avatars-card-border-color`
 - `--wp-user-avatars-card-border-radius`
 - `--wp-user-avatars-card-shadow`
+
+The block controls and shortcode accept these properties on the block wrapper
+or any ancestor of the shortcode:
+
 - `--wp-user-avatars-button-background`
 - `--wp-user-avatars-button-border-color`
 - `--wp-user-avatars-button-color`
