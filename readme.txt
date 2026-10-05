@@ -58,6 +58,18 @@ If you like this plugin, you'll probably like these!
 
 It works OK, but you'll want to consider exactly what level of privacy is best for your installation.
 
+= How do I add the avatar editor to a normal page? =
+
+Add the User Avatar Editor block or `[wp_user_avatars]` shortcode to an existing page. Both display the avatar editor for the signed-in user and do not create a profile page, registration flow, or membership system.
+
+The block adds no heading or description by default. Add either inline in the editor when the surrounding page needs more context. The block also supports background, text, border, spacing, typography, and wide-alignment controls.
+
+The shortcode uses the same avatar capabilities, upload restrictions, ratings, and Media Library permissions as the WordPress profile and bbPress profile integrations. Users without Media Library access can still upload their own avatar when the site's avatar permissions allow it. Uploads can include a rating without JavaScript. Rating changes and removal also work without JavaScript when an avatar already exists. Choosing an existing Media Library image requires JavaScript.
+
+Theme and plugin developers can render the same current-user editor with `wp_user_avatars_get_editor()`.
+
+The front-end editor uses semantic form groups instead of WordPress admin table markup. Themes can customize the `wp-user-avatars-frontend-form` classes. The block exposes `--wp-user-avatars-card-*` CSS custom properties on its wrapper. The block controls and shortcode expose `--wp-user-avatars-button-*` and `--wp-user-avatars-primary-*` properties on the block wrapper or an ancestor of the shortcode.
+
 = How do I display a larger or sharper avatar? =
 
 WP User Avatars uses the image size requested by WordPress. Ask for the intended display size instead of enlarging the default 96-pixel image with CSS:
@@ -97,6 +109,9 @@ For a directly uploaded avatar or a locally stored Media Library attachment, a d
 * Development: https://github.com/stuttter/wp-user-avatars/discussions
 
 == Changelog ==
+
+= 2.1.0 =
+* Add a User Avatar Editor block and `[wp_user_avatars]` shortcode for normal pages.
 
 = 2.0.1 =
 * Avoid warnings and deny avatar capability checks without a valid target user.

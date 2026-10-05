@@ -14,7 +14,55 @@ I decided to create this plugin because no existing solutions integrated into Wo
 - Install through the WordPress plugin installer or Composer.
 - Activate WP User Avatars from the Plugins screen.
 - Edit a user profile to upload or select an avatar.
+- To provide the same editor on a normal page, add the `[wp_user_avatars]`
+  shortcode to that page.
 - Configure allowed roles and local-only avatars under Settings > Discussion.
+
+## Front-end editor
+
+The User Avatar Editor block and `[wp_user_avatars]` shortcode display the
+avatar editor for the signed-in user. Neither creates a profile page,
+registration flow, or membership system. Add either one to an existing page
+and control access to that page with the tools already used by your site.
+
+The block adds no heading or description by default. Add either inline in the
+editor when the surrounding page needs more context. It also supports the
+block editor's background, text, border, spacing, typography, and wide-alignment
+controls.
+
+The editor uses the same avatar capabilities, upload restrictions, ratings,
+and Media Library permissions as the WordPress profile and bbPress profile
+integrations. Users without Media Library access can still upload their own
+avatar when the site's avatar permissions allow it. Uploads can include a
+rating without JavaScript. Rating changes and removal also work without
+JavaScript when an avatar already exists. Choosing an existing Media Library
+image requires JavaScript.
+
+Theme or plugin developers can render the same current-user editor with
+`wp_user_avatars_get_editor()`.
+
+The front-end editor uses semantic form groups instead of WordPress admin table
+markup. Themes can target the `wp-user-avatars-frontend-form` classes. The block
+card accepts these properties on its wrapper:
+
+- `--wp-user-avatars-card-background`
+- `--wp-user-avatars-card-border-color`
+- `--wp-user-avatars-card-border-radius`
+- `--wp-user-avatars-card-shadow`
+
+The block controls and shortcode accept these properties on the block wrapper
+or any ancestor of the shortcode:
+
+- `--wp-user-avatars-button-background`
+- `--wp-user-avatars-button-border-color`
+- `--wp-user-avatars-button-color`
+- `--wp-user-avatars-button-hover-background`
+- `--wp-user-avatars-button-hover-border-color`
+- `--wp-user-avatars-button-hover-color`
+- `--wp-user-avatars-primary-background`
+- `--wp-user-avatars-primary-color`
+- `--wp-user-avatars-primary-hover-background`
+- `--wp-user-avatars-primary-hover-color`
 
 ## Help
 

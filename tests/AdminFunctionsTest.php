@@ -41,6 +41,10 @@ final class AdminFunctionsTest extends TestCase {
 			'https://example.test/wp-admin/admin-ajax.php',
 			$GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['ajaxUrl']
 		);
+		$this->assertSame( 7, $GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['user_id'] );
+		$this->assertSame( 'remove_wp_user_avatars_nonce-nonce', $GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['deleteNonce'] );
+		$this->assertSame( 'assign_wp_user_avatars_nonce-nonce', $GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['mediaNonce'] );
+		$this->assertSame( 'upload_wp_user_avatars_nonce-nonce', $GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['uploadNonce'] );
 	}
 
 	/**
@@ -69,5 +73,124 @@ final class AdminFunctionsTest extends TestCase {
 		$this->assertNotFalse( $script );
 		$this->assertStringNotContainsString( '$( \'#your-profile p.submit\' )', $script );
 		$this->assertStringNotContainsString( '$( \'#wp-user-avatars-user-settings p.submit\' )', $script );
+	}
+
+	/**
+	 * Verify each script action stays inside the editor that triggered it.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_script_scopes_actions_to_each_editor(): void {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$script = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/assets/js/user-avatars.js' );
+
+		$this->assertNotFalse( $script );
+		$this->assertStringContainsString( "$( '.wp-user-avatars-editor' ).each", $script );
+		$this->assertStringContainsString( '$editor.find( \'.wp-user-avatars-upload\' )', $script );
+		$this->assertStringContainsString( ".prop( 'hidden', false )", $script );
+		$this->assertStringContainsString( '\'0\' === $editor.attr( \'data-has-avatar\' )', $script );
+		$this->assertStringContainsString( 'wp.media.frames.wp_user_avatars_modal', $script );
+		$this->assertStringNotContainsString( "$( '#wp-user-avatars-media' )", $script );
+		$this->assertStringNotContainsString( "$( '#wp-user-avatars-remove' )", $script );
+		$this->assertStringNotContainsString( "$( '#wp-user-avatars' )", $script );
+	}
+
+	/**
+	 * Verify changes to the editor assets also invalidate production caches.
+	 *
+	 * @return void
+	 */
+	public function test_editor_asset_version_matches_reviewed_files(): void {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$script = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/assets/js/user-avatars.js' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$style = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/assets/css/user-avatars.css' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$rtl_style = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/assets/css/user-avatars-rtl.css' );
+
+		$this->assertNotFalse( $script );
+		$this->assertNotFalse( $style );
+		$this->assertNotFalse( $rtl_style );
+		$this->assertSame( '04162079409c1af09a9fadf0e0f9f9589c0b36a722b0b0cb764d4a35bc450766', hash( 'sha256', $script ) );
+		$this->assertSame( 'e9b7150c36d70f56be1679686129e2dcd10d75d3f086aaacc830637bd72e250e', hash( 'sha256', $style ) );
+		$this->assertSame( '5e7855217c003a667b8b41f0f7fe0cba546e7e62160d9a43c81385f53a51d374', hash( 'sha256', $rtl_style ) );
+		$this->assertStringContainsString( 'margin-inline-end: 10px;', $style );
+		$this->assertStringContainsString( '#wp-user-avatars-user-settings .wp-user-avatars-ratings fieldset', $style );
+		$this->assertStringContainsString( '#wp-user-avatars-user-settings .wp-user-avatars-ratings fieldset', $rtl_style );
+		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $style );
+		$this->assertStringNotContainsString( "\n\t#wp-user-avatars-ratings fieldset {", $rtl_style );
+		$this->assertStringContainsString( '.wp-user-avatars-frontend-form .wp-user-avatars-rating-row', $style );
+		$this->assertStringContainsString( '.wp-user-avatars-frontend-form .wp-user-avatars-upload-layout', $style );
+		$this->assertStringContainsString( '--wp-user-avatars-card-background:', $style );
+		$this->assertStringNotContainsString( '.wp-user-avatars-frontend-form .form-table', $style );
+		$this->assertSame( 202610040010, wp_user_avatars_get_asset_version() );
+	}
+
+	/**
+	 * Verify AJAX responses provide enough source pixels for the front-end preview.
+	 *
+	 * @return void
+	 */
+	public function test_ajax_avatar_previews_use_the_frontend_source_size(): void {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$ajax = file_get_contents( dirname( __DIR__ ) . '/wp-user-avatars/includes/ajax.php' );
+
+		$this->assertNotFalse( $ajax );
+		$this->assertSame( 3, substr_count( $ajax, 'wp_user_avatars_get_avatar_preview( $user_id, 250 )' ) );
+		$this->assertStringNotContainsString( 'wp_user_avatars_get_avatar_preview( $user_id, 90 )', $ajax );
+	}
+
+	/**
+	 * Verify the block metadata and editor assets remain bound to the reviewed files.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_editor_block_assets_match_reviewed_files(): void {
+		$block_path = dirname( __DIR__ ) . '/wp-user-avatars/blocks/avatar-editor/';
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$metadata_source = file_get_contents( $block_path . 'block.json' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$editor_script = file_get_contents( $block_path . 'editor.js' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read a local test fixture.
+		$editor_style = file_get_contents( $block_path . 'editor.css' );
+		$editor_asset = require $block_path . 'editor.asset.php';
+
+		$this->assertNotFalse( $metadata_source );
+		$this->assertNotFalse( $editor_script );
+		$this->assertNotFalse( $editor_style );
+
+		$metadata = json_decode( $metadata_source, true, 512, JSON_THROW_ON_ERROR );
+
+		$this->assertSame( 'wp-user-avatars/avatar-editor', $metadata['name'] );
+		$this->assertSame( 3, $metadata['apiVersion'] );
+		$this->assertSame( 'file:./editor.js', $metadata['editorScript'] );
+		$this->assertSame( 'file:./editor.css', $metadata['editorStyle'] );
+		$this->assertSame( '', $metadata['attributes']['heading']['default'] );
+		$this->assertSame( '', $metadata['attributes']['description']['default'] );
+		$this->assertSame( array( 'wide' ), $metadata['supports']['align'] );
+		$this->assertTrue( $metadata['supports']['border']['radius'] );
+		$this->assertTrue( $metadata['supports']['color']['background'] );
+		$this->assertTrue( $metadata['supports']['spacing']['padding'] );
+		$this->assertTrue( $metadata['supports']['typography']['fontSize'] );
+		$this->assertStringContainsString( "registerBlockType( 'wp-user-avatars/avatar-editor'", $editor_script );
+		$this->assertStringContainsString( "'aria-label': __( 'Avatar editor heading'", $editor_script );
+		$this->assertStringContainsString( 'wp-user-avatars-block-preview__avatar', $editor_script );
+		$this->assertStringContainsString( "'button',", $editor_script );
+		$this->assertStringContainsString( 'disabled: true', $editor_script );
+		$this->assertStringContainsString( "__( 'Choose File'", $editor_script );
+		$this->assertStringContainsString( "__( 'Choose from Media'", $editor_script );
+		$this->assertStringContainsString( "'fieldset',", $editor_script );
+		$this->assertStringContainsString( "'legend'", $editor_script );
+		$this->assertStringContainsString( "__( 'Rating'", $editor_script );
+		$this->assertStringContainsString( "__( 'Save avatar'", $editor_script );
+		$this->assertStringContainsString( 'wp-user-avatars-block-preview', $editor_style );
+		$this->assertSame( '48468b7d402b4ea79b9275334d1afeea57e6c8f3a3dbdfe18cbe547f1667c815', hash( 'sha256', $editor_script ) );
+		$this->assertSame( '9fd291da482c06530e772dd9e5677c4349929f32929778ee0dcd064941267085', hash( 'sha256', $editor_style ) );
+		$this->assertSame( 'b888294e3458d89872f9b961025127227492c1c81857b3de6e4f1bb51ab2a9db', hash( 'sha256', $metadata_source ) );
+		$this->assertSame( '202610040010', $editor_asset['version'] );
+		$this->assertSame(
+			array( 'wp-block-editor', 'wp-blocks', 'wp-element', 'wp-i18n' ),
+			$editor_asset['dependencies']
+		);
 	}
 }

@@ -37,6 +37,7 @@ function _wp_user_avatars() { // phpcs:ignore WordPress.NamingConventions.Prefix
 	require_once $plugin_path . 'includes/capabilities.php';
 	require_once $plugin_path . 'includes/common.php';
 	require_once $plugin_path . 'includes/errors.php';
+	require_once $plugin_path . 'includes/frontend.php';
 	require_once $plugin_path . 'includes/metabox.php';
 	require_once $plugin_path . 'includes/sponsor.php';
 	require_once $plugin_path . 'includes/uninstall.php';
@@ -65,5 +66,5 @@ function wp_user_avatars_get_plugin_url() {
 function wp_user_avatars_get_asset_version() {
 	return defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG
 		? time()
-		: 202609290001;
+		: 202610040010;
 }
