@@ -16,8 +16,19 @@ I decided to create this plugin because no existing solutions integrated into Wo
 - Edit a user profile to upload or select an avatar.
 - To provide the same editor on a normal page, add the `[wp_user_avatars]`
   shortcode to that page.
-- Configure allowed roles and local-only avatars under Settings > Discussion.
+- Configure local-only avatars under Settings > Discussion.
 - Choose a site default from the Media Library under Settings > Discussion.
+
+## Documentation
+
+The [project wiki](https://github.com/stuttter/wp-user-avatars/wiki) includes:
+
+- [Getting Started](https://github.com/stuttter/wp-user-avatars/wiki/Getting-Started)
+- [Front-end Editor](https://github.com/stuttter/wp-user-avatars/wiki/Front-end-Editor)
+- [Theme and Plugin Integration](https://github.com/stuttter/wp-user-avatars/wiki/Theme-and-Plugin-Integration)
+- [Multisite and Storage](https://github.com/stuttter/wp-user-avatars/wiki/Multisite-and-Storage)
+- [Migration and Compatibility](https://github.com/stuttter/wp-user-avatars/wiki/Migration-and-Compatibility)
+- [Capabilities and Customization](https://github.com/stuttter/wp-user-avatars/wiki/Capabilities-and-Customization)
 
 ## Custom default avatar
 
