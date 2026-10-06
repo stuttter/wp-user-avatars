@@ -17,6 +17,19 @@ I decided to create this plugin because no existing solutions integrated into Wo
 - To provide the same editor on a normal page, add the `[wp_user_avatars]`
   shortcode to that page.
 - Configure allowed roles and local-only avatars under Settings > Discussion.
+- Choose a site default from the Media Library under Settings > Discussion.
+
+## Custom default avatar
+
+Choose a Custom Default Avatar under Settings > Discussion to add that image
+to WordPress's Default Avatar choices and select it for users without an
+individual avatar. This stores one site-level Media Library attachment. It does
+not write avatar metadata to every user.
+
+Choose a square image to avoid distortion. The setting is site-specific on
+multisite. WordPress still honors Mystery Person, Blank, and explicit defaults
+supplied by themes or plugins. Enable Block Gravatar when the selected fallback
+should be served directly without a Gravatar request.
 
 ## Front-end editor
 
