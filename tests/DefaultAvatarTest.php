@@ -21,7 +21,15 @@ final class DefaultAvatarTest extends TestCase {
 	 * @return void
 	 */
 	protected function setUp(): void {
-		$GLOBALS['wpua_test'] = array();
+		$GLOBALS['wpua_test'] = array(
+			'returns' => array(
+				'wp_attachment_is_image'     => true,
+				'wp_get_attachment_metadata' => array(
+					'width'  => 512,
+					'height' => 512,
+				),
+			),
+		);
 	}
 
 	/**
@@ -275,6 +283,106 @@ final class DefaultAvatarTest extends TestCase {
 	}
 
 	/**
+	 * Selecting a new image and then the existing Custom Image radio activates
+	 * the new attachment instead of stranding the old URL.
+	 *
+	 * @return void
+	 */
+	public function test_custom_image_radio_activates_the_new_picker_selection(): void {
+		$previous = array(
+			'media_id' => 42,
+			'url'      => 'https://example.test/uploads/old.jpg',
+		);
+
+		$GLOBALS['wpua_test']['callbacks']['get_option'] = static function ( $key ) use ( $previous ) {
+			return 'wp_user_avatars_default_avatar' === $key
+				? $previous
+				: 'https://example.test/uploads/old.jpg';
+		};
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url'] = 'https://example.test/uploads/new.jpg';
+
+		$this->assertSame(
+			array(
+				'media_id' => 99,
+				'url'      => 'https://example.test/uploads/new.jpg',
+			),
+			wp_user_avatars_sanitize_default_avatar(
+				array(
+					'media_id' => 99,
+					'activate' => 0,
+				)
+			)
+		);
+		$this->assertSame(
+			array( 'avatar_default', 'https://example.test/uploads/new.jpg' ),
+			$GLOBALS['wpua_test']['calls']['update_option'][0]
+		);
+	}
+
+	/**
+	 * Removing an active image recognizes its current URL after a migration.
+	 *
+	 * @return void
+	 */
+	public function test_removing_active_image_after_url_change_restores_mystery_person(): void {
+		$previous = array(
+			'media_id' => 42,
+			'url'      => 'http://old.example.test/uploads/default.jpg',
+		);
+
+		$GLOBALS['wpua_test']['callbacks']['get_option'] = static function ( $key ) use ( $previous ) {
+			return 'wp_user_avatars_default_avatar' === $key
+				? $previous
+				: 'https://new.example.test/uploads/default.jpg';
+		};
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url'] = 'https://new.example.test/uploads/default.jpg';
+
+		$this->assertSame( array(), wp_user_avatars_sanitize_default_avatar( array( 'media_id' => 0 ) ) );
+		$this->assertSame(
+			array( 'avatar_default', 'mystery' ),
+			$GLOBALS['wpua_test']['calls']['update_option'][0]
+		);
+	}
+
+	/**
+	 * Raw default reads preserve the registered display-filter priority.
+	 *
+	 * @return void
+	 */
+	public function test_raw_default_read_restores_the_original_filter_priority(): void {
+		$GLOBALS['wpua_test']['returns']['has_filter'] = 23;
+		$GLOBALS['wpua_test']['returns']['get_option'] = 'retro';
+
+		$this->assertSame( 'retro', wp_user_avatars_get_raw_avatar_default() );
+		$this->assertSame(
+			array( 'option_avatar_default', 'wp_user_avatars_option_avatar_default', 23 ),
+			$GLOBALS['wpua_test']['calls']['remove_filter'][0]
+		);
+		$this->assertSame(
+			array( 'option_avatar_default', 'wp_user_avatars_option_avatar_default', 23 ),
+			$GLOBALS['wpua_test']['calls']['add_filter'][0]
+		);
+	}
+
+	/**
+	 * Raw default updates do not add a filter that was not registered.
+	 *
+	 * @return void
+	 */
+	public function test_raw_default_update_does_not_restore_an_absent_filter(): void {
+		$GLOBALS['wpua_test']['returns']['has_filter'] = false;
+
+		wp_user_avatars_update_raw_avatar_default( 'blank' );
+
+		$this->assertSame(
+			array( 'avatar_default', 'blank' ),
+			$GLOBALS['wpua_test']['calls']['update_option'][0]
+		);
+		$this->assertArrayNotHasKey( 'remove_filter', $GLOBALS['wpua_test']['calls'] );
+		$this->assertArrayNotHasKey( 'add_filter', $GLOBALS['wpua_test']['calls'] );
+	}
+
+	/**
 	 * Add the custom image without removing WordPress defaults.
 	 *
 	 * @return void
@@ -395,6 +503,44 @@ final class DefaultAvatarTest extends TestCase {
 			wp_user_avatars_get_mystery_url(),
 			wp_user_avatars_maybe_use_local_mystery_person( 'https://secure.gravatar.com/avatar/hash?d=retro' )
 		);
+		$this->assertSame(
+			wp_user_avatars_get_mystery_url(),
+			wp_user_avatars_maybe_use_local_mystery_person(
+				'https://secure.gravatar.com/avatar/hash?d=https%3A%2F%2Fcdn.gravatar.com%2Ffallback.png'
+			)
+		);
+		$this->assertSame(
+			wp_user_avatars_get_mystery_url(),
+			wp_user_avatars_maybe_use_local_mystery_person(
+				'https://SECURE.GRAVATAR.COM/avatar/hash?d=https%3A%2F%2FCDN.GRAVATAR.COM%2Ffallback.png'
+			)
+		);
+	}
+
+	/**
+	 * A stored attachment that is no longer square is not served as a fallback.
+	 *
+	 * @return void
+	 */
+	public function test_runtime_rejects_a_stored_attachment_that_is_no_longer_square(): void {
+		$custom = array(
+			'media_id' => 42,
+			'url'      => 'https://example.test/uploads/default.jpg',
+		);
+		$GLOBALS['wpua_test']['callbacks']['get_option'] = static function ( $key ) use ( $custom ) {
+			return 'wp_user_avatars_default_avatar' === $key ? $custom : false;
+		};
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_metadata'] = array(
+			'width'  => 800,
+			'height' => 600,
+		);
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url'] = 'https://example.test/uploads/default.jpg';
+
+		$this->assertSame( '', wp_user_avatars_get_default_avatar_url() );
+		$this->assertSame(
+			'mystery',
+			wp_user_avatars_option_avatar_default( 'https://example.test/uploads/default.jpg' )
+		);
 	}
 
 	/**
@@ -487,6 +633,33 @@ final class DefaultAvatarTest extends TestCase {
 	}
 
 	/**
+	 * Saving Discussion settings clears a deleted active attachment quietly.
+	 *
+	 * @return void
+	 */
+	public function test_saving_a_deleted_stored_attachment_clears_it_without_an_error(): void {
+		$previous = array(
+			'media_id' => 42,
+			'url'      => 'https://example.test/uploads/default.jpg',
+		);
+
+		$GLOBALS['wpua_test']['callbacks']['get_option'] = static function ( $key ) use ( $previous ) {
+			return 'wp_user_avatars_default_avatar' === $key
+				? $previous
+				: 'https://example.test/uploads/default.jpg';
+		};
+		$GLOBALS['wpua_test']['returns']['wp_attachment_is_image'] = false;
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url']  = false;
+
+		$this->assertSame( array(), wp_user_avatars_sanitize_default_avatar( array( 'media_id' => 42 ) ) );
+		$this->assertSame(
+			array( 'avatar_default', 'mystery' ),
+			$GLOBALS['wpua_test']['calls']['update_option'][0]
+		);
+		$this->assertArrayNotHasKey( 'add_settings_error', $GLOBALS['wpua_test']['calls'] );
+	}
+
+	/**
 	 * Load Media Library assets only on the permitted Discussion screen.
 	 *
 	 * @return void
@@ -526,7 +699,7 @@ final class DefaultAvatarTest extends TestCase {
 			'media_id' => 42,
 			'url'      => 'https://example.test/uploads/default.jpg',
 		);
-		$GLOBALS['wpua_test']['returns']['wp_get_attachment_image_url'] = 'https://example.test/uploads/default-96.jpg';
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url'] = 'https://example.test/uploads/default.jpg';
 
 		ob_start();
 		wp_user_avatars_settings_field_default_avatar();
@@ -535,11 +708,33 @@ final class DefaultAvatarTest extends TestCase {
 		$this->assertStringContainsString( 'name="wp_user_avatars_default_avatar[media_id]"', $output );
 		$this->assertStringContainsString( 'name="wp_user_avatars_default_avatar[activate]"', $output );
 		$this->assertStringContainsString( 'value="42"', $output );
-		$this->assertStringContainsString( 'src="https://example.test/uploads/default-96.jpg"', $output );
+		$this->assertStringContainsString( 'src="https://example.test/uploads/default.jpg"', $output );
+		$this->assertStringContainsString( 'alt="Current custom default avatar"', $output );
 		$this->assertStringContainsString( 'Choose image', $output );
 		$this->assertStringContainsString( 'Remove image', $output );
 		$this->assertStringContainsString( 'does not assign an avatar to individual users', $output );
 		$this->assertStringContainsString( 'Choose a square image', $output );
+	}
+
+	/**
+	 * A stale attachment is replaced by an actionable warning and clear value.
+	 *
+	 * @return void
+	 */
+	public function test_settings_field_marks_a_stale_attachment_for_removal(): void {
+		$GLOBALS['wpua_test']['returns']['get_option'] = array(
+			'media_id' => 42,
+			'url'      => 'https://example.test/uploads/default.jpg',
+		);
+		$GLOBALS['wpua_test']['returns']['wp_attachment_is_image'] = false;
+
+		ob_start();
+		wp_user_avatars_settings_field_default_avatar();
+		$output = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'name="wp_user_avatars_default_avatar[media_id]" value="0"', $output );
+		$this->assertStringContainsString( 'unavailable or no longer square', $output );
+		$this->assertStringContainsString( 'wp-user-avatars-default-avatar-remove hide-if-no-js" hidden', $output );
 	}
 
 	/**
@@ -560,6 +755,9 @@ final class DefaultAvatarTest extends TestCase {
 		$this->assertStringContainsString( '$activate.val( 1 )', $script );
 		$this->assertStringContainsString( '$input.val( 0 )', $script );
 		$this->assertStringContainsString( 'attachment.width !== attachment.height', $script );
+		$this->assertStringContainsString( '$image.attr( \'src\', attachment.url )', $script );
+		$this->assertStringContainsString( '$select.trigger( \'focus\' )', $script );
+		$this->assertStringContainsString( 'i10n_WPUserAvatarsDefault.customUrl', $script );
 		$this->assertStringContainsString( 'input[name="avatar_default"]', $script );
 	}
 }

@@ -14,8 +14,9 @@
 		var $preview = $field.find( '.wp-user-avatars-default-avatar-preview' );
 		var $image = $preview.find( 'img' );
 		var $remove = $field.find( '.wp-user-avatars-default-avatar-remove' );
+		var $select = $field.find( '.wp-user-avatars-default-avatar-select' );
 
-		$field.find( '.wp-user-avatars-default-avatar-select' ).on( 'click', function () {
+		$select.on( 'click', function () {
 			if ( ! frame ) {
 				frame = wp.media( {
 					title: i10n_WPUserAvatarsDefault.chooseTitle,
@@ -32,13 +33,9 @@
 						return;
 					}
 
-					var previewUrl = attachment.sizes && attachment.sizes.thumbnail
-						? attachment.sizes.thumbnail.url
-						: attachment.url;
-
 					$input.val( attachment.id );
 					$activate.val( 1 );
-					$image.attr( 'src', previewUrl );
+					$image.attr( 'src', attachment.url );
 					$preview.prop( 'hidden', false );
 					$remove.prop( 'hidden', false );
 				} );
@@ -53,10 +50,11 @@
 			$image.attr( 'src', '' );
 			$preview.prop( 'hidden', true );
 			$remove.prop( 'hidden', true );
+			$select.trigger( 'focus' );
 		} );
 
 		$( 'input[name="avatar_default"]' ).on( 'change', function () {
-			$activate.val( 0 );
+			$activate.val( $( this ).val() === i10n_WPUserAvatarsDefault.customUrl ? 1 : 0 );
 		} );
 	} );
 }( jQuery ) );

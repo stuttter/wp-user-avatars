@@ -707,7 +707,8 @@ function wp_user_avatars_maybe_use_local_mystery_person( $url = '' ) {
 
 	// Bail if the URL is not hosted by Gravatar
 	$host = wp_parse_url( $url, PHP_URL_HOST );
-	if ( ! is_string( $host ) || ( 'gravatar.com' !== $host && '.gravatar.com' !== substr( $host, -13 ) ) ) {
+	$host = is_string( $host ) ? strtolower( $host ) : '';
+	if ( 'gravatar.com' !== $host && '.gravatar.com' !== substr( $host, -13 ) ) {
 		return $url;
 	}
 
@@ -728,8 +729,10 @@ function wp_user_avatars_maybe_use_local_mystery_person( $url = '' ) {
 	if ( isset( $query['d'] ) && is_string( $query['d'] ) ) {
 		$scheme = wp_parse_url( $query['d'], PHP_URL_SCHEME );
 		$host   = wp_parse_url( $query['d'], PHP_URL_HOST );
+		$host   = is_string( $host ) ? strtolower( $host ) : '';
 
-		if ( is_string( $scheme ) && in_array( strtolower( $scheme ), array( 'http', 'https' ), true ) && is_string( $host ) && '' !== $host ) {
+		$is_gravatar = 'gravatar.com' === $host || '.gravatar.com' === substr( $host, -13 );
+		if ( is_string( $scheme ) && in_array( strtolower( $scheme ), array( 'http', 'https' ), true ) && '' !== $host && ! $is_gravatar ) {
 			return esc_url_raw( $query['d'] );
 		}
 	}
@@ -822,12 +825,41 @@ function wp_user_avatars_get_default_avatar_url() {
 		return '';
 	}
 
-	$url = wp_get_attachment_url( absint( $avatar['media_id'] ) );
+	$media_id = absint( $avatar['media_id'] );
+	if ( ! wp_user_avatars_is_square_image( $media_id ) ) {
+		return '';
+	}
+
+	$url = wp_get_attachment_url( $media_id );
 	if ( ! is_string( $url ) || '' === $url ) {
 		return '';
 	}
 
 	return $url;
+}
+
+/**
+ * Return whether an attachment is an image with square source dimensions.
+ *
+ * The attachment is checked whenever the fallback is used because its file or
+ * metadata can change after it was selected in Discussion settings.
+ *
+ * @since 2.1.0
+ *
+ * @param int $media_id Attachment ID.
+ *
+ * @return bool
+ */
+function wp_user_avatars_is_square_image( $media_id ) {
+	if ( ! $media_id || ! wp_attachment_is_image( $media_id ) ) {
+		return false;
+	}
+
+	$metadata = wp_get_attachment_metadata( $media_id );
+	return is_array( $metadata )
+		&& ! empty( $metadata['width'] )
+		&& ! empty( $metadata['height'] )
+		&& (int) $metadata['width'] === (int) $metadata['height'];
 }
 
 /**

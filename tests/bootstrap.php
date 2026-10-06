@@ -87,6 +87,17 @@ class WP_Error {
 function add_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 function add_filter( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 /**
+ * Provide the has_filter test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function has_filter( ...$arguments ) {
+	$result = wpua_test_call( __FUNCTION__, $arguments );
+	return null === $result ? 10 : $result;
+}
+/**
  * Provide the add_shortcode test double.
  *
  * @param mixed ...$arguments Test input.

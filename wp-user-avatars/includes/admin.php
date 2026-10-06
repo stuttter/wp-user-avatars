@@ -48,12 +48,14 @@ function wp_user_avatars_register_settings() {
  * @return void
  */
 function wp_user_avatars_settings_field_default_avatar() {
-	$avatar   = get_option( 'wp_user_avatars_default_avatar', array() );
-	$media_id = is_array( $avatar ) && ! empty( $avatar['media_id'] )
+	$avatar          = get_option( 'wp_user_avatars_default_avatar', array() );
+	$stored_media_id = is_array( $avatar ) && ! empty( $avatar['media_id'] )
 		? absint( $avatar['media_id'] )
 		: 0;
-	$preview  = $media_id
-		? wp_get_attachment_image_url( $media_id, array( 96, 96 ) )
+	$is_valid        = $stored_media_id && wp_user_avatars_is_square_image( $stored_media_id );
+	$media_id        = $is_valid ? $stored_media_id : 0;
+	$preview         = $media_id
+		? wp_get_attachment_url( $media_id )
 		: false;
 	?>
 
@@ -61,12 +63,17 @@ function wp_user_avatars_settings_field_default_avatar() {
 		<input type="hidden" class="wp-user-avatars-default-avatar-id" name="wp_user_avatars_default_avatar[media_id]" value="<?php echo esc_attr( (string) $media_id ); ?>" />
 		<input type="hidden" class="wp-user-avatars-default-avatar-activate" name="wp_user_avatars_default_avatar[activate]" value="0" />
 		<p class="wp-user-avatars-default-avatar-preview"<?php echo $preview ? '' : ' hidden'; ?>>
-			<img src="<?php echo esc_url( $preview ? $preview : '' ); ?>" alt="" width="96" height="96" />
+			<img src="<?php echo esc_url( $preview ? $preview : '' ); ?>" alt="<?php echo esc_attr( esc_html__( 'Current custom default avatar', 'wp-user-avatars' ) ); ?>" width="96" height="96" />
 		</p>
 		<p>
 			<button type="button" class="button wp-user-avatars-default-avatar-select hide-if-no-js"><?php esc_html_e( 'Choose image', 'wp-user-avatars' ); ?></button>
 			<button type="button" class="button-link-delete wp-user-avatars-default-avatar-remove hide-if-no-js"<?php echo $media_id ? '' : ' hidden'; ?>><?php esc_html_e( 'Remove image', 'wp-user-avatars' ); ?></button>
 		</p>
+		<?php if ( $stored_media_id && ! $is_valid ) : ?>
+			<p class="notice notice-warning inline">
+				<?php esc_html_e( 'The previously selected image is unavailable or no longer square. Save changes to clear it, or choose another image.', 'wp-user-avatars' ); ?>
+			</p>
+		<?php endif; ?>
 		<p class="description">
 			<?php esc_html_e( 'Choose a square image to use when WordPress would otherwise show a default avatar. This does not assign an avatar to individual users. Enable Block Gravatar to serve the selected fallback without a Gravatar request.', 'wp-user-avatars' ); ?>
 		</p>
@@ -178,22 +185,32 @@ function wp_user_avatars_sanitize_default_avatar( $input ) {
 	$media_id     = is_array( $input ) && ! empty( $input['media_id'] ) ? absint( $input['media_id'] ) : 0;
 	$activate     = is_array( $input ) && ! empty( $input['activate'] );
 	$active       = wp_user_avatars_get_raw_avatar_default();
+	$previous_now = $previous_id ? wp_get_attachment_url( $previous_id ) : '';
+	$previous_now = is_string( $previous_now ) ? esc_url_raw( $previous_now ) : '';
+	$slot_active  = $active && ( $active === $previous_url || $active === $previous_now );
 
 	if ( 0 === $media_id ) {
-		if ( $previous_url && $active === $previous_url ) {
+		if ( $slot_active ) {
 			wp_user_avatars_update_raw_avatar_default( 'mystery' );
 		}
 
 		return array();
 	}
 
-	if ( ! wp_attachment_is_image( $media_id ) ) {
-		add_settings_error( 'wp_user_avatars_default_avatar', 'invalid-image', esc_html__( 'Choose a valid image attachment.', 'wp-user-avatars' ) );
-		return $previous;
-	}
+	if ( ! wp_user_avatars_is_square_image( $media_id ) ) {
+		if ( $media_id === $previous_id ) {
+			if ( $slot_active ) {
+				wp_user_avatars_update_raw_avatar_default( 'mystery' );
+			}
 
-	$metadata = wp_get_attachment_metadata( $media_id );
-	if ( ! is_array( $metadata ) || empty( $metadata['width'] ) || empty( $metadata['height'] ) || (int) $metadata['width'] !== (int) $metadata['height'] ) {
+			return array();
+		}
+
+		if ( ! wp_attachment_is_image( $media_id ) ) {
+			add_settings_error( 'wp_user_avatars_default_avatar', 'invalid-image', esc_html__( 'Choose a valid image attachment.', 'wp-user-avatars' ) );
+			return $previous;
+		}
+
 		add_settings_error( 'wp_user_avatars_default_avatar', 'image-not-square', esc_html__( 'Choose a square image so the default avatar is not distorted.', 'wp-user-avatars' ) );
 		return $previous;
 	}
@@ -206,7 +223,7 @@ function wp_user_avatars_sanitize_default_avatar( $input ) {
 	$url = esc_url_raw( $url );
 
 	// Keep an active custom default synchronized after URL or scheme changes.
-	if ( $activate || ( $previous_id === $media_id && $previous_url && $active === $previous_url ) ) {
+	if ( $activate || $slot_active ) {
 		wp_user_avatars_update_raw_avatar_default( $url );
 	}
 
@@ -224,9 +241,16 @@ function wp_user_avatars_sanitize_default_avatar( $input ) {
  * @return string
  */
 function wp_user_avatars_get_raw_avatar_default() {
-	remove_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+	$priority = has_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+	if ( false !== $priority ) {
+		remove_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default', $priority );
+	}
+
 	$default = get_option( 'avatar_default', 'mystery' );
-	add_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+
+	if ( false !== $priority ) {
+		add_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default', $priority );
+	}
 
 	return is_string( $default ) ? $default : 'mystery';
 }
@@ -242,9 +266,16 @@ function wp_user_avatars_get_raw_avatar_default() {
  * @return void
  */
 function wp_user_avatars_update_raw_avatar_default( $avatar_default ) {
-	remove_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+	$priority = has_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+	if ( false !== $priority ) {
+		remove_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default', $priority );
+	}
+
 	update_option( 'avatar_default', $avatar_default );
-	add_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+
+	if ( false !== $priority ) {
+		add_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default', $priority );
+	}
 }
 
 /**
@@ -274,6 +305,7 @@ function wp_user_avatars_settings_enqueue_scripts( $hook_suffix ) {
 			'chooseTitle'  => esc_html__( 'Choose a Default Avatar', 'wp-user-avatars' ),
 			'chooseButton' => esc_html__( 'Use as default avatar', 'wp-user-avatars' ),
 			'squareImage'  => esc_html__( 'Choose a square image so the default avatar is not distorted.', 'wp-user-avatars' ),
+			'customUrl'    => wp_user_avatars_get_default_avatar_url(),
 		)
 	);
 }
