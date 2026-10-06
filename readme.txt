@@ -54,6 +54,10 @@ If you like this plugin, you'll probably like these!
 
 == Frequently Asked Questions ==
 
+= Where can I find complete documentation? =
+
+The [project wiki](https://github.com/stuttter/wp-user-avatars/wiki) covers setup, the front-end editor, theme and plugin integration, multisite and remote storage, migration and compatibility, and capability-based customization.
+
 = How does this work with multisite? =
 
 It works OK, but you'll want to consider exactly what level of privacy is best for your installation.
