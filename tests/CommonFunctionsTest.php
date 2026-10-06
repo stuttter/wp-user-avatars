@@ -394,6 +394,7 @@ final class CommonFunctionsTest extends TestCase {
 				'size'          => 144,
 				'force_default' => false,
 				'found_avatar'  => true,
+				'alt'           => '',
 			),
 			wp_user_avatars_filter_pre_get_avatar_data(
 				array(
@@ -401,6 +402,7 @@ final class CommonFunctionsTest extends TestCase {
 					'size'          => 144,
 					'force_default' => false,
 					'found_avatar'  => false,
+					'alt'           => '',
 				),
 				7
 			)
@@ -429,6 +431,7 @@ final class CommonFunctionsTest extends TestCase {
 				'size'          => 144,
 				'force_default' => false,
 				'found_avatar'  => true,
+				'alt'           => 'Portrait of Jane & "JJJ" Doe',
 			),
 			wp_user_avatars_filter_pre_get_avatar_data(
 				array(
@@ -436,6 +439,7 @@ final class CommonFunctionsTest extends TestCase {
 					'size'          => 144,
 					'force_default' => false,
 					'found_avatar'  => false,
+					'alt'           => 'Portrait of Jane & "JJJ" Doe',
 				),
 				7
 			)
@@ -451,6 +455,7 @@ final class CommonFunctionsTest extends TestCase {
 		$args = array(
 			'size'          => 96,
 			'force_default' => false,
+			'alt'           => '',
 		);
 
 		$this->assertSame( $args, wp_user_avatars_filter_pre_get_avatar_data( $args, 7 ) );

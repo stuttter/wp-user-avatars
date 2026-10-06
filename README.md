@@ -41,6 +41,24 @@ image requires JavaScript.
 Theme or plugin developers can render the same current-user editor with
 `wp_user_avatars_get_editor()`.
 
+## Avatar alternative text
+
+WordPress creates avatar image markup. Pass meaningful alternative text as the
+fourth argument to `get_avatar()` when the avatar conveys information:
+
+```php
+echo get_avatar( $user_id, 96, '', 'Portrait of Jane Doe' );
+```
+
+WordPress escapes that value when it creates the HTML attribute. WP User
+Avatars supplies the image URL and preserves the caller's alternative text. It
+does not copy alternative text from a Media Library attachment. A directly
+uploaded avatar may not have an attachment, and WordPress uses the same empty
+value when a caller omits alternative text or deliberately marks an avatar as
+decorative. Leave the fourth argument empty when nearby text already identifies
+the person and the avatar adds no information. Themes that build their own
+`<img>` markup must set the `alt` attribute themselves.
+
 The front-end editor uses semantic form groups instead of WordPress admin table
 markup. Themes can target the `wp-user-avatars-frontend-form` classes. The block
 card accepts these properties on its wrapper:
