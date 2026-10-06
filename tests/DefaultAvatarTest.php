@@ -799,7 +799,7 @@ final class DefaultAvatarTest extends TestCase {
 		$this->assertStringContainsString( "selection.on( 'add remove reset change', updateSelectionValidation )", $script );
 		$this->assertStringContainsString( "'role': 'alert'", $script );
 		$this->assertStringContainsString( "'aria-live': 'assertive'", $script );
-		$this->assertStringContainsString( ".media-frame-toolbar .media-toolbar-secondary", $script );
+		$this->assertStringContainsString( '.media-frame-toolbar .media-toolbar-secondary', $script );
 		$this->assertStringContainsString( '$button.prop( \'disabled\', ! attachment || pending || invalid )', $script );
 		$this->assertStringContainsString( '$button.attr( \'aria-describedby\', errorId )', $script );
 		$this->assertStringNotContainsString( 'window.alert', $script );
