@@ -544,6 +544,27 @@ final class DefaultAvatarTest extends TestCase {
 	}
 
 	/**
+	 * An attachment without complete dimensions is not a valid square image.
+	 *
+	 * @return void
+	 */
+	public function test_runtime_rejects_an_attachment_without_dimensions(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_option']               = static function ( $key ) {
+			return 'wp_user_avatars_default_avatar' === $key
+				? array(
+					'media_id' => 42,
+					'url'      => 'https://example.test/uploads/default.svg',
+				)
+				: false;
+		};
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_metadata'] = array();
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url']      = 'https://example.test/uploads/default.svg';
+
+		$this->assertFalse( wp_user_avatars_is_square_image( 42 ) );
+		$this->assertSame( '', wp_user_avatars_get_default_avatar_url() );
+	}
+
+	/**
 	 * Resolve the selected default through the attachment after a URL change.
 	 *
 	 * @return void
@@ -678,6 +699,10 @@ final class DefaultAvatarTest extends TestCase {
 			'i10n_WPUserAvatarsDefault',
 			$GLOBALS['wpua_test']['calls']['wp_localize_script'][0][1]
 		);
+		$this->assertSame(
+			'mystery',
+			$GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['mysteryValue']
+		);
 
 		$GLOBALS['wpua_test'] = array();
 		wp_user_avatars_settings_enqueue_scripts( 'profile.php' );
@@ -687,6 +712,25 @@ final class DefaultAvatarTest extends TestCase {
 		wp_user_avatars_settings_enqueue_scripts( 'options-discussion.php' );
 		$this->assertArrayNotHasKey( 'wp_enqueue_media', $GLOBALS['wpua_test']['calls'] );
 		$this->assertArrayNotHasKey( 'wp_enqueue_script', $GLOBALS['wpua_test']['calls'] );
+	}
+
+	/**
+	 * Localize the URL-backed Mystery radio value when Gravatar is blocked.
+	 *
+	 * @return void
+	 */
+	public function test_discussion_screen_localizes_the_blocked_mystery_value(): void {
+		$GLOBALS['wpua_test']['returns']['current_user_can'] = true;
+		$GLOBALS['wpua_test']['callbacks']['get_option']     = static function ( $key ) {
+			return 'wp_user_avatars_block_gravatar' === $key;
+		};
+
+		wp_user_avatars_settings_enqueue_scripts( 'options-discussion.php' );
+
+		$this->assertSame(
+			wp_user_avatars_get_mystery_url(),
+			$GLOBALS['wpua_test']['calls']['wp_localize_script'][0][2]['mysteryValue']
+		);
 	}
 
 	/**
@@ -711,6 +755,7 @@ final class DefaultAvatarTest extends TestCase {
 		$this->assertStringContainsString( 'src="https://example.test/uploads/default.jpg"', $output );
 		$this->assertStringContainsString( 'alt="Current custom default avatar"', $output );
 		$this->assertStringContainsString( 'Choose image', $output );
+		$this->assertStringContainsString( 'class="button wp-user-avatars-default-avatar-remove hide-if-no-js"', $output );
 		$this->assertStringContainsString( 'Remove image', $output );
 		$this->assertStringContainsString( 'does not assign an avatar to individual users', $output );
 		$this->assertStringContainsString( 'Choose a square image', $output );
@@ -734,7 +779,7 @@ final class DefaultAvatarTest extends TestCase {
 
 		$this->assertStringContainsString( 'name="wp_user_avatars_default_avatar[media_id]" value="0"', $output );
 		$this->assertStringContainsString( 'unavailable or no longer square', $output );
-		$this->assertStringContainsString( 'wp-user-avatars-default-avatar-remove hide-if-no-js" hidden', $output );
+		$this->assertStringContainsString( 'button wp-user-avatars-default-avatar-remove hide-if-no-js hidden" hidden', $output );
 	}
 
 	/**
@@ -751,13 +796,24 @@ final class DefaultAvatarTest extends TestCase {
 		$this->assertStringContainsString( "library: { type: 'image' }", $script );
 		$this->assertStringContainsString( 'multiple: false', $script );
 		$this->assertStringContainsString( "frame.on( 'select'", $script );
+		$this->assertStringContainsString( "selection.on( 'add remove reset change', updateSelectionValidation )", $script );
+		$this->assertStringContainsString( "'role': 'alert'", $script );
+		$this->assertStringContainsString( "'aria-live': 'assertive'", $script );
+		$this->assertStringContainsString( ".media-frame-toolbar .media-toolbar-secondary", $script );
+		$this->assertStringContainsString( '$button.prop( \'disabled\', ! attachment || pending || invalid )', $script );
+		$this->assertStringContainsString( '$button.attr( \'aria-describedby\', errorId )', $script );
+		$this->assertStringNotContainsString( 'window.alert', $script );
 		$this->assertStringContainsString( '$input.val( attachment.id )', $script );
 		$this->assertStringContainsString( '$activate.val( 1 )', $script );
 		$this->assertStringContainsString( '$input.val( 0 )', $script );
-		$this->assertStringContainsString( 'attachment.width !== attachment.height', $script );
+		$this->assertStringContainsString( '! width || ! height || width !== height', $script );
+		$this->assertStringContainsString( 'attachment.uploading || ! attachment.type', $script );
 		$this->assertStringContainsString( '$image.attr( \'src\', attachment.url )', $script );
+		$this->assertStringContainsString( 'syncFrameSelection()', $script );
+		$this->assertStringContainsString( 'disableCustomDefault()', $script );
 		$this->assertStringContainsString( '$select.trigger( \'focus\' )', $script );
 		$this->assertStringContainsString( 'i10n_WPUserAvatarsDefault.customUrl', $script );
+		$this->assertStringContainsString( 'i10n_WPUserAvatarsDefault.mysteryValue', $script );
 		$this->assertStringContainsString( 'input[name="avatar_default"]', $script );
 	}
 }

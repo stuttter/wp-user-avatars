@@ -511,8 +511,13 @@ function wp_user_avatars_maybe_secure_url( $url, $site_id = null ) {
  */
 function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 
-	// Bail if forcing default
+	// Serve the custom default directly when WordPress renders its forced preview.
 	if ( ! empty( $args['force_default'] ) ) {
+		$custom_url = wp_user_avatars_get_default_avatar_url();
+		if ( $custom_url && isset( $args['default'] ) && $custom_url === $args['default'] ) {
+			return $custom_url;
+		}
+
 		return $url;
 	}
 

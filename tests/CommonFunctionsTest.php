@@ -373,6 +373,100 @@ final class CommonFunctionsTest extends TestCase {
 	}
 
 	/**
+	 * Verify a forced custom default preview uses its local attachment directly.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_filter_serves_forced_custom_default_directly(): void {
+		$GLOBALS['wpua_test']['returns']['get_option']                 = array(
+			'media_id' => 42,
+			'url'      => 'https://example.test/uploads/default.jpg',
+		);
+		$GLOBALS['wpua_test']['returns']['wp_attachment_is_image']     = true;
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_metadata'] = array(
+			'width'  => 512,
+			'height' => 512,
+		);
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url']      = 'https://example.test/uploads/default.jpg';
+
+		$this->assertSame(
+			'https://example.test/uploads/default.jpg',
+			wp_user_avatars_filter_get_avatar_url(
+				'https://secure.gravatar.com/avatar/hash',
+				7,
+				array(
+					'default'       => 'https://example.test/uploads/default.jpg',
+					'force_default' => true,
+					'size'          => 96,
+				)
+			)
+		);
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * Verify an unrelated forced default is not replaced by the custom image.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_filter_preserves_an_unrelated_forced_default(): void {
+		$GLOBALS['wpua_test']['returns']['get_option']                 = array(
+			'media_id' => 42,
+			'url'      => 'https://example.test/uploads/default.jpg',
+		);
+		$GLOBALS['wpua_test']['returns']['wp_attachment_is_image']     = true;
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_metadata'] = array(
+			'width'  => 512,
+			'height' => 512,
+		);
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url']      = 'https://example.test/uploads/default.jpg';
+
+		$this->assertSame(
+			'https://secure.gravatar.com/avatar/hash',
+			wp_user_avatars_filter_get_avatar_url(
+				'https://secure.gravatar.com/avatar/hash',
+				7,
+				array(
+					'default'       => 'retro',
+					'force_default' => true,
+					'size'          => 96,
+				)
+			)
+		);
+	}
+
+	/**
+	 * Verify an invalid custom attachment cannot replace a forced preview.
+	 *
+	 * @return void
+	 */
+	public function test_avatar_filter_rejects_an_invalid_forced_custom_default(): void {
+		$GLOBALS['wpua_test']['returns']['get_option']                 = array(
+			'media_id' => 42,
+			'url'      => 'https://example.test/uploads/default.jpg',
+		);
+		$GLOBALS['wpua_test']['returns']['wp_attachment_is_image']     = true;
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_metadata'] = array(
+			'width'  => 800,
+			'height' => 600,
+		);
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url']      = 'https://example.test/uploads/default.jpg';
+
+		$this->assertSame(
+			'https://secure.gravatar.com/avatar/hash',
+			wp_user_avatars_filter_get_avatar_url(
+				'https://secure.gravatar.com/avatar/hash',
+				7,
+				array(
+					'default'       => 'https://example.test/uploads/default.jpg',
+					'force_default' => true,
+					'size'          => 96,
+				)
+			)
+		);
+	}
+
+	/**
 	 * An early provider should not hide an explicitly assigned local avatar.
 	 *
 	 * @return void

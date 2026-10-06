@@ -67,7 +67,7 @@ function wp_user_avatars_settings_field_default_avatar() {
 		</p>
 		<p>
 			<button type="button" class="button wp-user-avatars-default-avatar-select hide-if-no-js"><?php esc_html_e( 'Choose image', 'wp-user-avatars' ); ?></button>
-			<button type="button" class="button-link-delete wp-user-avatars-default-avatar-remove hide-if-no-js"<?php echo $media_id ? '' : ' hidden'; ?>><?php esc_html_e( 'Remove image', 'wp-user-avatars' ); ?></button>
+			<button type="button" class="button wp-user-avatars-default-avatar-remove hide-if-no-js<?php echo $media_id ? '' : ' hidden'; ?>"<?php echo $media_id ? '' : ' hidden'; ?>><?php esc_html_e( 'Remove image', 'wp-user-avatars' ); ?></button>
 		</p>
 		<?php if ( $stored_media_id && ! $is_valid ) : ?>
 			<p class="notice notice-warning inline">
@@ -306,6 +306,7 @@ function wp_user_avatars_settings_enqueue_scripts( $hook_suffix ) {
 			'chooseButton' => esc_html__( 'Use as default avatar', 'wp-user-avatars' ),
 			'squareImage'  => esc_html__( 'Choose a square image so the default avatar is not distorted.', 'wp-user-avatars' ),
 			'customUrl'    => wp_user_avatars_get_default_avatar_url(),
+			'mysteryValue' => get_option( 'wp_user_avatars_block_gravatar' ) ? wp_user_avatars_get_mystery_url() : 'mystery',
 		)
 	);
 }
