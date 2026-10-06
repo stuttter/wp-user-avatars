@@ -82,6 +82,14 @@ When you only need the URL, pass the size explicitly:
 
 WordPress requests a 2x source for `get_avatar()`, so the first example can also provide a sharper image on high-density displays when the uploaded source is large enough. Theme builders need to expose or pass the intended avatar size; CSS alone cannot recover detail from a 96-pixel URL.
 
+= How do I set alternative text for an avatar? =
+
+WordPress creates avatar image markup. Pass meaningful alternative text as the fourth argument to `get_avatar()` when the avatar conveys information:
+
+`echo get_avatar( $user_id, 96, '', 'Portrait of Jane Doe' );`
+
+WordPress escapes that value when it creates the HTML attribute. WP User Avatars supplies the image URL and preserves the caller's alternative text. It does not copy alternative text from a Media Library attachment. A directly uploaded avatar may not have an attachment, and WordPress uses the same empty value when a caller omits alternative text or deliberately marks an avatar as decorative. Leave the fourth argument empty when nearby text already identifies the person and the avatar adds no information. Themes that build their own `<img>` markup must set the `alt` attribute themselves.
+
 = How do I limit generated avatar sizes? =
 
 WP User Avatars creates a square derivative the first time WordPress requests an uncached size for a directly uploaded avatar. To disable future plugin-owned dynamic resizing, add this to a site plugin, must-use plugin, or your theme's `functions.php` file:
@@ -112,6 +120,7 @@ For a directly uploaded avatar or a locally stored Media Library attachment, a d
 
 = 2.1.0 =
 * Add a User Avatar Editor block and `[wp_user_avatars]` shortcode for normal pages.
+* Document avatar alternative-text behavior for themes and plugins.
 
 = 2.0.1 =
 * Avoid warnings and deny avatar capability checks without a valid target user.

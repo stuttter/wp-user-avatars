@@ -3,6 +3,7 @@
 ## 2.1.0
 
 - Add a standalone User Avatar Editor block and `[wp_user_avatars]` shortcode for normal pages.
+- Document avatar alternative-text behavior for themes and plugins.
 
 ## 2.0.1
 
