@@ -30,6 +30,18 @@ function add_settings_field( ...$arguments ) {
 }
 
 /**
+ * Provide the has_filter test double.
+ *
+ * @param mixed ...$arguments Test input.
+ *
+ * @return mixed
+ */
+function has_filter( ...$arguments ) {
+	$result = wpua_test_call( __FUNCTION__, $arguments );
+	return null === $result ? 10 : $result;
+}
+
+/**
  * Provide the absint test double.
  *
  * @param mixed $value Test input.
