@@ -19,6 +19,7 @@ add_filter( 'map_meta_cap', 'wp_user_avatars_meta_caps', 10, 4 );
 
 // Scripts
 add_action( 'admin_enqueue_scripts', 'wp_user_avatars_admin_enqueue_scripts' );
+add_action( 'admin_enqueue_scripts', 'wp_user_avatars_settings_enqueue_scripts' );
 add_action( 'wp_enqueue_scripts', 'wp_user_avatars_admin_enqueue_scripts' );
 
 // Front-end editor.

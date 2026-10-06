@@ -667,13 +667,22 @@ function wp_user_avatars_avatar_defaults( $avatar_defaults = array() ) {
 
 	// Default
 	$new_avatar_defaults = $avatar_defaults;
+	$custom_url          = wp_user_avatars_get_default_avatar_url();
 
 	// Maybe block Gravatars
 	if ( get_option( 'wp_user_avatars_block_gravatar' ) ) {
-		$new_avatar_defaults = array(
+		$new_avatar_defaults = array();
+
+		if ( $custom_url ) {
+			$new_avatar_defaults[ $custom_url ] = esc_html__( 'Custom Image', 'wp-user-avatars' );
+		}
+
+		$new_avatar_defaults += array(
 			wp_user_avatars_get_mystery_url() => esc_html__( 'Mystery Person', 'wp-user-avatars' ),
 			'blank'                           => esc_html__( 'Blank', 'wp-user-avatars' ),
 		);
+	} elseif ( $custom_url ) {
+		$new_avatar_defaults[ $custom_url ] = esc_html__( 'Custom Image', 'wp-user-avatars' );
 	}
 
 	// Return avatar types, maybe without Gravatar options
@@ -707,6 +716,22 @@ function wp_user_avatars_maybe_use_local_mystery_person( $url = '' ) {
 	parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
 	if ( isset( $query['d'] ) && 'blank' === $query['d'] ) {
 		return wp_user_avatars_get_plugin_url() . 'assets/images/blank.svg';
+	}
+
+	// Serve the selected site fallback directly when it is requested explicitly.
+	$custom_url = wp_user_avatars_get_default_avatar_url();
+	if ( $custom_url && isset( $query['d'] ) && $custom_url === $query['d'] ) {
+		return $custom_url;
+	}
+
+	// Preserve an explicit URL default without contacting Gravatar.
+	if ( isset( $query['d'] ) && is_string( $query['d'] ) ) {
+		$scheme = wp_parse_url( $query['d'], PHP_URL_SCHEME );
+		$host   = wp_parse_url( $query['d'], PHP_URL_HOST );
+
+		if ( is_string( $scheme ) && in_array( strtolower( $scheme ), array( 'http', 'https' ), true ) && is_string( $host ) && '' !== $host ) {
+			return esc_url_raw( $query['d'] );
+		}
 	}
 
 	// Return the local mystery person
@@ -748,6 +773,15 @@ function wp_user_avatars_update_option_avatar_default( $value = null ) {
  * @return string
  */
 function wp_user_avatars_option_avatar_default( $value = null ) {
+	$custom = get_option( 'wp_user_avatars_default_avatar', array() );
+	if ( is_array( $custom ) && ! empty( $custom['url'] ) && is_string( $custom['url'] ) && $custom['url'] === $value ) {
+		$current_url = wp_user_avatars_get_default_avatar_url();
+		if ( $current_url ) {
+			return $current_url;
+		}
+
+		$value = 'mystery';
+	}
 
 	// Bail if not defaulting to mystery
 	if ( 'mystery' !== $value ) {
@@ -773,6 +807,27 @@ function wp_user_avatars_option_avatar_default( $value = null ) {
 function wp_user_avatars_get_mystery_url() {
 	$mystery = wp_user_avatars_get_plugin_url() . 'assets/images/mystery.jpg';
 	return apply_filters( 'wp_user_avatars_get_mystery_url', $mystery );
+}
+
+/**
+ * Return the current site's custom default avatar URL.
+ *
+ * @since 2.1.0
+ *
+ * @return string Empty when no valid attachment is configured.
+ */
+function wp_user_avatars_get_default_avatar_url() {
+	$avatar = get_option( 'wp_user_avatars_default_avatar', array() );
+	if ( ! is_array( $avatar ) || empty( $avatar['media_id'] ) ) {
+		return '';
+	}
+
+	$url = wp_get_attachment_url( absint( $avatar['media_id'] ) );
+	if ( ! is_string( $url ) || '' === $url ) {
+		return '';
+	}
+
+	return $url;
 }
 
 /**

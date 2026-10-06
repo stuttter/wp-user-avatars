@@ -47,6 +47,20 @@ final class HookRegistrationTest extends TestCase {
 	}
 
 	/**
+	 * Verify the default-avatar settings assets are registered.
+	 *
+	 * @return void
+	 */
+	public function test_default_avatar_settings_assets_are_registered(): void {
+		require dirname( __DIR__ ) . '/wp-user-avatars/includes/hooks.php';
+
+		$this->assertContains(
+			array( 'admin_enqueue_scripts', 'wp_user_avatars_settings_enqueue_scripts' ),
+			$GLOBALS['wpua_test']['calls']['add_action']
+		);
+	}
+
+	/**
 	 * Verify the early avatar provider compatibility hook is registered.
 	 *
 	 * @return void

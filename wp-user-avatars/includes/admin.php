@@ -23,6 +23,7 @@ function wp_user_avatars_register_settings() {
 	// Register the settings
 	register_setting( 'discussion', 'wp_user_avatars_roles',          'wp_user_avatars_sanitize_roles'          );
 	register_setting( 'discussion', 'wp_user_avatars_block_gravatar', 'wp_user_avatars_sanitize_block_gravatar' );
+	register_setting( 'discussion', 'wp_user_avatars_default_avatar', 'wp_user_avatars_sanitize_default_avatar' );
 
 	// Maybe hide by default
 	$args = get_option( 'show_avatars' )
@@ -34,6 +35,44 @@ function wp_user_avatars_register_settings() {
 
 	// Local only (no Gravatars)
 	add_settings_field( 'wp_user_avatars_block_gravatar', esc_html__( 'Block Gravatar', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_gravatar', 'discussion', 'avatars', $args );
+
+	// Site default.
+	add_settings_field( 'wp_user_avatars_default_avatar', esc_html__( 'Custom Default Avatar', 'wp-user-avatars' ), 'wp_user_avatars_settings_field_default_avatar', 'discussion', 'avatars', $args );
+}
+
+/**
+ * Settings field for choosing a site-specific default avatar.
+ *
+ * @since 2.1.0
+ *
+ * @return void
+ */
+function wp_user_avatars_settings_field_default_avatar() {
+	$avatar   = get_option( 'wp_user_avatars_default_avatar', array() );
+	$media_id = is_array( $avatar ) && ! empty( $avatar['media_id'] )
+		? absint( $avatar['media_id'] )
+		: 0;
+	$preview  = $media_id
+		? wp_get_attachment_image_url( $media_id, array( 96, 96 ) )
+		: false;
+	?>
+
+	<div id="wp-user-avatars-default-avatar-field">
+		<input type="hidden" class="wp-user-avatars-default-avatar-id" name="wp_user_avatars_default_avatar[media_id]" value="<?php echo esc_attr( (string) $media_id ); ?>" />
+		<input type="hidden" class="wp-user-avatars-default-avatar-activate" name="wp_user_avatars_default_avatar[activate]" value="0" />
+		<p class="wp-user-avatars-default-avatar-preview"<?php echo $preview ? '' : ' hidden'; ?>>
+			<img src="<?php echo esc_url( $preview ? $preview : '' ); ?>" alt="" width="96" height="96" />
+		</p>
+		<p>
+			<button type="button" class="button wp-user-avatars-default-avatar-select hide-if-no-js"><?php esc_html_e( 'Choose image', 'wp-user-avatars' ); ?></button>
+			<button type="button" class="button-link-delete wp-user-avatars-default-avatar-remove hide-if-no-js"<?php echo $media_id ? '' : ' hidden'; ?>><?php esc_html_e( 'Remove image', 'wp-user-avatars' ); ?></button>
+		</p>
+		<p class="description">
+			<?php esc_html_e( 'Choose a square image to use when WordPress would otherwise show a default avatar. This does not assign an avatar to individual users. Enable Block Gravatar to serve the selected fallback without a Gravatar request.', 'wp-user-avatars' ); ?>
+		</p>
+	</div>
+
+	<?php
 }
 
 /**
@@ -112,6 +151,131 @@ function wp_user_avatars_sanitize_roles( $input ) {
  */
 function wp_user_avatars_sanitize_block_gravatar( $input ) {
 	return (bool) $input;
+}
+
+/**
+ * Validate and activate a site-specific default avatar attachment.
+ *
+ * The last selection made in the picker or WordPress default list wins. Saving
+ * an unchanged attachment preserves the active choice, while removing an active
+ * custom attachment restores Mystery Person.
+ *
+ * @since 2.1.0
+ *
+ * @param mixed $input Submitted setting value.
+ *
+ * @phpstan-return array{media_id: int, url: string}|array{}
+ *
+ * @return array
+ */
+function wp_user_avatars_sanitize_default_avatar( $input ) {
+	$previous     = get_option( 'wp_user_avatars_default_avatar', array() );
+	$previous     = is_array( $previous ) ? $previous : array();
+	$previous_id  = ! empty( $previous['media_id'] ) ? absint( $previous['media_id'] ) : 0;
+	$previous_url = ! empty( $previous['url'] ) && is_string( $previous['url'] )
+		? $previous['url']
+		: '';
+	$media_id     = is_array( $input ) && ! empty( $input['media_id'] ) ? absint( $input['media_id'] ) : 0;
+	$activate     = is_array( $input ) && ! empty( $input['activate'] );
+	$active       = wp_user_avatars_get_raw_avatar_default();
+
+	if ( 0 === $media_id ) {
+		if ( $previous_url && $active === $previous_url ) {
+			wp_user_avatars_update_raw_avatar_default( 'mystery' );
+		}
+
+		return array();
+	}
+
+	if ( ! wp_attachment_is_image( $media_id ) ) {
+		add_settings_error( 'wp_user_avatars_default_avatar', 'invalid-image', esc_html__( 'Choose a valid image attachment.', 'wp-user-avatars' ) );
+		return $previous;
+	}
+
+	$metadata = wp_get_attachment_metadata( $media_id );
+	if ( ! is_array( $metadata ) || empty( $metadata['width'] ) || empty( $metadata['height'] ) || (int) $metadata['width'] !== (int) $metadata['height'] ) {
+		add_settings_error( 'wp_user_avatars_default_avatar', 'image-not-square', esc_html__( 'Choose a square image so the default avatar is not distorted.', 'wp-user-avatars' ) );
+		return $previous;
+	}
+
+	$url = wp_get_attachment_url( $media_id );
+	if ( ! is_string( $url ) || '' === $url ) {
+		return $previous;
+	}
+
+	$url = esc_url_raw( $url );
+
+	// Keep an active custom default synchronized after URL or scheme changes.
+	if ( $activate || ( $previous_id === $media_id && $previous_url && $active === $previous_url ) ) {
+		wp_user_avatars_update_raw_avatar_default( $url );
+	}
+
+	return array(
+		'media_id' => $media_id,
+		'url'      => $url,
+	);
+}
+
+/**
+ * Return the stored WordPress default without this plugin's display filter.
+ *
+ * @since 2.1.0
+ *
+ * @return string
+ */
+function wp_user_avatars_get_raw_avatar_default() {
+	remove_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+	$default = get_option( 'avatar_default', 'mystery' );
+	add_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+
+	return is_string( $default ) ? $default : 'mystery';
+}
+
+/**
+ * Update the stored WordPress default without the display filter hiding a
+ * migrated custom URL from WordPress's unchanged-value check.
+ *
+ * @since 2.1.0
+ *
+ * @param string $avatar_default Default avatar value.
+ *
+ * @return void
+ */
+function wp_user_avatars_update_raw_avatar_default( $avatar_default ) {
+	remove_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+	update_option( 'avatar_default', $avatar_default );
+	add_filter( 'option_avatar_default', 'wp_user_avatars_option_avatar_default' );
+}
+
+/**
+ * Load the default-avatar Media Library picker on Discussion settings.
+ *
+ * @since 2.1.0
+ *
+ * @param string $hook_suffix Current admin screen suffix.
+ *
+ * @return void
+ */
+function wp_user_avatars_settings_enqueue_scripts( $hook_suffix ) {
+	if ( 'options-discussion.php' !== $hook_suffix || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	wp_enqueue_media();
+
+	$url = wp_user_avatars_get_plugin_url();
+	$ver = wp_user_avatars_get_asset_version();
+
+	wp_enqueue_script( 'wp-user-avatars-default-avatar', $url . 'assets/js/default-avatar.js', array( 'jquery' ), $ver, true );
+	wp_localize_script(
+		'wp-user-avatars-default-avatar',
+		'i10n_WPUserAvatarsDefault',
+		array(
+			'chooseTitle'  => esc_html__( 'Choose a Default Avatar', 'wp-user-avatars' ),
+			'chooseButton' => esc_html__( 'Use as default avatar', 'wp-user-avatars' ),
+			'squareImage'  => esc_html__( 'Choose a square image so the default avatar is not distorted.', 'wp-user-avatars' ),
+		)
+	);
 }
 
 /**

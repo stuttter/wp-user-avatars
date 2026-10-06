@@ -70,6 +70,12 @@ Theme and plugin developers can render the same current-user editor with `wp_use
 
 The front-end editor uses semantic form groups instead of WordPress admin table markup. Themes can customize the `wp-user-avatars-frontend-form` classes. The block exposes `--wp-user-avatars-card-*` CSS custom properties on its wrapper. The block controls and shortcode expose `--wp-user-avatars-button-*` and `--wp-user-avatars-primary-*` properties on the block wrapper or an ancestor of the shortcode.
 
+= How do I set a default avatar for new users? =
+
+Choose a square Custom Default Avatar from the Media Library under Settings > Discussion. The selected image becomes an ordinary WordPress default for users who do not have an individual avatar. It is a site-level fallback and does not write avatar metadata to every user. Rectangular images are rejected to prevent distortion.
+
+The setting is site-specific on multisite. Mystery Person and Blank remain available. Enable Block Gravatar when the selected fallback should be served directly without a Gravatar request.
+
 = How do I display a larger or sharper avatar? =
 
 WP User Avatars uses the image size requested by WordPress. Ask for the intended display size instead of enlarging the default 96-pixel image with CSS:
@@ -117,6 +123,9 @@ For a directly uploaded avatar or a locally stored Media Library attachment, a d
 * Development: https://github.com/stuttter/wp-user-avatars/discussions
 
 == Changelog ==
+
+= 2.2.0 =
+* Add a site-specific custom default avatar from the Media Library.
 
 = 2.1.0 =
 * Add a User Avatar Editor block and `[wp_user_avatars]` shortcode for normal pages.

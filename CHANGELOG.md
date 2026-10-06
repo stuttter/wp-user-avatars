@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0
+
+- Add a site-specific custom default avatar from the Media Library.
+
 ## 2.1.0
 
 - Add a standalone User Avatar Editor block and `[wp_user_avatars]` shortcode for normal pages.
