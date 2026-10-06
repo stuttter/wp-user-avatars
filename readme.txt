@@ -10,7 +10,7 @@ Tags:              user, profile, avatar, media, local
 Requires PHP:      7.4
 Requires at least: 6.4
 Tested up to:      7.1
-Stable tag:        2.0.1
+Stable tag:        2.1.0
 
 Allow registered users to upload and select their own avatars.
 
@@ -120,6 +120,9 @@ For a directly uploaded avatar or a locally stored Media Library attachment, a d
 
 = 2.1.0 =
 * Add a User Avatar Editor block and `[wp_user_avatars]` shortcode for normal pages.
+* Keep local avatars ahead of avatar providers that return early, including when their URLs match.
+* Preserve the primary profile save action when avatar controls are present.
+* Explain avatar display sizes and generated-size limits.
 * Document avatar alternative-text behavior for themes and plugins.
 
 = 2.0.1 =

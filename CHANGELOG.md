@@ -3,6 +3,9 @@
 ## 2.1.0
 
 - Add a standalone User Avatar Editor block and `[wp_user_avatars]` shortcode for normal pages.
+- Keep local avatars ahead of avatar providers that return early, including when their URLs match.
+- Preserve the primary profile save action when avatar controls are present.
+- Explain avatar display sizes and generated-size limits.
 - Document avatar alternative-text behavior for themes and plugins.
 
 ## 2.0.1
