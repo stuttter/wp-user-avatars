@@ -294,7 +294,7 @@ final class DefaultAvatarTest extends TestCase {
 			'url'      => 'https://example.test/uploads/old.jpg',
 		);
 
-		$GLOBALS['wpua_test']['callbacks']['get_option'] = static function ( $key ) use ( $previous ) {
+		$GLOBALS['wpua_test']['callbacks']['get_option']          = static function ( $key ) use ( $previous ) {
 			return 'wp_user_avatars_default_avatar' === $key
 				? $previous
 				: 'https://example.test/uploads/old.jpg';
@@ -330,7 +330,7 @@ final class DefaultAvatarTest extends TestCase {
 			'url'      => 'http://old.example.test/uploads/default.jpg',
 		);
 
-		$GLOBALS['wpua_test']['callbacks']['get_option'] = static function ( $key ) use ( $previous ) {
+		$GLOBALS['wpua_test']['callbacks']['get_option']          = static function ( $key ) use ( $previous ) {
 			return 'wp_user_avatars_default_avatar' === $key
 				? $previous
 				: 'https://new.example.test/uploads/default.jpg';
@@ -527,14 +527,14 @@ final class DefaultAvatarTest extends TestCase {
 			'media_id' => 42,
 			'url'      => 'https://example.test/uploads/default.jpg',
 		);
-		$GLOBALS['wpua_test']['callbacks']['get_option'] = static function ( $key ) use ( $custom ) {
+		$GLOBALS['wpua_test']['callbacks']['get_option']               = static function ( $key ) use ( $custom ) {
 			return 'wp_user_avatars_default_avatar' === $key ? $custom : false;
 		};
 		$GLOBALS['wpua_test']['returns']['wp_get_attachment_metadata'] = array(
 			'width'  => 800,
 			'height' => 600,
 		);
-		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url'] = 'https://example.test/uploads/default.jpg';
+		$GLOBALS['wpua_test']['returns']['wp_get_attachment_url']      = 'https://example.test/uploads/default.jpg';
 
 		$this->assertSame( '', wp_user_avatars_get_default_avatar_url() );
 		$this->assertSame(
@@ -643,7 +643,7 @@ final class DefaultAvatarTest extends TestCase {
 			'url'      => 'https://example.test/uploads/default.jpg',
 		);
 
-		$GLOBALS['wpua_test']['callbacks']['get_option'] = static function ( $key ) use ( $previous ) {
+		$GLOBALS['wpua_test']['callbacks']['get_option']           = static function ( $key ) use ( $previous ) {
 			return 'wp_user_avatars_default_avatar' === $key
 				? $previous
 				: 'https://example.test/uploads/default.jpg';
@@ -695,7 +695,7 @@ final class DefaultAvatarTest extends TestCase {
 	 * @return void
 	 */
 	public function test_settings_field_preserves_attachment_identity_and_preview(): void {
-		$GLOBALS['wpua_test']['returns']['get_option']                  = array(
+		$GLOBALS['wpua_test']['returns']['get_option']            = array(
 			'media_id' => 42,
 			'url'      => 'https://example.test/uploads/default.jpg',
 		);
@@ -722,7 +722,7 @@ final class DefaultAvatarTest extends TestCase {
 	 * @return void
 	 */
 	public function test_settings_field_marks_a_stale_attachment_for_removal(): void {
-		$GLOBALS['wpua_test']['returns']['get_option'] = array(
+		$GLOBALS['wpua_test']['returns']['get_option']             = array(
 			'media_id' => 42,
 			'url'      => 'https://example.test/uploads/default.jpg',
 		);
