@@ -3,6 +3,7 @@
 ## 2.2.0
 
 - Add a site-specific custom default avatar from the Media Library.
+- Publish setup, integration, multisite, migration, and customization guides in the project wiki.
 
 ## 2.1.0
 
