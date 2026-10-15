@@ -43,7 +43,7 @@ function wp_user_avatars_register_settings() {
 /**
  * Settings field for choosing a site-specific default avatar.
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @return void
  */
@@ -167,7 +167,7 @@ function wp_user_avatars_sanitize_block_gravatar( $input ) {
  * an unchanged attachment preserves the active choice, while removing an active
  * custom attachment restores Mystery Person.
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @param mixed $input Submitted setting value.
  *
@@ -236,7 +236,7 @@ function wp_user_avatars_sanitize_default_avatar( $input ) {
 /**
  * Return the stored WordPress default without this plugin's display filter.
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @return string
  */
@@ -259,7 +259,7 @@ function wp_user_avatars_get_raw_avatar_default() {
  * Update the stored WordPress default without the display filter hiding a
  * migrated custom URL from WordPress's unchanged-value check.
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @param string $avatar_default Default avatar value.
  *
@@ -281,7 +281,7 @@ function wp_user_avatars_update_raw_avatar_default( $avatar_default ) {
 /**
  * Load the default-avatar Media Library picker on Discussion settings.
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @param string $hook_suffix Current admin screen suffix.
  *

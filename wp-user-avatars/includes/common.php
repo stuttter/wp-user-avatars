@@ -546,7 +546,7 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
  * their established order. This callback only handles requests that another
  * pre_get_avatar_data provider has already short-circuited.
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @param array $args        Processed avatar arguments.
  * @param mixed $id_or_email Avatar identity.
@@ -820,7 +820,7 @@ function wp_user_avatars_get_mystery_url() {
 /**
  * Return the current site's custom default avatar URL.
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @return string Empty when no valid attachment is configured.
  */
@@ -849,7 +849,7 @@ function wp_user_avatars_get_default_avatar_url() {
  * The attachment is checked whenever the fallback is used because its file or
  * metadata can change after it was selected in Discussion settings.
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @param int $media_id Attachment ID.
  *

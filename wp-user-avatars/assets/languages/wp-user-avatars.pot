@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP User Avatars 2.1.0\n"
+"Project-Id-Version: WP User Avatars 2.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-user-avatars\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-30T03:28:48+00:00\n"
+"POT-Creation-Date: 2026-10-15T17:55:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wp-user-avatars\n"
@@ -39,97 +39,163 @@ msgstr ""
 msgid "https://jjj.software"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:33
+#: wp-user-avatars/includes/admin.php:34
 msgid "Allowed Roles"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:36
+#: wp-user-avatars/includes/admin.php:37
 msgid "Block Gravatar"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:53
+#: wp-user-avatars/includes/admin.php:40
+msgid "Custom Default Avatar"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:66
+msgid "Current custom default avatar"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:69
+msgid "Choose image"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:70
+msgid "Remove image"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:74
+msgid "The previously selected image is unavailable or no longer square. Save changes to clear it, or choose another image."
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:78
+msgid "Choose a square image to use when WordPress would otherwise show a default avatar. This does not assign an avatar to individual users. Enable Block Gravatar to serve the selected fallback without a Gravatar request."
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:99
 msgid "Prevent avatar requests from reaching out to Gravatar.com."
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:73
+#: wp-user-avatars/includes/admin.php:119
 msgid "Upload Options"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:161
+#: wp-user-avatars/includes/admin.php:210
+msgid "Choose a valid image attachment."
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:214
+#: wp-user-avatars/includes/admin.php:307
+msgid "Choose a square image so the default avatar is not distorted."
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:305
+msgid "Choose a Default Avatar"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:306
+msgid "Use as default avatar"
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:370
 msgid "Choose an Avatar"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:162
+#: wp-user-avatars/includes/admin.php:371
 msgid "Set as avatar"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:167
+#: wp-user-avatars/includes/admin.php:376
+msgid "The avatar could not be selected. Please try again."
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:377
+msgid "The avatar could not be removed. Please try again."
+msgstr ""
+
+#: wp-user-avatars/includes/admin.php:378
 msgid "The avatar could not be uploaded. Please try again."
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:193
+#: wp-user-avatars/includes/admin.php:438
+#: wp-user-avatars/includes/frontend.php:175
 msgid "Avatar"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:226
+#: wp-user-avatars/includes/admin.php:489
+#: wp-user-avatars/includes/frontend.php:172
+#: wp-user-avatars/blocks/avatar-editor/editor.js:95
 msgid "Upload"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:249
+#: wp-user-avatars/includes/admin.php:513
+#: wp-user-avatars/includes/frontend.php:191
+#: wp-user-avatars/blocks/avatar-editor/editor.js:119
 msgid "Choose from Media"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:266
+#: wp-user-avatars/includes/admin.php:534
+#: wp-user-avatars/includes/frontend.php:207
 msgid "Remove"
 msgstr ""
 
-#: wp-user-avatars/includes/admin.php:287
-#: wp-user-avatars/includes/admin.php:290
+#: wp-user-avatars/includes/admin.php:555
+#: wp-user-avatars/includes/admin.php:562
+#: wp-user-avatars/includes/frontend.php:228
+#: wp-user-avatars/blocks/avatar-editor/editor.js:129
 msgid "Rating"
 msgstr ""
 
 #: wp-user-avatars/includes/ajax.php:38
-#: wp-user-avatars/includes/ajax.php:111
+#: wp-user-avatars/includes/ajax.php:113
 msgid "You do not have permission to edit this user."
 msgstr ""
 
-#: wp-user-avatars/includes/ajax.php:105
+#: wp-user-avatars/includes/ajax.php:106
 msgid "The upload request was incomplete."
 msgstr ""
 
-#: wp-user-avatars/includes/ajax.php:115
+#: wp-user-avatars/includes/ajax.php:117
 msgid "The upload request could not be verified."
 msgstr ""
 
-#: wp-user-avatars/includes/common.php:86
+#: wp-user-avatars/includes/common.php:88
 msgid "The selected file type is not allowed."
 msgstr ""
 
-#: wp-user-avatars/includes/common.php:117
+#: wp-user-avatars/includes/common.php:122
 msgid "The avatar could not be uploaded."
 msgstr ""
 
-#: wp-user-avatars/includes/common.php:204
+#: wp-user-avatars/includes/common.php:211
+#: wp-user-avatars/blocks/avatar-editor/editor.js:55
 msgid "Suitable for all audiences"
 msgstr ""
 
-#: wp-user-avatars/includes/common.php:205
+#: wp-user-avatars/includes/common.php:212
+#: wp-user-avatars/blocks/avatar-editor/editor.js:56
 msgid "Possibly offensive, usually for audiences 13 and above"
 msgstr ""
 
-#: wp-user-avatars/includes/common.php:206
+#: wp-user-avatars/includes/common.php:213
+#: wp-user-avatars/blocks/avatar-editor/editor.js:57
 msgid "Intended for adult audiences above 17"
 msgstr ""
 
-#: wp-user-avatars/includes/common.php:207
+#: wp-user-avatars/includes/common.php:214
+#: wp-user-avatars/blocks/avatar-editor/editor.js:58
 msgid "Even more mature than above"
 msgstr ""
 
-#: wp-user-avatars/includes/common.php:587
+#: wp-user-avatars/includes/common.php:682
+#: wp-user-avatars/includes/common.php:690
+msgid "Custom Image"
+msgstr ""
+
+#: wp-user-avatars/includes/common.php:686
 msgid "Mystery Person"
 msgstr ""
 
-#: wp-user-avatars/includes/common.php:588
+#: wp-user-avatars/includes/common.php:687
 msgid "Blank"
 msgstr ""
 
@@ -141,6 +207,31 @@ msgstr ""
 msgid "Avatar upload failed."
 msgstr ""
 
+#: wp-user-avatars/includes/frontend.php:92
+#: wp-user-avatars/includes/frontend.php:304
+msgid "You must log in to edit your avatar."
+msgstr ""
+
+#: wp-user-avatars/includes/frontend.php:103
+#: wp-user-avatars/includes/frontend.php:317
+#: wp-user-avatars/includes/frontend.php:337
+msgid "You do not have permission to edit this avatar."
+msgstr ""
+
+#: wp-user-avatars/includes/frontend.php:116
+#: wp-user-avatars/includes/frontend.php:126
+#: wp-user-avatars/blocks/avatar-editor/editor.js:156
+msgid "Save avatar"
+msgstr ""
+
+#: wp-user-avatars/includes/frontend.php:308
+msgid "The avatar request could not be verified."
+msgstr ""
+
+#: wp-user-avatars/includes/frontend.php:325
+msgid "The avatar request was not recognized."
+msgstr ""
+
 #: wp-user-avatars/includes/metabox.php:27
 msgctxt "users user-admin edit screen"
 msgid "Avatar"
@@ -149,4 +240,73 @@ msgstr ""
 #: wp-user-avatars/includes/sponsor.php:41
 msgctxt "verb"
 msgid "Sponsor"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:13
+msgid "User Avatar Editor"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:14
+msgid "Let the signed-in user update their avatar."
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:18
+msgid "avatar"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:19
+msgid "profile"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:20
+msgid "user"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:71
+msgid "Avatar editor heading"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:72
+msgid "Add an optional heading…"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:83
+msgid "Avatar editor description"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:84
+msgid "Add an optional description…"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:112
+msgid "Choose File"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/editor.js:114
+msgid "No file selected"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/block.json
+msgctxt "block title"
+msgid "User Avatar Editor"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/block.json
+msgctxt "block description"
+msgid "Let the signed-in user update their avatar."
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/block.json
+msgctxt "block keyword"
+msgid "avatar"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/block.json
+msgctxt "block keyword"
+msgid "profile"
+msgstr ""
+
+#: wp-user-avatars/blocks/avatar-editor/block.json
+msgctxt "block keyword"
+msgid "user"
 msgstr ""
