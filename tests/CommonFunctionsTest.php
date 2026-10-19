@@ -573,6 +573,56 @@ final class CommonFunctionsTest extends TestCase {
 	}
 
 	/**
+	 * The wpDiscuz default provider should not hide an assigned local avatar.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_default_provider_preserves_local_avatar_precedence(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full' => 'https://example.test/full.jpg',
+					96     => 'https://example.test/96.jpg',
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
+
+		$this->assertSame(
+			'https://example.test/96.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://wpdiscuz.example/default-user.jpg',
+				7,
+				array(
+					'force_default'                => false,
+					'size'                         => 96,
+					'wpdiscuz_gravatar_user_email' => 'user@example.test',
+				)
+			)
+		);
+	}
+
+	/**
+	 * Other providers should retain their established get_avatar_url order.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_compatibility_filter_ignores_unmarked_requests(): void {
+		$this->assertSame(
+			'https://provider.example/avatar.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://provider.example/avatar.jpg',
+				7,
+				array(
+					'force_default' => false,
+					'size'          => 96,
+				)
+			)
+		);
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
 	 * Verify avatar preview displays when public avatars are hidden.
 	 *
 	 * @return void

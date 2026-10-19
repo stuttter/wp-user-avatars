@@ -540,6 +540,31 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 }
 
 /**
+ * Restore local-avatar precedence after wpDiscuz applies its default avatar.
+ *
+ * The wpDiscuz plugin identifies its avatar requests with a custom argument and filters
+ * get_avatar_url at priority 99. Limit the later lookup to those requests so
+ * the established order for other avatar providers remains unchanged.
+ *
+ * @since 2.3.0
+ *
+ * @param string $url         Avatar URL.
+ * @param mixed  $id_or_email Avatar identity.
+ * @param array  $args        Processed avatar arguments.
+ *
+ * @phpstan-param array<string, mixed> $args
+ *
+ * @return string
+ */
+function wp_user_avatars_filter_wpdiscuz_avatar_url( $url, $id_or_email, $args ) {
+	if ( ! array_key_exists( 'wpdiscuz_gravatar_user_email', $args ) ) {
+		return $url;
+	}
+
+	return wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args );
+}
+
+/**
  * Restore local-avatar precedence when another provider returns early.
  *
  * Normal requests continue through get_avatar_url so existing filters retain

@@ -45,6 +45,7 @@ add_filter( 'pre_update_option_avatar_default', 'wp_user_avatars_update_option_a
 // Filter avatars
 add_filter( 'pre_get_avatar_data', 'wp_user_avatars_filter_pre_get_avatar_data', 99, 2 );
 add_filter( 'get_avatar_url', 'wp_user_avatars_filter_get_avatar_url', 10, 3 );
+add_filter( 'get_avatar_url', 'wp_user_avatars_filter_wpdiscuz_avatar_url', 100, 3 );
 add_filter( 'get_avatar_url', 'wp_user_avatars_maybe_use_local_mystery_person' );
 
 // Ajax
