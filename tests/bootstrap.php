@@ -86,6 +86,7 @@ class WP_Error {
 
 function add_action( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
 function add_filter( ...$arguments ) { wpua_test_call( __FUNCTION__, $arguments ); }
+function wpDiscuz() { return wpua_test_call( __FUNCTION__, func_get_args() ); }
 /**
  * Provide the add_shortcode test double.
  *

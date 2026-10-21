@@ -542,9 +542,10 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 /**
  * Restore local-avatar precedence after wpDiscuz applies its default avatar.
  *
- * The wpDiscuz plugin identifies its avatar requests with a custom argument and filters
- * get_avatar_url at priority 99. Limit the later lookup to those requests so
- * the established order for other avatar providers remains unchanged.
+ * The wpDiscuz plugin filters get_avatar_url at priority 99. It identifies its own
+ * avatar requests with a custom argument, and can also replace avatars sitewide with
+ * either of its configured defaults. Limit the later lookup to those cases so the
+ * established order for other avatar providers remains unchanged.
  *
  * @since 2.3.0
  *
@@ -557,7 +558,33 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
  * @return string
  */
 function wp_user_avatars_filter_wpdiscuz_avatar_url( $url, $id_or_email, $args ) {
-	if ( ! array_key_exists( 'wpdiscuz_gravatar_user_email', $args ) ) {
+	$marked_request = array_key_exists( 'wpdiscuz_gravatar_user_email', $args );
+	$default_url    = false;
+
+	if ( ! $marked_request && function_exists( 'wpDiscuz' ) ) {
+		$wpdiscuz = call_user_func( 'wpDiscuz' );
+
+		if ( is_object( $wpdiscuz ) ) {
+			$wpdiscuz_vars = get_object_vars( $wpdiscuz );
+			$options       = $wpdiscuz_vars['options'] ?? null;
+
+			if ( is_object( $options ) ) {
+				$options_vars   = get_object_vars( $options );
+				$thread_layouts = $options_vars['thread_layouts'] ?? null;
+
+				if ( is_array( $thread_layouts ) && ! empty( $thread_layouts['changeAvatarsEverywhere'] ) ) {
+					foreach ( array( 'defaultAvatarUrlForUser', 'defaultAvatarUrlForGuest' ) as $key ) {
+						if ( ! empty( $thread_layouts[ $key ] ) && $url === $thread_layouts[ $key ] ) {
+							$default_url = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if ( ! $marked_request && ! $default_url ) {
 		return $url;
 	}
 
