@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
+require_once __DIR__ . '/wpdiscuz-functions.php';
+
 final class CommonFunctionsTest extends TestCase {
 	/**
 	 * Reset the recorded WordPress calls.
@@ -569,6 +571,272 @@ final class CommonFunctionsTest extends TestCase {
 		);
 
 		$this->assertSame( $args, wp_user_avatars_filter_pre_get_avatar_data( $args, 7 ) );
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * The wpDiscuz default provider should not hide an assigned local avatar.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_default_provider_preserves_local_avatar_precedence(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full' => 'https://example.test/full.jpg',
+					96     => 'https://example.test/96.jpg',
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
+		$GLOBALS['wpua_test']['returns']['wpDiscuz']        = (object) array(
+			'options' => (object) array(
+				'thread_layouts' => array(
+					'defaultAvatarUrlForUser'  => 'https://wpdiscuz.example/default-user.jpg',
+					'defaultAvatarUrlForGuest' => '',
+					'changeAvatarsEverywhere'  => 0,
+				),
+			),
+		);
+
+		$this->assertSame(
+			'https://example.test/96.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://wpdiscuz.example/default-user.jpg',
+				7,
+				array(
+					'force_default'                => false,
+					'size'                         => 96,
+					'wpdiscuz_gravatar_user_email' => 'user@example.test',
+				)
+			)
+		);
+	}
+
+	/**
+	 * The sitewide wpDiscuz default should not hide an assigned local avatar.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_sitewide_default_preserves_local_avatar_precedence(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full' => 'https://example.test/full.jpg',
+					96     => 'https://example.test/96.jpg',
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
+		$GLOBALS['wpua_test']['returns']['wpDiscuz']        = (object) array(
+			'options' => (object) array(
+				'thread_layouts' => array(
+					'defaultAvatarUrlForUser'  => 'https://wpdiscuz.example/default-user.jpg',
+					'defaultAvatarUrlForGuest' => 'https://wpdiscuz.example/default-guest.jpg',
+					'changeAvatarsEverywhere'  => 1,
+				),
+			),
+		);
+
+		$this->assertSame(
+			'https://example.test/96.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://wpdiscuz.example/default-user.jpg',
+				7,
+				array(
+					'force_default' => false,
+					'size'          => 96,
+				)
+			)
+		);
+	}
+
+	/**
+	 * The sitewide wpDiscuz guest default should not hide an assigned local avatar.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_sitewide_guest_default_preserves_local_avatar_precedence(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full' => 'https://example.test/full.jpg',
+					96     => 'https://example.test/96.jpg',
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
+		$GLOBALS['wpua_test']['returns']['wpDiscuz']        = (object) array(
+			'options' => (object) array(
+				'thread_layouts' => array(
+					'defaultAvatarUrlForUser'  => 'https://wpdiscuz.example/default-user.jpg',
+					'defaultAvatarUrlForGuest' => 'https://wpdiscuz.example/default-guest.jpg',
+					'changeAvatarsEverywhere'  => 1,
+				),
+			),
+		);
+
+		$this->assertSame(
+			'https://example.test/96.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://wpdiscuz.example/default-guest.jpg',
+				new WP_Post( 7 ),
+				array(
+					'force_default' => false,
+					'size'          => 96,
+				)
+			)
+		);
+	}
+
+	/**
+	 * A marked request without a local avatar should retain the wpDiscuz default.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_default_provider_remains_without_local_avatar(): void {
+		$GLOBALS['wpua_test']['returns']['wpDiscuz'] = (object) array(
+			'options' => (object) array(
+				'thread_layouts' => array(
+					'defaultAvatarUrlForUser'  => 'https://wpdiscuz.example/default-user.jpg',
+					'defaultAvatarUrlForGuest' => '',
+					'changeAvatarsEverywhere'  => 0,
+				),
+			),
+		);
+
+		$this->assertSame(
+			'https://wpdiscuz.example/default-user.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://wpdiscuz.example/default-user.jpg',
+				7,
+				array(
+					'force_default'                => false,
+					'size'                         => 96,
+					'wpdiscuz_gravatar_user_email' => 'user@example.test',
+				)
+			)
+		);
+	}
+
+	/**
+	 * A forced default should remain authoritative for a marked wpDiscuz request.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_default_provider_preserves_forced_default(): void {
+		$GLOBALS['wpua_test']['returns']['wpDiscuz'] = (object) array(
+			'options' => (object) array(
+				'thread_layouts' => array(
+					'defaultAvatarUrlForUser'  => 'https://wpdiscuz.example/default-user.jpg',
+					'defaultAvatarUrlForGuest' => '',
+					'changeAvatarsEverywhere'  => 0,
+				),
+			),
+		);
+
+		$this->assertSame(
+			'https://wpdiscuz.example/default-user.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://wpdiscuz.example/default-user.jpg',
+				7,
+				array(
+					'force_default'                => true,
+					'size'                         => 96,
+					'wpdiscuz_gravatar_user_email' => 'user@example.test',
+				)
+			)
+		);
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * A marked request should remain unchanged when wpDiscuz did not apply a default.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_marked_request_preserves_other_provider_url(): void {
+		$GLOBALS['wpua_test']['returns']['wpDiscuz'] = (object) array(
+			'options' => (object) array(
+				'thread_layouts' => array(
+					'defaultAvatarUrlForUser'  => 'https://wpdiscuz.example/default-user.jpg',
+					'defaultAvatarUrlForGuest' => 'https://wpdiscuz.example/default-guest.jpg',
+					'changeAvatarsEverywhere'  => 0,
+				),
+			),
+		);
+
+		$this->assertSame(
+			'https://provider.example/avatar.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://provider.example/avatar.jpg',
+				7,
+				array(
+					'force_default'                => false,
+					'size'                         => 96,
+					'wpdiscuz_gravatar_user_email' => 'user@example.test',
+				)
+			)
+		);
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * A disabled sitewide default should not affect an unmarked request.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_compatibility_filter_ignores_disabled_sitewide_default(): void {
+		$GLOBALS['wpua_test']['returns']['wpDiscuz'] = (object) array(
+			'options' => (object) array(
+				'thread_layouts' => array(
+					'defaultAvatarUrlForUser' => 'https://wpdiscuz.example/default-user.jpg',
+					'changeAvatarsEverywhere' => 0,
+				),
+			),
+		);
+
+		$this->assertSame(
+			'https://wpdiscuz.example/default-user.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://wpdiscuz.example/default-user.jpg',
+				7,
+				array(
+					'force_default' => false,
+					'size'          => 96,
+				)
+			)
+		);
+		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
+	}
+
+	/**
+	 * Other providers should retain their established get_avatar_url order.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_compatibility_filter_ignores_unmarked_requests(): void {
+		$GLOBALS['wpua_test']['returns']['wpDiscuz'] = (object) array(
+			'options' => (object) array(
+				'thread_layouts' => array(
+					'defaultAvatarUrlForUser'  => 'https://wpdiscuz.example/default-user.jpg',
+					'defaultAvatarUrlForGuest' => 'https://wpdiscuz.example/default-guest.jpg',
+					'changeAvatarsEverywhere'  => 1,
+				),
+			),
+		);
+
+		$this->assertSame(
+			'https://provider.example/avatar.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://provider.example/avatar.jpg',
+				7,
+				array(
+					'force_default' => false,
+					'size'          => 96,
+				)
+			)
+		);
 		$this->assertArrayNotHasKey( 'get_user_meta', $GLOBALS['wpua_test']['calls'] ?? array() );
 	}
 

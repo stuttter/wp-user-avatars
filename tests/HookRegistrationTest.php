@@ -74,6 +74,20 @@ final class HookRegistrationTest extends TestCase {
 		);
 	}
 
+	/**
+	 * Verify the wpDiscuz compatibility hook runs after its default provider.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_avatar_provider_compatibility_hook_is_registered(): void {
+		require dirname( __DIR__ ) . '/wp-user-avatars/includes/hooks.php';
+
+		$this->assertContains(
+			array( 'get_avatar_url', 'wp_user_avatars_filter_wpdiscuz_avatar_url', 100, 3 ),
+			$GLOBALS['wpua_test']['calls']['add_filter']
+		);
+	}
+
 	public function test_native_profile_fields_remain_registered(): void {
 		require dirname( __DIR__ ) . '/wp-user-avatars/includes/hooks.php';
 

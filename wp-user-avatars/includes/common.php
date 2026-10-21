@@ -540,6 +540,61 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 }
 
 /**
+ * Restore local-avatar precedence after wpDiscuz applies its default avatar.
+ *
+ * The wpDiscuz plugin filters get_avatar_url at priority 99. It identifies its own
+ * avatar requests with a custom argument, and can also replace avatars sitewide with
+ * either of its configured defaults. Limit the later lookup to those cases so the
+ * established order for other avatar providers remains unchanged.
+ *
+ * @since 2.3.0
+ *
+ * @param string $url         Avatar URL.
+ * @param mixed  $id_or_email Avatar identity.
+ * @param array  $args        Processed avatar arguments.
+ *
+ * @phpstan-param array<string, mixed> $args
+ *
+ * @return string
+ */
+function wp_user_avatars_filter_wpdiscuz_avatar_url( $url, $id_or_email, $args ) {
+	$marked_request = array_key_exists( 'wpdiscuz_gravatar_user_email', $args );
+	$default_url    = false;
+	$sitewide       = false;
+
+	if ( function_exists( 'wpDiscuz' ) ) {
+		$wpdiscuz = call_user_func( 'wpDiscuz' );
+
+		if ( is_object( $wpdiscuz ) ) {
+			$wpdiscuz_vars = get_object_vars( $wpdiscuz );
+			$options       = $wpdiscuz_vars['options'] ?? null;
+
+			if ( is_object( $options ) ) {
+				$options_vars   = get_object_vars( $options );
+				$thread_layouts = $options_vars['thread_layouts'] ?? null;
+
+				if ( is_array( $thread_layouts ) ) {
+					$sitewide = ! empty( $thread_layouts['changeAvatarsEverywhere'] );
+
+					foreach ( array( 'defaultAvatarUrlForUser', 'defaultAvatarUrlForGuest' ) as $key ) {
+						if ( ! empty( $thread_layouts[ $key ] ) && $url === $thread_layouts[ $key ] ) {
+							$default_url = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if ( ! $default_url || ( ! $marked_request && ! $sitewide ) ) {
+		return $url;
+	}
+
+	return wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args );
+}
+
+/**
  * Restore local-avatar precedence when another provider returns early.
  *
  * Normal requests continue through get_avatar_url so existing filters retain
