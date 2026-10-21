@@ -560,8 +560,9 @@ function wp_user_avatars_filter_get_avatar_url( $url, $id_or_email, $args ) {
 function wp_user_avatars_filter_wpdiscuz_avatar_url( $url, $id_or_email, $args ) {
 	$marked_request = array_key_exists( 'wpdiscuz_gravatar_user_email', $args );
 	$default_url    = false;
+	$sitewide       = false;
 
-	if ( ! $marked_request && function_exists( 'wpDiscuz' ) ) {
+	if ( function_exists( 'wpDiscuz' ) ) {
 		$wpdiscuz = call_user_func( 'wpDiscuz' );
 
 		if ( is_object( $wpdiscuz ) ) {
@@ -572,7 +573,9 @@ function wp_user_avatars_filter_wpdiscuz_avatar_url( $url, $id_or_email, $args )
 				$options_vars   = get_object_vars( $options );
 				$thread_layouts = $options_vars['thread_layouts'] ?? null;
 
-				if ( is_array( $thread_layouts ) && ! empty( $thread_layouts['changeAvatarsEverywhere'] ) ) {
+				if ( is_array( $thread_layouts ) ) {
+					$sitewide = ! empty( $thread_layouts['changeAvatarsEverywhere'] );
+
 					foreach ( array( 'defaultAvatarUrlForUser', 'defaultAvatarUrlForGuest' ) as $key ) {
 						if ( ! empty( $thread_layouts[ $key ] ) && $url === $thread_layouts[ $key ] ) {
 							$default_url = true;
@@ -584,7 +587,7 @@ function wp_user_avatars_filter_wpdiscuz_avatar_url( $url, $id_or_email, $args )
 		}
 	}
 
-	if ( ! $marked_request && ! $default_url ) {
+	if ( ! $default_url || ( ! $marked_request && ! $sitewide ) ) {
 		return $url;
 	}
 
