@@ -641,6 +641,44 @@ final class CommonFunctionsTest extends TestCase {
 	}
 
 	/**
+	 * The sitewide wpDiscuz guest default should not hide an assigned local avatar.
+	 *
+	 * @return void
+	 */
+	public function test_wpdiscuz_sitewide_guest_default_preserves_local_avatar_precedence(): void {
+		$GLOBALS['wpua_test']['callbacks']['get_user_meta'] = static function ( $user_id, $key ) {
+			return 'wp_user_avatars' === $key
+				? array(
+					'full' => 'https://example.test/full.jpg',
+					96     => 'https://example.test/96.jpg',
+				)
+				: 'G';
+		};
+		$GLOBALS['wpua_test']['returns']['get_option']      = 'G';
+		$GLOBALS['wpua_test']['returns']['wpDiscuz']        = (object) array(
+			'options' => (object) array(
+				'thread_layouts' => array(
+					'defaultAvatarUrlForUser'  => 'https://wpdiscuz.example/default-user.jpg',
+					'defaultAvatarUrlForGuest' => 'https://wpdiscuz.example/default-guest.jpg',
+					'changeAvatarsEverywhere'  => 1,
+				),
+			),
+		);
+
+		$this->assertSame(
+			'https://example.test/96.jpg',
+			wp_user_avatars_filter_wpdiscuz_avatar_url(
+				'https://wpdiscuz.example/default-guest.jpg',
+				new WP_Post( 7 ),
+				array(
+					'force_default' => false,
+					'size'          => 96,
+				)
+			)
+		);
+	}
+
+	/**
 	 * A marked request without a local avatar should retain the wpDiscuz default.
 	 *
 	 * @return void
